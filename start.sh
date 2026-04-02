@@ -78,6 +78,11 @@ echo ""
 echo -e "${BLUE}🚀 Starting ClaudeContext worker...${NC}"
 cd "$WORKER_DIR"
 
+# Export 9router environment variables
+export ANTHROPIC_BASE_URL="http://localhost:20128/v1"
+export ANTHROPIC_AUTH_TOKEN="sk_9router"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="AWS"
+
 # Start in background and save PID
 PORT=$PORT node dist/src/index.js > "$LOG_FILE" 2>&1 &
 WORKER_PID=$!

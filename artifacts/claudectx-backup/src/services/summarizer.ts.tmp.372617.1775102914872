@@ -46,11 +46,6 @@ export async function summarizeSession(
     }).filter(Boolean).join('\n')
 
     const client = getClient()
-
-    console.log(`[Summarizer] Starting summarization for session ${sessionId}`)
-    console.log(`[Summarizer] Using model: ${CONFIG.summaryModel}`)
-    console.log(`[Summarizer] API Base URL: ${CONFIG.apiBaseUrl}`)
-
     const response = await client.messages.create({
       model: CONFIG.summaryModel,
       max_tokens: CONFIG.summaryMaxTokens,
@@ -87,22 +82,14 @@ Rules:
       }]
     })
 
-    console.log(`[Summarizer] Response received:`, JSON.stringify(response, null, 2))
+    console.log('API Response:', JSON.stringify(response, null, 2))
 
-    // Handle both Anthropic format (content array) and OpenAI format (choices array)
-    let raw = ''
-    if (response.content && response.content[0]) {
-      // Anthropic format
-      raw = response.content[0].type === 'text' ? response.content[0].text : ''
-    } else if ((response as any).choices && (response as any).choices[0]) {
-      // OpenAI format (from 9router)
-      raw = (response as any).choices[0].message.content || ''
-    } else {
-      throw new Error(`Invalid API response: ${JSON.stringify(response)}`)
+    if (!response.content || !Array.isArray(response.content) || response.content.length === 0) {
+      console.error('Invalid API response - no content array:', response)
+      throw new Error('API returned invalid response structure')
     }
 
-    console.log(`[Summarizer] Raw content:`, raw)
-
+    const raw = response.content[0].type === 'text' ? response.content[0].text : ''
     const summary: SessionSummary = JSON.parse(raw.replace(/```json\n?|\n?```/g, '').trim())
 
     queries.updateSession(sessionId, {

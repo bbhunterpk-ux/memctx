@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { queries } from '../db/queries'
 
-export const searchRouter = Router()
+export const searchRouter: import("express").Router = Router()
 
 searchRouter.post('/', (req, res) => {
   try {

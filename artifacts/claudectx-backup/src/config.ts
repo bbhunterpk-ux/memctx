@@ -11,7 +11,7 @@ export const CONFIG = {
   claudeProjectsDir: path.join(homedir(), '.claude', 'projects'),
   claudeSettingsPath: path.join(homedir(), '.claude', 'settings.json'),
 
-  port: parseInt(process.env.CLAUDECTX_PORT || process.env.PORT || '9999'),
+  port: parseInt(process.env.CLAUDECTX_PORT || process.env.PORT || '8000'),
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 
   defaultContextSessions: parseInt(process.env.CLAUDECTX_SESSIONS || '3'),

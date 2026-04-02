@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getDB } from '../db/client'
 
-export const observationsRouter = Router()
+export const observationsRouter: import("express").Router = Router()
 
 observationsRouter.get('/', (req, res) => {
   try {

@@ -44,7 +44,7 @@ async function main() {
   app.use('/api/health', healthRouter)
   app.use('/api/observations', observationsRouter)
 
-  const dashboardDist = path.join(__dirname, '..', 'dashboard', 'dist')
+  const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {

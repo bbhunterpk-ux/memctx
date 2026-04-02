@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { queries } from '../db/queries'
 
-export const projectsRouter = Router()
+export const projectsRouter: import("express").Router = Router()
 
 projectsRouter.get('/', (_req, res) => {
   try {

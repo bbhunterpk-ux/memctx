@@ -3,7 +3,7 @@ import { CONFIG } from '../config'
 import { getDB } from '../db/client'
 import { getQueueSize } from '../services/queue'
 
-export const healthRouter = Router()
+export const healthRouter: import("express").Router = Router()
 const startTime = Date.now()
 
 healthRouter.get('/', (_req, res) => {

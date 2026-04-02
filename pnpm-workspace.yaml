@@ -36,7 +36,7 @@ minimumReleaseAgeExclude:
 
 packages:
   - artifacts/*
-  - artifacts/claudectx/dashboard
+  - artifacts/claudectx-backup/dashboard
   - lib/*
   - lib/integrations/*
   - scripts

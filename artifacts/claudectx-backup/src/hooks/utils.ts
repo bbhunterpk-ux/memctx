@@ -1,6 +1,6 @@
 import * as http from 'http'
 
-const WORKER_PORT = process.env.CLAUDECTX_PORT || '9999'
+const WORKER_PORT = process.env.CLAUDECTX_PORT || '8000'
 
 export async function readStdin(): Promise<any> {
   return new Promise((resolve) => {

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { buildContextMarkdown } from '../services/context-builder'
 import { CONFIG } from '../config'
 
-export const contextRouter = Router()
+export const contextRouter: import("express").Router = Router()
 
 async function handleContext(req: any, res: any) {
   try {

@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, type Router as RouterType } from 'express'
 import { detectProject } from '../services/project-detector'
 import { enqueue } from '../services/queue'
 import { summarizeSession, snapshotSession } from '../services/summarizer'
 import { broadcast } from '../ws/broadcast'
 import { queries } from '../db/queries'
 
-export const hookRouter = Router()
+export const hookRouter: RouterType = Router()
 
 hookRouter.post('/', async (req, res) => {
   res.json({ ok: true }) // Always respond immediately

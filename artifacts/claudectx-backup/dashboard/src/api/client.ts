@@ -1,0 +1,33 @@
+const BASE = ''  // Same origin in production; proxied in dev
+
+export async function apiFetch(path: string, opts?: RequestInit) {
+  const res = await fetch(BASE + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...opts?.headers }
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
+export const api = {
+  getProjects: () => apiFetch('/api/projects'),
+  getProject: (id: string) => apiFetch(`/api/projects/${id}`),
+  getSessions: (params: Record<string, string | number> = {}) => {
+    const q = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))
+    return apiFetch(`/api/sessions?${q}`)
+  },
+  getSession: (id: string) => apiFetch(`/api/sessions/${id}`),
+  getHealth: () => apiFetch('/api/health'),
+  getContext: (cwd: string, n = 3) => apiFetch(`/api/context?cwd=${encodeURIComponent(cwd)}&n=${n}`),
+  search: (query: string, project_id?: string) =>
+    apiFetch('/api/search', {
+      method: 'POST',
+      body: JSON.stringify({ query, project_id })
+    }),
+  getObservations: (session_id: string) => apiFetch(`/api/observations?session_id=${session_id}`),
+}
+
+export function createWebSocket(): WebSocket {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return new WebSocket(`${proto}//${location.host}`)
+}

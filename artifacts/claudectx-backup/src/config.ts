@@ -12,11 +12,14 @@ export const CONFIG = {
   claudeSettingsPath: path.join(homedir(), '.claude', 'settings.json'),
 
   port: parseInt(process.env.CLAUDECTX_PORT || process.env.PORT || '8000'),
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+
+  // Use 9router endpoint from Claude Code settings
+  apiBaseUrl: process.env.ANTHROPIC_BASE_URL || 'http://localhost:20128/v1',
+  apiKey: process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_API_KEY || 'sk_9router',
 
   defaultContextSessions: parseInt(process.env.CLAUDECTX_SESSIONS || '3'),
   maxContextTokens: 2000,
-  summaryModel: 'claude-haiku-4-5-20251001' as const,
+  summaryModel: process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL || 'AWS',
   summaryMaxTokens: 1500,
   disableSummaries: process.env.CLAUDECTX_DISABLE_SUMMARIES === '1',
 }

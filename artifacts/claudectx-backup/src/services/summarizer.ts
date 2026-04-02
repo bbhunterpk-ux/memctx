@@ -17,7 +17,10 @@ interface SessionSummary {
 }
 
 function getClient(): Anthropic {
-  return new Anthropic({ apiKey: CONFIG.apiKey })
+  return new Anthropic({
+    apiKey: CONFIG.apiKey,
+    baseURL: CONFIG.apiBaseUrl
+  })
 }
 
 export async function summarizeSession(

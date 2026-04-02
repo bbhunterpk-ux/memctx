@@ -203,5 +203,164 @@ export const queries = {
       GROUP BY day
       ORDER BY day ASC
     `)
+  },
+
+  // Memory System Queries
+
+  // Preferences
+  getPreferences(category?: string) {
+    if (category) {
+      return all('SELECT * FROM preferences WHERE category = ? ORDER BY updated_at DESC', category)
+    }
+    return all('SELECT * FROM preferences ORDER BY category, key')
+  },
+
+  setPreference(category: string, key: string, value: string, confidence: number = 1.0, sessionId?: string) {
+    run(`
+      INSERT INTO preferences (category, key, value, confidence, source_session_id)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(category, key) DO UPDATE SET
+        value = excluded.value,
+        confidence = excluded.confidence,
+        source_session_id = excluded.source_session_id,
+        updated_at = unixepoch()
+    `, category, key, value, confidence, sessionId ?? null)
+  },
+
+  // Knowledge
+  getKnowledge(category?: string, limit: number = 10) {
+    if (category) {
+      return all(`
+        SELECT * FROM knowledge_items
+        WHERE category = ?
+        ORDER BY confidence DESC, updated_at DESC
+        LIMIT ?
+      `, category, limit)
+    }
+    return all(`
+      SELECT * FROM knowledge_items
+      ORDER BY confidence DESC, updated_at DESC
+      LIMIT ?
+    `, limit)
+  },
+
+  addKnowledge(item: { id: string; category: string; topic: string; content: string; confidence?: number; sessionId?: string }) {
+    run(`
+      INSERT INTO knowledge_items (id, category, topic, content, confidence, source_session_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        content = excluded.content,
+        confidence = excluded.confidence,
+        updated_at = unixepoch()
+    `, item.id, item.category, item.topic, item.content, item.confidence ?? 0.5, item.sessionId ?? null)
+  },
+
+  // Patterns
+  getPatterns(type?: string, limit: number = 10) {
+    if (type) {
+      return all(`
+        SELECT * FROM learned_patterns
+        WHERE pattern_type = ?
+        ORDER BY success_count DESC, last_used_at DESC
+        LIMIT ?
+      `, type, limit)
+    }
+    return all(`
+      SELECT * FROM learned_patterns
+      ORDER BY success_count DESC, last_used_at DESC
+      LIMIT ?
+    `, limit)
+  },
+
+  addPattern(pattern: { id: string; type: string; title: string; description: string; example?: string }) {
+    run(`
+      INSERT INTO learned_patterns (id, pattern_type, title, description, example)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        description = excluded.description,
+        example = excluded.example,
+        updated_at = unixepoch()
+    `, pattern.id, pattern.type, pattern.title, pattern.description, pattern.example ?? null)
+  },
+
+  incrementPatternSuccess(id: string) {
+    run(`
+      UPDATE learned_patterns
+      SET success_count = success_count + 1, last_used_at = unixepoch()
+      WHERE id = ?
+    `, id)
+  },
+
+  // Tasks
+  getTasks(status?: string, projectId?: string) {
+    const conditions: string[] = ['1=1']
+    const params: any[] = []
+    if (status) { conditions.push('status = ?'); params.push(status) }
+    if (projectId) { conditions.push('project_id = ?'); params.push(projectId) }
+    return all(`
+      SELECT * FROM tasks
+      WHERE ${conditions.join(' AND ')}
+      ORDER BY
+        CASE priority
+          WHEN 'urgent' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          ELSE 4
+        END,
+        created_at DESC
+    `, ...params)
+  },
+
+  addTask(task: { id: string; title: string; description?: string; status?: string; priority?: string; projectId?: string; sessionId?: string }) {
+    run(`
+      INSERT INTO tasks (id, title, description, status, priority, project_id, created_session_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, task.id, task.title, task.description ?? null, task.status ?? 'pending',
+       task.priority ?? 'medium', task.projectId ?? null, task.sessionId ?? null)
+  },
+
+  updateTask(id: string, fields: { status?: string; priority?: string; completedSessionId?: string }) {
+    const updates: string[] = []
+    const params: any[] = []
+    if (fields.status) { updates.push('status = ?'); params.push(fields.status) }
+    if (fields.priority) { updates.push('priority = ?'); params.push(fields.priority) }
+    if (fields.completedSessionId) {
+      updates.push('completed_session_id = ?');
+      params.push(fields.completedSessionId)
+      updates.push('completed_at = unixepoch()')
+    }
+    if (updates.length > 0) {
+      updates.push('updated_at = unixepoch()')
+      params.push(id)
+      run(`UPDATE tasks SET ${updates.join(', ')} WHERE id = ?`, ...params)
+    }
+  },
+
+  // Contacts
+  getContacts(type?: string) {
+    if (type) {
+      return all('SELECT * FROM contacts WHERE type = ? ORDER BY name', type)
+    }
+    return all('SELECT * FROM contacts ORDER BY type, name')
+  },
+
+  addContact(contact: { id: string; name: string; type: string; role?: string; email?: string; metadata?: string }) {
+    run(`
+      INSERT INTO contacts (id, name, type, role, email, metadata)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        name = excluded.name,
+        role = excluded.role,
+        email = excluded.email,
+        metadata = excluded.metadata,
+        updated_at = unixepoch()
+    `, contact.id, contact.name, contact.type, contact.role ?? null, contact.email ?? null, contact.metadata ?? null)
+  },
+
+  addInteraction(contactId: string, sessionId: string, type: string, context: string) {
+    run(`
+      INSERT INTO interactions (contact_id, session_id, interaction_type, context)
+      VALUES (?, ?, ?, ?)
+    `, contactId, sessionId, type, context)
   }
 }

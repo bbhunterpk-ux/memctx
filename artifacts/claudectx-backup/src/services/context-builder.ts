@@ -10,10 +10,22 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
   }
 
   const lines: string[] = [
-    `=== ClaudeContext: Last ${sessions.length} session(s) for [${project.name}] ===`,
+    `=== ClaudeContext Memory ===`,
     ''
   ]
 
+  // 1. User Preferences
+  const prefs = queries.getPreferences()
+  if (prefs.length > 0) {
+    lines.push('## Your Preferences')
+    prefs.forEach((p: any) => {
+      lines.push(`- ${p.key}: ${p.value}`)
+    })
+    lines.push('')
+  }
+
+  // 2. Recent Sessions
+  lines.push(`## Recent Sessions`)
   for (const s of sessions) {
     const date = new Date(s.started_at * 1000).toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -30,15 +42,6 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
       } catch {}
     }
 
-    if (s.summary_files_changed) {
-      try {
-        const files = JSON.parse(s.summary_files_changed) as string[]
-        if (files.length > 0) {
-          lines.push(`  Files: ${files.slice(0, 4).join(', ')}`)
-        }
-      } catch {}
-    }
-
     if (s.summary_next_steps) {
       try {
         const next = JSON.parse(s.summary_next_steps) as string[]
@@ -48,18 +51,39 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
       } catch {}
     }
 
-    if (s.summary_gotchas) {
-      try {
-        const gotchas = JSON.parse(s.summary_gotchas) as string[]
-        if (gotchas.length > 0) {
-          lines.push(`  Remember: ${gotchas[0]}`)
-        }
-      } catch {}
-    }
-
     lines.push('')
   }
 
-  lines.push('=== End of ClaudeContext ===')
+  // 3. Pending Tasks
+  const tasks = queries.getTasks('pending', project.id)
+  if (tasks.length > 0) {
+    lines.push('## Pending Tasks')
+    tasks.slice(0, 5).forEach((t: any) => {
+      lines.push(`- [${t.priority}] ${t.title}`)
+    })
+    lines.push('')
+  }
+
+  // 4. Domain Knowledge
+  const knowledge = queries.getKnowledge(undefined, 5)
+  if (knowledge.length > 0) {
+    lines.push('## What You Know')
+    knowledge.forEach((k: any) => {
+      lines.push(`- ${k.topic}: ${k.content}`)
+    })
+    lines.push('')
+  }
+
+  // 5. Learned Patterns
+  const patterns = queries.getPatterns(undefined, 5)
+  if (patterns.length > 0) {
+    lines.push('## Your Patterns')
+    patterns.forEach((p: any) => {
+      lines.push(`- ${p.title}: ${p.description}`)
+    })
+    lines.push('')
+  }
+
+  lines.push('=== End of ClaudeContext Memory ===')
   return lines.join('\n')
 }

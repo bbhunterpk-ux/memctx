@@ -17,6 +17,14 @@ export function initDB(): Database.Database {
   _db.pragma('foreign_keys = ON')
   _db.exec(SCHEMA_SQL)
 
+  // Run migrations after initial schema
+  try {
+    const { runMigrations } = require('./migrate')
+    runMigrations()
+  } catch (err) {
+    console.error('Migration error:', err)
+  }
+
   return _db
 }
 

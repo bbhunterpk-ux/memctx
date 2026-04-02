@@ -14,6 +14,11 @@ interface SessionSummary {
   next_steps: string[]
   gotchas: string[]
   tech_stack_notes: string[]
+  preferences?: Array<{ category: string; key: string; value: string; confidence: number }>
+  knowledge?: Array<{ category: string; topic: string; content: string; confidence: number }>
+  patterns?: Array<{ type: string; title: string; description: string; example?: string }>
+  tasks?: Array<{ title: string; description?: string; priority: string; status: string }>
+  contacts?: Array<{ name: string; type: string; role?: string; context: string }>
 }
 
 function getClient(): Anthropic {
@@ -55,7 +60,14 @@ export async function summarizeSession(
       model: CONFIG.summaryModel,
       max_tokens: CONFIG.summaryMaxTokens,
       stream: false,
-      system: `You are a technical session summarizer. Extract structured information from Claude Code session transcripts.
+      system: `You are a memory extraction system. Analyze the session and extract:
+1. Session summary (what was done)
+2. User preferences discovered (coding style, workflow, communication)
+3. Domain knowledge learned (technologies, patterns, gotchas)
+4. Problem-solving patterns used
+5. Pending tasks identified
+6. People/teams mentioned
+
 Always respond with ONLY valid JSON matching the exact schema provided. No preamble, no markdown, no explanation.`,
       messages: [{
         role: 'user',
@@ -73,7 +85,12 @@ Return this exact JSON schema:
   "files_changed": ["relative/path/to/file.ts"],
   "next_steps": ["concrete next thing to do"],
   "gotchas": ["important warning or thing to remember"],
-  "tech_stack_notes": ["framework/library/pattern note"]
+  "tech_stack_notes": ["framework/library/pattern note"],
+  "preferences": [{"category": "coding", "key": "style", "value": "TypeScript", "confidence": 0.9}],
+  "knowledge": [{"category": "technology", "topic": "9router", "content": "Returns OpenAI format", "confidence": 0.8}],
+  "patterns": [{"type": "debugging", "title": "Check logs first", "description": "Always check logs before diving into code"}],
+  "tasks": [{"title": "Fix bug", "description": "Details", "priority": "high", "status": "pending"}],
+  "contacts": [{"name": "John", "type": "person", "role": "engineer", "context": "discussed API"}]
 }
 
 Rules:
@@ -116,6 +133,42 @@ Rules:
       summary_tech_notes: JSON.stringify(summary.tech_stack_notes),
       status: 'completed'
     })
+
+    // Store extracted memory
+    if (summary.preferences) {
+      for (const pref of summary.preferences) {
+        queries.setPreference(pref.category, pref.key, pref.value, pref.confidence, sessionId)
+      }
+    }
+
+    if (summary.knowledge) {
+      for (const k of summary.knowledge) {
+        const id = `${k.category}_${k.topic}`.replace(/\s+/g, '_').toLowerCase()
+        queries.addKnowledge({ id, category: k.category, topic: k.topic, content: k.content, confidence: k.confidence, sessionId })
+      }
+    }
+
+    if (summary.patterns) {
+      for (const p of summary.patterns) {
+        const id = `${p.type}_${p.title}`.replace(/\s+/g, '_').toLowerCase()
+        queries.addPattern({ id, type: p.type, title: p.title, description: p.description, example: p.example })
+      }
+    }
+
+    if (summary.tasks) {
+      for (const t of summary.tasks) {
+        const id = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        queries.addTask({ id, title: t.title, description: t.description, priority: t.priority, status: t.status, projectId, sessionId })
+      }
+    }
+
+    if (summary.contacts) {
+      for (const c of summary.contacts) {
+        const id = c.name.replace(/\s+/g, '_').toLowerCase()
+        queries.addContact({ id, name: c.name, type: c.type, role: c.role })
+        queries.addInteraction(id, sessionId, 'mentioned', c.context)
+      }
+    }
 
     for (const item of [...summary.what_we_did, ...summary.decisions_made]) {
       queries.insertObservation({

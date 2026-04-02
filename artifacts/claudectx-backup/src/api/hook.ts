@@ -16,6 +16,17 @@ hookRouter.post('/', async (req, res) => {
   try {
     const project = await detectProject(cwd)
 
+    // Ensure session exists for all events (not just SessionStart)
+    const existingSession = queries.getSession(session_id)
+    if (!existingSession) {
+      queries.upsertSession({
+        id: session_id,
+        project_id: project.id,
+        started_at: Math.floor(Date.now() / 1000),
+        status: 'active'
+      })
+    }
+
     switch (event) {
       case 'SessionStart': {
         queries.upsertSession({
@@ -65,12 +76,34 @@ hookRouter.post('/', async (req, res) => {
       }
 
       case 'UserPromptSubmit': {
+        // Log user prompt as observation
+        const obs = {
+          session_id,
+          project_id: project.id,
+          event_type: 'user_message',
+          tool_name: null,
+          file_path: null,
+          content: data.prompt_preview || data.prompt || '',
+          metadata: JSON.stringify({})
+        }
+        queries.insertObservation(obs)
         queries.incrementTurnStats(session_id, 'turns')
         broadcast({ type: 'user_prompt', session_id, preview: data.prompt_preview })
         break
       }
 
       case 'Stop': {
+        // Log assistant response as observation
+        const obs = {
+          session_id,
+          project_id: project.id,
+          event_type: 'assistant_message',
+          tool_name: null,
+          file_path: null,
+          content: data.message_preview || '',
+          metadata: JSON.stringify({})
+        }
+        queries.insertObservation(obs)
         broadcast({ type: 'stop', session_id, preview: data.message_preview })
         break
       }

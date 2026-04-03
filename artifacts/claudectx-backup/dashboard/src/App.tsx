@@ -7,6 +7,7 @@ import Search from './pages/Search'
 import Live from './pages/Live'
 import Memory from './pages/Memory'
 import MetricsDashboard from './pages/MetricsDashboard'
+import Logs from './pages/Logs'
 import ToastContainer from './components/Toast'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/live" element={<Live />} />
           <Route path="/metrics" element={<MetricsDashboard />} />
+          <Route path="/logs" element={<Logs />} />
         </Routes>
       </Layout>
       <ToastContainer />

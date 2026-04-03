@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
-import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3 } from 'lucide-react'
+import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText } from 'lucide-react'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const loc = useLocation()
@@ -17,6 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { path: '/search', icon: Search, label: 'Search' },
     { path: '/live', icon: Radio, label: 'Live' },
     { path: '/metrics', icon: BarChart3, label: 'Metrics' },
+    { path: '/logs', icon: FileText, label: 'Logs' },
   ]
 
   return (

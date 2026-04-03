@@ -13,6 +13,7 @@
   --yellow: #eab308;
   --red: #ef4444;
   --blue: #3b82f6;
+  --orange: #f97316;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,3 +32,23 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 a { color: inherit; text-decoration: none; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

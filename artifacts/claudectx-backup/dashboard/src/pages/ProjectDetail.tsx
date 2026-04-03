@@ -5,11 +5,28 @@ import SessionCard from '../components/SessionCard'
 import ActivityChart from '../components/ActivityChart'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { toast } from '../components/Toast'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
   const [consolidating, setConsolidating] = useState(false)
   const [resyncing, setResyncing] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+    confirmText: string
+    confirmColor: string
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    confirmText: 'Confirm',
+    confirmColor: 'var(--accent)',
+  })
 
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', id],
@@ -29,11 +46,14 @@ export default function ProjectDetail() {
   const handleConsolidate = async () => {
     if (!id) return
     setConsolidating(true)
+    const toastId = toast.loading('Consolidating memory...')
     try {
       await api.consolidateMemory(id)
-      alert('Memory consolidation complete!')
+      toast.dismiss(toastId)
+      toast.success('Memory consolidation complete!')
     } catch (error) {
-      alert('Consolidation failed: ' + error)
+      toast.dismiss(toastId)
+      toast.error('Consolidation failed: ' + error)
     } finally {
       setConsolidating(false)
     }
@@ -42,22 +62,34 @@ export default function ProjectDetail() {
   const handleResync = async (force: boolean = false) => {
     if (!id) return
 
-    const confirmMsg = force
-      ? 'Force resync will regenerate ALL summaries with v2.0 fields. This may take a while. Continue?'
-      : 'Resync will only process sessions without summaries. Use Force Resync to regenerate existing summaries. Continue?'
-
-    if (!confirm(confirmMsg)) return
-
-    setResyncing(true)
-    try {
-      const result = await api.resyncProject(id, force)
-      alert(result.result.message)
-      refetchSessions()
-    } catch (error) {
-      alert('Resync failed: ' + error)
-    } finally {
-      setResyncing(false)
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: force ? 'Force Resync All Sessions' : 'Resync New Sessions',
+      message: force
+        ? 'This will regenerate ALL summaries with v2.0 fields (mood, complexity, blockers, resolved, key insights). This may take several minutes. Continue?'
+        : 'This will only process sessions without summaries. To regenerate existing summaries with v2.0 fields, use "Force Resync All". Continue?',
+      confirmText: force ? 'Force Resync' : 'Resync',
+      confirmColor: force ? 'var(--orange)' : 'var(--blue)',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        setResyncing(true)
+        const toastId = toast.loading('Queueing sessions for resync...', 0)
+        try {
+          const result = await api.resyncProject(id, force)
+          toast.update(toastId, `Queued ${result.result.queued} sessions. Processing...`, 50)
+          setTimeout(() => {
+            toast.dismiss(toastId)
+            toast.success(result.result.message)
+          }, 2000)
+          refetchSessions()
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Resync failed: ' + error)
+        } finally {
+          setResyncing(false)
+        }
+      }
+    })
   }
 
   const activityData = health?.uptime ? [] : [] // placeholder
@@ -228,6 +260,17 @@ export default function ProjectDetail() {
           {parsed.map((s: any) => <SessionCard key={s.id} session={s} />)}
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText="Cancel"
+        confirmColor={confirmDialog.confirmColor}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+      />
     </div>
   )
 }

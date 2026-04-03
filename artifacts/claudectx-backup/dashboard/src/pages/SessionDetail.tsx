@@ -28,44 +28,69 @@ function buildCopyText(session: any): string {
     lines.push('')
   }
 
-  if (session.summary_what_we_did?.length) {
+  const parseArray = (field: any) => {
+    if (!field) return []
+    if (Array.isArray(field)) return field
+    try {
+      return JSON.parse(field)
+    } catch {
+      return []
+    }
+  }
+
+  const whatWeDid = parseArray(session.summary_what_we_did)
+  if (whatWeDid.length) {
     lines.push('## What We Did')
-    session.summary_what_we_did.forEach((i: string) => lines.push(`- ${i}`))
+    whatWeDid.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_decisions?.length) {
+
+  const decisions = parseArray(session.summary_decisions)
+  if (decisions.length) {
     lines.push('## Decisions Made')
-    session.summary_decisions.forEach((i: string) => lines.push(`- ${i}`))
+    decisions.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_blockers?.length) {
+
+  const blockers = parseArray(session.summary_blockers)
+  if (blockers.length) {
     lines.push('## Blockers')
-    session.summary_blockers.forEach((i: string) => lines.push(`- ${i}`))
+    blockers.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_resolved?.length) {
+
+  const resolved = parseArray(session.summary_resolved)
+  if (resolved.length) {
     lines.push('## Resolved')
-    session.summary_resolved.forEach((i: string) => lines.push(`- ${i}`))
+    resolved.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_files_changed?.length) {
+
+  const filesChanged = parseArray(session.summary_files_changed)
+  if (filesChanged.length) {
     lines.push('## Files Changed')
-    session.summary_files_changed.forEach((i: string) => lines.push(`- ${i}`))
+    filesChanged.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_next_steps?.length) {
+
+  const nextSteps = parseArray(session.summary_next_steps)
+  if (nextSteps.length) {
     lines.push('## Next Steps')
-    session.summary_next_steps.forEach((i: string) => lines.push(`- ${i}`))
+    nextSteps.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_gotchas?.length) {
+
+  const gotchas = parseArray(session.summary_gotchas)
+  if (gotchas.length) {
     lines.push('## Gotchas / Remember')
-    session.summary_gotchas.forEach((i: string) => lines.push(`- ${i}`))
+    gotchas.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
-  if (session.summary_tech_notes?.length) {
+
+  const techNotes = parseArray(session.summary_tech_notes)
+  if (techNotes.length) {
     lines.push('## Tech Notes')
-    session.summary_tech_notes.forEach((i: string) => lines.push(`- ${i}`))
+    techNotes.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
 
@@ -170,48 +195,55 @@ export default function SessionDetail() {
         )}
 
         {/* Blockers and Resolved */}
-        {(session.summary_blockers?.length > 0 || session.summary_resolved?.length > 0) && (
-          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-            {session.summary_blockers?.length > 0 && (
-              <div style={{
-                flex: 1,
-                minWidth: 200,
-                padding: '10px 12px',
-                background: 'var(--red)10',
-                border: '1px solid var(--red)30',
-                borderRadius: 8,
-                fontSize: 12
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
-                  <AlertCircle size={14} />
-                  Blockers
+        {(() => {
+          const blockers = session.summary_blockers ? JSON.parse(session.summary_blockers) : []
+          const resolved = session.summary_resolved ? JSON.parse(session.summary_resolved) : []
+
+          if (blockers.length === 0 && resolved.length === 0) return null
+
+          return (
+            <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+              {blockers.length > 0 && (
+                <div style={{
+                  flex: 1,
+                  minWidth: 200,
+                  padding: '10px 12px',
+                  background: 'var(--red)10',
+                  border: '1px solid var(--red)30',
+                  borderRadius: 8,
+                  fontSize: 12
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
+                    <AlertCircle size={14} />
+                    Blockers
+                  </div>
+                  {blockers.map((b: string, i: number) => (
+                    <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {b}</div>
+                  ))}
                 </div>
-                {JSON.parse(session.summary_blockers).map((b: string, i: number) => (
-                  <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {b}</div>
-                ))}
-              </div>
-            )}
-            {session.summary_resolved?.length > 0 && (
-              <div style={{
-                flex: 1,
-                minWidth: 200,
-                padding: '10px 12px',
-                background: 'var(--green)10',
-                border: '1px solid var(--green)30',
-                borderRadius: 8,
-                fontSize: 12
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--green)', fontWeight: 600 }}>
-                  <CheckCircle size={14} />
-                  Resolved
+              )}
+              {resolved.length > 0 && (
+                <div style={{
+                  flex: 1,
+                  minWidth: 200,
+                  padding: '10px 12px',
+                  background: 'var(--green)10',
+                  border: '1px solid var(--green)30',
+                  borderRadius: 8,
+                  fontSize: 12
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--green)', fontWeight: 600 }}>
+                    <CheckCircle size={14} />
+                    Resolved
+                  </div>
+                  {resolved.map((r: string, i: number) => (
+                    <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {r}</div>
+                  ))}
                 </div>
-                {JSON.parse(session.summary_resolved).map((r: string, i: number) => (
-                  <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {r}</div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )
+        })()}
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {hasSummary && (

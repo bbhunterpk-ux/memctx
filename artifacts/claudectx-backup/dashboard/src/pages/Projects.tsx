@@ -4,9 +4,26 @@ import { api } from '../api/client'
 import { formatDistanceToNow } from 'date-fns'
 import { FolderGit2, Clock, Layers, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { toast } from '../components/Toast'
 
 export default function Projects() {
   const [resyncingAll, setResyncingAll] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+    confirmText: string
+    confirmColor: string
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    confirmText: 'Confirm',
+    confirmColor: 'var(--accent)',
+  })
 
   const { data: projects, isLoading, error, refetch } = useQuery({
     queryKey: ['projects'],
@@ -15,22 +32,34 @@ export default function Projects() {
   })
 
   const handleResyncAll = async (force: boolean = false) => {
-    const confirmMsg = force
-      ? 'Force resync ALL projects will regenerate ALL summaries with v2.0 fields. This may take a long time. Continue?'
-      : 'Resync will only process sessions without summaries. Use Force Resync to regenerate existing summaries. Continue?'
-
-    if (!confirm(confirmMsg)) return
-
-    setResyncingAll(true)
-    try {
-      const result = await api.resyncAll(force)
-      alert(result.result.message)
-      refetch()
-    } catch (error) {
-      alert('Resync failed: ' + error)
-    } finally {
-      setResyncingAll(false)
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: force ? 'Force Resync All Projects' : 'Resync All Projects',
+      message: force
+        ? 'This will regenerate ALL summaries across ALL projects with v2.0 fields. This may take a very long time. Continue?'
+        : 'This will only process sessions without summaries across all projects. To regenerate existing summaries with v2.0 fields, use "Force Resync All". Continue?',
+      confirmText: force ? 'Force Resync' : 'Resync',
+      confirmColor: force ? 'var(--orange)' : 'var(--blue)',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        setResyncingAll(true)
+        const toastId = toast.loading('Queueing sessions across all projects...', 0)
+        try {
+          const result = await api.resyncAll(force)
+          toast.update(toastId, `Queued ${result.result.queued} sessions. Processing...`, 50)
+          setTimeout(() => {
+            toast.dismiss(toastId)
+            toast.success(result.result.message)
+          }, 2000)
+          refetch()
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Resync failed: ' + error)
+        } finally {
+          setResyncingAll(false)
+        }
+      }
+    })
   }
 
   if (isLoading) return <Loading />
@@ -153,6 +182,17 @@ export default function Projects() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText="Cancel"
+        confirmColor={confirmDialog.confirmColor}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+      />
     </div>
   )
 }

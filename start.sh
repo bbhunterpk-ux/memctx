@@ -20,7 +20,7 @@ echo ""
 
 # Configuration
 WORKER_DIR="/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup"
-PORT="${CLAUDECTX_PORT:-8000}"
+PORT="${CLAUDECTX_PORT:-9999}"
 LOG_FILE="/tmp/claudectx.log"
 PID_FILE="/tmp/claudectx.pid"
 

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
 import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2 } from 'lucide-react'
 import StatusBadge from './StatusBadge'
+import ConfirmDialog from './ConfirmDialog'
 import { api } from '../api/client'
 import { useState } from 'react'
 
@@ -29,6 +30,8 @@ const complexityColors: Record<string, string> = {
 export default function SessionCard({ session, onSessionUpdated }: Props) {
   const [ending, setEnding] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showForceEndDialog, setShowForceEndDialog] = useState(false)
   const startDate = new Date(session.started_at * 1000)
   const duration = session.duration_seconds
     ? Math.floor(session.duration_seconds / 60)
@@ -50,11 +53,11 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const handleForceEnd = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    setShowForceEndDialog(true)
+  }
 
-    if (!confirm('Force end this session? This will mark it as completed and trigger AI summarization.')) {
-      return
-    }
-
+  const confirmForceEnd = async () => {
+    setShowForceEndDialog(false)
     setEnding(true)
     try {
       await api.forceEndSession(session.id)
@@ -71,11 +74,11 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    setShowDeleteDialog(true)
+  }
 
-    if (!confirm('Delete this session? This will permanently remove the session and all its data (observations, memory). This cannot be undone.')) {
-      return
-    }
-
+  const confirmDelete = async () => {
+    setShowDeleteDialog(false)
     setDeleting(true)
     try {
       await api.deleteSession(session.id)
@@ -90,7 +93,8 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   }
 
   return (
-    <Link to={`/session/${session.id}`} style={{ display: 'block' }}>
+    <>
+      <Link to={`/session/${session.id}`} style={{ display: 'block' }}>
       <div style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
@@ -256,5 +260,30 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
         </div>
       </div>
     </Link>
+
+    {/* Force End Confirmation Dialog */}
+    <ConfirmDialog
+      isOpen={showForceEndDialog}
+      title="Force End Session"
+      message="This will mark the session as completed and trigger AI summarization. The session will be processed and added to your project history."
+      confirmText="Force End"
+      cancelText="Cancel"
+      confirmColor="var(--green)"
+      onConfirm={confirmForceEnd}
+      onCancel={() => setShowForceEndDialog(false)}
+    />
+
+    {/* Delete Confirmation Dialog */}
+    <ConfirmDialog
+      isOpen={showDeleteDialog}
+      title="Delete Session"
+      message="This will permanently remove the session and all its data including observations, preferences, knowledge, and tasks. This action cannot be undone."
+      confirmText="Delete"
+      cancelText="Cancel"
+      confirmColor="var(--red)"
+      onConfirm={confirmDelete}
+      onCancel={() => setShowDeleteDialog(false)}
+    />
+    </>
   )
 }

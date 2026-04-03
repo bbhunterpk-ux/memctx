@@ -92,13 +92,12 @@ export const queries = {
   },
 
   deleteSession(id: string) {
-    // Delete all related data first (observations, memory)
+    // Delete all related data first
     run('DELETE FROM observations WHERE session_id = ?', id)
-    run('DELETE FROM preferences WHERE session_id = ?', id)
-    run('DELETE FROM knowledge_items WHERE session_id = ?', id)
-    run('DELETE FROM learned_patterns WHERE session_id = ?', id)
-    run('DELETE FROM tasks WHERE session_id = ?', id)
-    run('DELETE FROM contacts WHERE session_id = ?', id)
+    run('DELETE FROM preferences WHERE source_session_id = ?', id)
+    run('DELETE FROM knowledge_items WHERE source_session_id = ?', id)
+    run('DELETE FROM tasks WHERE created_session_id = ? OR completed_session_id = ?', id, id)
+    // learned_patterns and contacts don't have session_id columns, so skip them
     // Finally delete the session
     run('DELETE FROM sessions WHERE id = ?', id)
   },

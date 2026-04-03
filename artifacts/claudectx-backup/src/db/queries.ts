@@ -103,6 +103,14 @@ export const queries = {
     )
   },
 
+  getActiveSessions() {
+    return all(`
+      SELECT * FROM sessions
+      WHERE status = 'active' OR (status IS NULL AND ended_at IS NULL)
+      ORDER BY started_at DESC
+    `)
+  },
+
   getLastNCompletedSessions(project_id: string, n: number) {
     return all(`
       SELECT * FROM sessions

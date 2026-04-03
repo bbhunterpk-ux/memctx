@@ -10,17 +10,23 @@ import { logger } from '../services/logger'
 export const hookRouter: RouterType = Router()
 
 hookRouter.post('/', async (req, res) => {
+  console.log('[Hook] Received event:', req.body.event, 'session:', req.body.session_id?.slice(0, 8))
   res.json({ ok: true }) // Always respond immediately
 
   const { event, session_id, cwd, ...data } = req.body
-  if (!session_id || !cwd) return
+  if (!session_id || !cwd) {
+    console.log('[Hook] Missing session_id or cwd, ignoring')
+    return
+  }
 
   try {
     const project = await detectProject(cwd)
+    console.log('[Hook] Project detected:', project.name, 'id:', project.id.slice(0, 8))
 
     // Ensure session exists for all events (not just SessionStart)
     const existingSession = queries.getSession(session_id)
     if (!existingSession) {
+      console.log('[Hook] Creating new session:', session_id.slice(0, 8))
       queries.upsertSession({
         id: session_id,
         project_id: project.id,
@@ -31,6 +37,7 @@ hookRouter.post('/', async (req, res) => {
 
     switch (event) {
       case 'SessionStart': {
+        console.log('[Hook] SessionStart:', session_id.slice(0, 8))
         queries.upsertSession({
           id: session_id,
           project_id: project.id,
@@ -42,13 +49,16 @@ hookRouter.post('/', async (req, res) => {
       }
 
       case 'SessionEnd': {
+        console.log('[Hook] SessionEnd:', session_id.slice(0, 8), 'transcript:', data.transcript_path)
         queries.updateSession(session_id, {
           ended_at: Math.floor(Date.now() / 1000),
           status: 'completed',
           transcript_path: data.transcript_path || null
         })
+        console.log('[Hook] Session marked as completed')
         if (data.transcript_path) {
           logger.info('Hook', `SessionEnd received for ${session_id}`, { projectId: project.id })
+          console.log('[Hook] Queuing summarization for:', session_id.slice(0, 8))
           summarizationQueue.enqueue({
             sessionId: session_id,
             transcriptPath: data.transcript_path,
@@ -57,10 +67,12 @@ hookRouter.post('/', async (req, res) => {
           })
         }
         broadcast({ type: 'session_end', session_id })
+        console.log('[Hook] Broadcast session_end event')
         break
       }
 
       case 'PostToolUse': {
+        console.log('[Hook] PostToolUse:', data.tool_name, 'file:', data.file_path)
         const obs = {
           session_id,
           project_id: project.id,
@@ -84,6 +96,7 @@ hookRouter.post('/', async (req, res) => {
       }
 
       case 'UserPromptSubmit': {
+        console.log('[Hook] UserPromptSubmit:', data.prompt_preview?.slice(0, 50))
         // Log user prompt as observation
         const obs = {
           session_id,
@@ -96,11 +109,19 @@ hookRouter.post('/', async (req, res) => {
         }
         queries.insertObservation(obs)
         queries.incrementTurnStats(session_id, 'turns')
+
+        // Update session last_activity timestamp
+        queries.updateSession(session_id, {
+          last_activity: Math.floor(Date.now() / 1000)
+        })
+        console.log('[Hook] Updated last_activity for session:', session_id.slice(0, 8))
+
         broadcast({ type: 'user_prompt', session_id, preview: data.prompt_preview })
         break
       }
 
       case 'Stop': {
+        console.log('[Hook] Stop event - session:', session_id.slice(0, 8))
         // Log assistant response as observation
         const obs = {
           session_id,
@@ -112,11 +133,19 @@ hookRouter.post('/', async (req, res) => {
           metadata: JSON.stringify({})
         }
         queries.insertObservation(obs)
+
+        // Update session last_activity timestamp
+        queries.updateSession(session_id, {
+          last_activity: Math.floor(Date.now() / 1000)
+        })
+        console.log('[Hook] Updated last_activity for session:', session_id.slice(0, 8))
+
         broadcast({ type: 'stop', session_id, preview: data.message_preview })
         break
       }
 
       case 'PreCompact': {
+        console.log('[Hook] PreCompact:', session_id.slice(0, 8))
         queries.updateSession(session_id, { status: 'compacted' })
         if (data.transcript_path) {
           enqueue(() => snapshotSession(session_id, data.transcript_path, project.id))
@@ -124,8 +153,12 @@ hookRouter.post('/', async (req, res) => {
         broadcast({ type: 'pre_compact', session_id })
         break
       }
+
+      default: {
+        console.log('[Hook] Unknown event:', event)
+      }
     }
   } catch (err) {
-    console.error('Hook processing error:', err)
+    console.error('[Hook] Processing error:', err)
   }
 })

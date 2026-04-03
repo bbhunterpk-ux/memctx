@@ -18,6 +18,7 @@ import { startWatcher } from './services/watcher'
 import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
 import { memoryDecay } from './services/memory-decay'
+import { startSessionTimeoutChecker } from './services/session-timeout'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -73,6 +74,9 @@ async function main() {
 
   // Start memory decay scheduler
   memoryDecay.startDecayScheduler()
+
+  // Start session timeout checker
+  startSessionTimeoutChecker()
 
   server.listen(CONFIG.port, () => {
     console.log(`ClaudeContext running at http://localhost:${CONFIG.port}`)

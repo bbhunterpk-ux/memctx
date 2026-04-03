@@ -9,6 +9,7 @@ import { useState } from 'react'
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
   const [consolidating, setConsolidating] = useState(false)
+  const [resyncing, setResyncing] = useState(false)
 
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', id],
@@ -16,7 +17,7 @@ export default function ProjectDetail() {
     enabled: !!id,
   })
 
-  const { data: sessions } = useQuery({
+  const { data: sessions, refetch: refetchSessions } = useQuery({
     queryKey: ['sessions', id],
     queryFn: () => api.getSessions({ project_id: id!, limit: 50 }),
     enabled: !!id,
@@ -35,6 +36,20 @@ export default function ProjectDetail() {
       alert('Consolidation failed: ' + error)
     } finally {
       setConsolidating(false)
+    }
+  }
+
+  const handleResync = async (force: boolean = false) => {
+    if (!id) return
+    setResyncing(true)
+    try {
+      const result = await api.resyncProject(id, force)
+      alert(result.result.message)
+      refetchSessions()
+    } catch (error) {
+      alert('Resync failed: ' + error)
+    } finally {
+      setResyncing(false)
     }
   }
 
@@ -123,6 +138,29 @@ export default function ProjectDetail() {
             <Brain size={16} />
             View Memory
           </Link>
+
+          <button
+            onClick={() => handleResync(false)}
+            disabled={resyncing}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: resyncing ? 'var(--surface)' : 'var(--blue)15',
+              color: resyncing ? 'var(--text-muted)' : 'var(--blue)',
+              border: '1px solid',
+              borderColor: resyncing ? 'var(--border)' : 'var(--blue)30',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: resyncing ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
+            {resyncing ? 'Resyncing...' : 'Resync Sessions'}
+          </button>
 
           <button
             onClick={handleConsolidate}

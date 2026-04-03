@@ -6,7 +6,8 @@ import StatusBadge from '../components/StatusBadge'
 import SummaryView from '../components/SummaryView'
 import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
-import { ArrowLeft, Zap, AlertCircle, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 
 function buildCopyText(session: any): string {
   const lines = [
@@ -73,13 +74,28 @@ function buildCopyText(session: any): string {
 
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>()
+  const [resyncing, setResyncing] = useState(false)
 
-  const { data: session, isLoading } = useQuery({
+  const { data: session, isLoading, refetch } = useQuery({
     queryKey: ['session', id],
     queryFn: () => api.getSession(id!),
     enabled: !!id,
     refetchInterval: (data: any) => data?.status === 'active' ? 5000 : false,
   })
+
+  const handleResync = async () => {
+    if (!id) return
+    setResyncing(true)
+    try {
+      await api.resyncSession(id)
+      alert('Session queued for resync. Summary will be regenerated.')
+      setTimeout(() => refetch(), 2000)
+    } catch (error) {
+      alert('Resync failed: ' + error)
+    } finally {
+      setResyncing(false)
+    }
+  }
 
   if (isLoading) {
     return <div style={{ padding: 32, color: 'var(--text-muted)', fontSize: 13 }}>Loading session...</div>
@@ -200,6 +216,30 @@ export default function SessionDetail() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {hasSummary && (
             <CopyButton text={buildCopyText(session)} label="Copy as Markdown" />
+          )}
+          {session.status !== 'active' && session.transcript_path && (
+            <button
+              onClick={handleResync}
+              disabled={resyncing}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: resyncing ? 'var(--surface)' : 'var(--blue)15',
+                color: resyncing ? 'var(--text-muted)' : 'var(--blue)',
+                border: '1px solid',
+                borderColor: resyncing ? 'var(--border)' : 'var(--blue)30',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: resyncing ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
+              {resyncing ? 'Resyncing...' : 'Resync Summary'}
+            </button>
           )}
         </div>
       </div>

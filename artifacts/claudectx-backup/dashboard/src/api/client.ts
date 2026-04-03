@@ -33,6 +33,9 @@ export const api = {
   getContacts: (projectId: string) => apiFetch(`/api/memory/contacts?project_id=${projectId}`),
   getMetrics: () => apiFetch('/api/metrics'),
   consolidateMemory: (projectId: string) => apiFetch(`/api/consolidate/${projectId}`, { method: 'POST' }),
+  resyncProject: (projectId: string, force?: boolean) => apiFetch(`/api/resync/${projectId}${force ? '?force=true' : ''}`, { method: 'POST' }),
+  resyncSession: (sessionId: string) => apiFetch(`/api/resync/session/${sessionId}`, { method: 'POST' }),
+  resyncAll: (force?: boolean) => apiFetch(`/api/resync/all${force ? '?force=true' : ''}`, { method: 'POST' }),
 }
 
 export function createWebSocket(): WebSocket {

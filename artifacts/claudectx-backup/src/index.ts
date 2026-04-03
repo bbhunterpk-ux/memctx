@@ -13,6 +13,7 @@ import { observationsRouter } from './api/observations'
 import { memoryRouter } from './api/memory'
 import consolidateRouter from './api/consolidate'
 import metricsRouter from './api/metrics'
+import resyncRouter from './api/resync'
 import { startWatcher } from './services/watcher'
 import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
@@ -50,6 +51,7 @@ async function main() {
   app.use('/api/memory', memoryRouter)
   app.use('/api/consolidate', consolidateRouter)
   app.use('/api/metrics', metricsRouter)
+  app.use('/api/resync', resyncRouter)
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))

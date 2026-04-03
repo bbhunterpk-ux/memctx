@@ -2,14 +2,30 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import { formatDistanceToNow } from 'date-fns'
-import { FolderGit2, Clock, Layers } from 'lucide-react'
+import { FolderGit2, Clock, Layers, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 
 export default function Projects() {
-  const { data: projects, isLoading, error } = useQuery({
+  const [resyncingAll, setResyncingAll] = useState(false)
+
+  const { data: projects, isLoading, error, refetch } = useQuery({
     queryKey: ['projects'],
     queryFn: api.getProjects,
     refetchInterval: 15000,
   })
+
+  const handleResyncAll = async (force: boolean = false) => {
+    setResyncingAll(true)
+    try {
+      const result = await api.resyncAll(force)
+      alert(result.result.message)
+      refetch()
+    } catch (error) {
+      alert('Resync failed: ' + error)
+    } finally {
+      setResyncingAll(false)
+    }
+  }
 
   if (isLoading) return <Loading />
   if (error) return <ErrorState message={String(error)} />
@@ -17,10 +33,36 @@ export default function Projects() {
   return (
     <div style={{ padding: '28px 32px', maxWidth: 900 }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Projects</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-          All tracked workspaces — {projects?.length ?? 0} total
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Projects</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+              All tracked workspaces — {projects?.length ?? 0} total
+            </p>
+          </div>
+          <button
+            onClick={() => handleResyncAll(false)}
+            disabled={resyncingAll}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: resyncingAll ? 'var(--surface)' : 'var(--blue)15',
+              color: resyncingAll ? 'var(--text-muted)' : 'var(--blue)',
+              border: '1px solid',
+              borderColor: resyncingAll ? 'var(--border)' : 'var(--blue)30',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: resyncingAll ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={16} style={{ animation: resyncingAll ? 'spin 1s linear infinite' : 'none' }} />
+            {resyncingAll ? 'Resyncing...' : 'Resync All'}
+          </button>
+        </div>
       </div>
 
       {!projects || projects.length === 0 ? (

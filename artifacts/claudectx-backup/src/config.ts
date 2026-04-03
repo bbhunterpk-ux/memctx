@@ -20,6 +20,6 @@ export const CONFIG = {
   defaultContextSessions: parseInt(process.env.CLAUDECTX_SESSIONS || '3'),
   maxContextTokens: 2000,
   summaryModel: process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL || 'AWS',
-  summaryMaxTokens: 1500,
+  summaryMaxTokens: 2500,
   disableSummaries: process.env.CLAUDECTX_DISABLE_SUMMARIES === '1',
 }

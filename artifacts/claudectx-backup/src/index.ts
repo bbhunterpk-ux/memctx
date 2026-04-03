@@ -11,9 +11,12 @@ import { searchRouter } from './api/search'
 import { healthRouter } from './api/health'
 import { observationsRouter } from './api/observations'
 import { memoryRouter } from './api/memory'
+import consolidateRouter from './api/consolidate'
+import metricsRouter from './api/metrics'
 import { startWatcher } from './services/watcher'
 import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
+import { memoryDecay } from './services/memory-decay'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -45,6 +48,8 @@ async function main() {
   app.use('/api/health', healthRouter)
   app.use('/api/observations', observationsRouter)
   app.use('/api/memory', memoryRouter)
+  app.use('/api/consolidate', consolidateRouter)
+  app.use('/api/metrics', metricsRouter)
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))
@@ -63,6 +68,9 @@ async function main() {
   } catch (err) {
     console.error('Watcher failed to start:', err)
   }
+
+  // Start memory decay scheduler
+  memoryDecay.startDecayScheduler()
 
   server.listen(CONFIG.port, () => {
     console.log(`ClaudeContext running at http://localhost:${CONFIG.port}`)

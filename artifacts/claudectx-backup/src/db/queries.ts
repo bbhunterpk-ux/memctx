@@ -400,5 +400,18 @@ export const queries = {
       INSERT INTO interactions (contact_id, session_id, interaction_type, context)
       VALUES (?, ?, ?, ?)
     `, contactId, sessionId, type, context)
+  },
+
+  // Delete methods for consolidation
+  deletePreference(id: number) {
+    run('DELETE FROM preferences WHERE id = ?', id)
+  },
+
+  deleteKnowledge(id: string) {
+    run('DELETE FROM knowledge_items WHERE id = ?', id)
+  },
+
+  deletePattern(id: string) {
+    run('DELETE FROM learned_patterns WHERE id = ?', id)
   }
 }

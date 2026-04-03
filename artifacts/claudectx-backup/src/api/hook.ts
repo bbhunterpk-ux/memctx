@@ -4,6 +4,8 @@ import { enqueue } from '../services/queue'
 import { summarizeSession, snapshotSession } from '../services/summarizer'
 import { broadcast } from '../ws/broadcast'
 import { queries } from '../db/queries'
+import { summarizationQueue } from '../services/summarization-queue'
+import { logger } from '../services/logger'
 
 export const hookRouter: RouterType = Router()
 
@@ -46,7 +48,13 @@ hookRouter.post('/', async (req, res) => {
           transcript_path: data.transcript_path || null
         })
         if (data.transcript_path) {
-          enqueue(() => summarizeSession(session_id, data.transcript_path, project.id))
+          logger.info('Hook', `SessionEnd received for ${session_id}`, { projectId: project.id })
+          summarizationQueue.enqueue({
+            sessionId: session_id,
+            transcriptPath: data.transcript_path,
+            projectId: project.id,
+            priority: 'normal'
+          })
         }
         broadcast({ type: 'session_end', session_id })
         break

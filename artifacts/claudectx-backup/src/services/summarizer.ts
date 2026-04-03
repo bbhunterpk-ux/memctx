@@ -4,6 +4,9 @@ import { queries } from '../db/queries'
 import { CONFIG } from '../config'
 import { updateClaudeMd } from './claude-md-updater'
 import { broadcast } from '../ws/broadcast'
+import { fuzzyTaskMatcher } from './fuzzy-task-matcher'
+import { logger } from './logger'
+import { metricsTracker } from './metrics'
 
 interface SessionSummary {
   title: string
@@ -14,11 +17,55 @@ interface SessionSummary {
   next_steps: string[]
   gotchas: string[]
   tech_stack_notes: string[]
+  mood?: string
+  complexity?: string
+  blockers?: string[]
+  resolved?: string[]
+  key_insight?: string
   preferences?: Array<{ category: string; key: string; value: string; confidence: number }>
   knowledge?: Array<{ category: string; topic: string; content: string; confidence: number }>
   patterns?: Array<{ type: string; title: string; description: string; example?: string }>
   tasks?: Array<{ title: string; description?: string; priority: string; status: string }>
   contacts?: Array<{ name: string; type: string; role?: string; context: string }>
+}
+
+function compactTranscriptSmart(turns: any[]): string {
+  // Take last 80 turns for better context
+  const recentTurns = turns.slice(-80)
+
+  const lines: string[] = []
+  let lastRole = ''
+
+  for (const turn of recentTurns) {
+    if (turn.role === 'user') {
+      const content = (turn.content || '').slice(0, 500)
+      if (content.trim()) {
+        lines.push(`USER: ${content}`)
+        lastRole = 'user'
+      }
+    } else if (turn.role === 'assistant') {
+      // Keep full assistant responses for decisions/explanations
+      const content = (turn.content || '').slice(0, 800)
+      if (content.trim()) {
+        lines.push(`CLAUDE: ${content}`)
+        lastRole = 'assistant'
+      }
+    } else if (turn.type === 'tool_use') {
+      // Compress repetitive tool calls
+      const toolName = turn.name || 'unknown'
+      const input = JSON.stringify(turn.input || {})
+
+      if (toolName === 'Read' || toolName === 'Grep' || toolName === 'Glob') {
+        lines.push(`TOOL(${toolName}): ${input.slice(0, 150)}`)
+      } else if (toolName === 'Edit' || toolName === 'Write') {
+        lines.push(`TOOL(${toolName}): ${input.slice(0, 300)}`)
+      } else {
+        lines.push(`TOOL(${toolName}): ${input.slice(0, 200)}`)
+      }
+    }
+  }
+
+  return lines.join('\n')
 }
 
 function getClient(): Anthropic {
@@ -39,29 +86,26 @@ export async function summarizeSession(
   }
 
   try {
+    const startTime = Date.now()
     const turns = await readTranscript(transcriptPath)
     if (turns.length === 0) return
 
-    const recentTurns = turns.slice(-60)
-    const compactTranscript = recentTurns.map(t => {
-      if (t.role === 'user') return `USER: ${(t.content || '').slice(0, 300)}`
-      if (t.role === 'assistant') return `CLAUDE: ${(t.content || '').slice(0, 400)}`
-      if (t.type === 'tool_use') return `TOOL(${t.name}): ${JSON.stringify(t.input || {}).slice(0, 200)}`
-      return null
-    }).filter(Boolean).join('\n')
+    // Smart transcript compaction
+    const compactTranscript = compactTranscriptSmart(turns)
 
     const client = getClient()
 
-    console.log(`[Summarizer] Starting summarization for session ${sessionId}`)
-    console.log(`[Summarizer] Using model: ${CONFIG.summaryModel}`)
-    console.log(`[Summarizer] API Base URL: ${CONFIG.apiBaseUrl}`)
+    logger.info('Summarizer', `Starting summarization for session ${sessionId}`, {
+      model: CONFIG.summaryModel,
+      transcriptLength: turns.length
+    })
 
     const response = await client.messages.create({
       model: CONFIG.summaryModel,
       max_tokens: CONFIG.summaryMaxTokens,
       stream: false,
       system: `You are a memory extraction system. Analyze the session and extract:
-1. Session summary (what was done)
+1. Session summary (what was done, mood, complexity, blockers, resolutions, key insight)
 2. User preferences discovered (coding style, workflow, communication)
 3. Domain knowledge learned (technologies, patterns, gotchas)
 4. Problem-solving patterns used
@@ -86,6 +130,11 @@ Return this exact JSON schema:
   "next_steps": ["concrete next thing to do"],
   "gotchas": ["important warning or thing to remember"],
   "tech_stack_notes": ["framework/library/pattern note"],
+  "mood": "productive OR frustrated OR exploratory OR debugging OR blocked",
+  "complexity": "trivial OR simple OR moderate OR complex OR very_complex",
+  "blockers": ["thing that blocked progress"],
+  "resolved": ["problem that was solved"],
+  "key_insight": "single most important learning or realization from this session",
   "preferences": [{"category": "coding", "key": "style", "value": "TypeScript", "confidence": 0.9}],
   "knowledge": [{"category": "technology", "topic": "9router", "content": "Returns OpenAI format", "confidence": 0.8}],
   "patterns": [{"type": "debugging", "title": "Check logs first", "description": "Always check logs before diving into code"}],
@@ -100,6 +149,11 @@ Rules:
 - next_steps: max 3 items, most important first
 - gotchas: only truly important things (bugs found, footguns)
 - tech_stack_notes: language/framework specifics future sessions need
+- mood: overall emotional tone of the session
+- complexity: technical difficulty level
+- blockers: things that prevented progress (empty array if none)
+- resolved: problems that were fixed (empty array if none)
+- key_insight: most valuable takeaway (empty string if none)
 - If nothing significant happened, use status "in_progress"`
       }]
     })
@@ -122,6 +176,12 @@ Rules:
 
     const summary: SessionSummary = JSON.parse(raw.replace(/```json\n?|\n?```/g, '').trim())
 
+    // Calculate session duration
+    const session = queries.getSession(sessionId)
+    const durationSeconds = session?.ended_at && session?.started_at
+      ? session.ended_at - session.started_at
+      : null
+
     queries.updateSession(sessionId, {
       summary_title: summary.title,
       summary_status: summary.status,
@@ -131,6 +191,12 @@ Rules:
       summary_next_steps: JSON.stringify(summary.next_steps),
       summary_gotchas: JSON.stringify(summary.gotchas),
       summary_tech_notes: JSON.stringify(summary.tech_stack_notes),
+      summary_mood: summary.mood || null,
+      summary_complexity: summary.complexity || null,
+      summary_blockers: summary.blockers ? JSON.stringify(summary.blockers) : null,
+      summary_resolved: summary.resolved ? JSON.stringify(summary.resolved) : null,
+      summary_key_insight: summary.key_insight || null,
+      duration_seconds: durationSeconds,
       status: 'completed'
     })
 
@@ -157,8 +223,14 @@ Rules:
 
     if (summary.tasks) {
       for (const t of summary.tasks) {
-        const id = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        queries.addTask({ id, title: t.title, description: t.description, priority: t.priority, status: t.status, projectId, sessionId })
+        // Use fuzzy matching to avoid duplicate tasks
+        fuzzyTaskMatcher.addTaskSmart({
+          title: t.title,
+          description: t.description,
+          priority: t.priority,
+          projectId,
+          sessionId
+        })
       }
     }
 
@@ -182,11 +254,19 @@ Rules:
 
     await updateClaudeMd(projectId, sessionId, summary)
     broadcast({ type: 'summary_ready', session_id: sessionId, title: summary.title })
-    console.log(`Summary saved for session ${sessionId}: "${summary.title}"`)
+
+    const duration = Date.now() - startTime
+    logger.info('Summarizer', `Summary saved for session ${sessionId}`, {
+      title: summary.title,
+      duration: `${duration}ms`
+    })
+    metricsTracker.recordSummarization(true, duration)
 
   } catch (err) {
-    console.error('Summarization failed for session', sessionId, err)
+    logger.error('Summarizer', `Summarization failed for session ${sessionId}`, { error: err })
+    metricsTracker.recordSummarization(false, 0)
     queries.updateSession(sessionId, { status: 'completed' })
+    throw err // Re-throw for queue retry logic
   }
 }
 

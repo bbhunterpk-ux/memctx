@@ -14,8 +14,8 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
     ''
   ]
 
-  // 1. User Preferences
-  const prefs = queries.getPreferences()
+  // 1. User Preferences (project-specific)
+  const prefs = queries.getPreferences(project.id)
   if (prefs.length > 0) {
     lines.push('## Your Preferences')
     prefs.forEach((p: any) => {
@@ -24,14 +24,18 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
     lines.push('')
   }
 
-  // 2. Recent Sessions
+  // 2. Recent Sessions with enhanced fields
   lines.push(`## Recent Sessions`)
   for (const s of sessions) {
     const date = new Date(s.started_at * 1000).toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     } as any)
 
-    lines.push(`[${date}] ${s.summary_title || 'Untitled session'} — ${(s.summary_status || 'completed').toUpperCase()}`)
+    const status = (s.summary_status || 'completed').toUpperCase()
+    const mood = s.summary_mood ? ` [${s.summary_mood}]` : ''
+    const complexity = s.summary_complexity ? ` (${s.summary_complexity})` : ''
+
+    lines.push(`[${date}] ${s.summary_title || 'Untitled session'}${mood} — ${status}${complexity}`)
 
     if (s.summary_what_we_did) {
       try {
@@ -51,10 +55,23 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
       } catch {}
     }
 
+    if (s.summary_key_insight) {
+      lines.push(`  Key Insight: ${s.summary_key_insight}`)
+    }
+
+    if (s.summary_blockers) {
+      try {
+        const blockers = JSON.parse(s.summary_blockers) as string[]
+        if (blockers.length > 0) {
+          lines.push(`  Blockers: ${blockers.join(', ')}`)
+        }
+      } catch {}
+    }
+
     lines.push('')
   }
 
-  // 3. Pending Tasks
+  // 3. Pending Tasks (project-specific)
   const tasks = queries.getTasks('pending', project.id)
   if (tasks.length > 0) {
     lines.push('## Pending Tasks')
@@ -64,8 +81,8 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
     lines.push('')
   }
 
-  // 4. Domain Knowledge
-  const knowledge = queries.getKnowledge(undefined, 5)
+  // 4. Domain Knowledge (project-specific)
+  const knowledge = queries.getKnowledge(undefined, 5, project.id)
   if (knowledge.length > 0) {
     lines.push('## What You Know')
     knowledge.forEach((k: any) => {
@@ -74,8 +91,8 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
     lines.push('')
   }
 
-  // 5. Learned Patterns
-  const patterns = queries.getPatterns(undefined, 5)
+  // 5. Learned Patterns (project-specific)
+  const patterns = queries.getPatterns(undefined, 5, project.id)
   if (patterns.length > 0) {
     lines.push('## Your Patterns')
     patterns.forEach((p: any) => {

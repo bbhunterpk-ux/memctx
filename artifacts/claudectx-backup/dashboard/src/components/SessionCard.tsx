@@ -42,7 +42,9 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const MoodIcon = session.summary_mood ? moodIcons[session.summary_mood] : null
   const complexityColor = session.summary_complexity ? complexityColors[session.summary_complexity] : 'var(--text-muted)'
 
-  const isActive = session.status === 'active' || (!session.status && !session.ended_at)
+  const isActive = session.status === 'active' ||
+                   (!session.status && !session.ended_at) ||
+                   (session.summary_status && session.summary_status.toLowerCase() === 'in_progress')
 
   const handleForceEnd = async (e: React.MouseEvent) => {
     e.preventDefault()

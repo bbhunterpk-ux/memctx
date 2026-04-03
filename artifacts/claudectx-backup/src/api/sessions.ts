@@ -55,6 +55,25 @@ sessionsRouter.get('/:id', (req, res) => {
   }
 })
 
+sessionsRouter.delete('/:id', (req, res) => {
+  try {
+    const session = queries.getSession(req.params.id)
+    if (!session) {
+      res.status(404).json({ error: 'Session not found' })
+      return
+    }
+
+    // Delete session and all related data (observations, memory)
+    queries.deleteSession(req.params.id)
+
+    console.log(`[API] Deleted session: ${req.params.id.slice(0, 8)}`)
+    res.json({ success: true, message: 'Session deleted' })
+  } catch (err) {
+    console.error('[API] Error deleting session:', err)
+    res.status(500).json({ error: String(err) })
+  }
+})
+
 function tryParse(val: any): any {
   if (!val) return null
   try { return JSON.parse(val) } catch { return val }

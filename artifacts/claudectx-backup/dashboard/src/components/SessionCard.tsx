@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
-import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle } from 'lucide-react'
+import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2 } from 'lucide-react'
 import StatusBadge from './StatusBadge'
 import { api } from '../api/client'
 import { useState } from 'react'
@@ -28,6 +28,7 @@ const complexityColors: Record<string, string> = {
 
 export default function SessionCard({ session, onSessionUpdated }: Props) {
   const [ending, setEnding] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const startDate = new Date(session.started_at * 1000)
   const duration = session.duration_seconds
     ? Math.floor(session.duration_seconds / 60)
@@ -64,6 +65,27 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
       alert('Failed to end session: ' + error)
     } finally {
       setEnding(false)
+    }
+  }
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!confirm('Delete this session? This will permanently remove the session and all its data (observations, memory). This cannot be undone.')) {
+      return
+    }
+
+    setDeleting(true)
+    try {
+      await api.deleteSession(session.id)
+      if (onSessionUpdated) {
+        setTimeout(() => onSessionUpdated(), 500)
+      }
+    } catch (error) {
+      alert('Failed to delete session: ' + error)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -196,6 +218,39 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
                 {ending ? 'Ending...' : 'Force End'}
               </button>
             )}
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              title="Delete session"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                background: deleting ? 'var(--surface)' : 'transparent',
+                color: deleting ? 'var(--text-muted)' : 'var(--text-muted)',
+                border: '1px solid var(--border)',
+                borderRadius: 6,
+                cursor: deleting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!deleting) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--red)15'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--red)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--red)30'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!deleting) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
+                }
+              }}
+            >
+              <Trash2 size={14} />
+            </button>
             <StatusBadge status={session.summary_status || session.status} />
           </div>
         </div>

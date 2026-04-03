@@ -37,6 +37,7 @@ export const api = {
   resyncSession: (sessionId: string) => apiFetch(`/api/resync/session/${sessionId}`, { method: 'POST' }),
   resyncAll: (force?: boolean) => apiFetch(`/api/resync/all${force ? '?force=true' : ''}`, { method: 'POST' }),
   forceEndSession: (sessionId: string) => apiFetch(`/api/force-end-session/${sessionId}`, { method: 'POST' }),
+  deleteSession: (sessionId: string) => apiFetch(`/api/sessions/${sessionId}`, { method: 'DELETE' }),
 }
 
 export function createWebSocket(): WebSocket {

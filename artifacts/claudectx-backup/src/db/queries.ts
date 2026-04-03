@@ -91,6 +91,18 @@ export const queries = {
     return get('SELECT * FROM sessions WHERE id = ?', id)
   },
 
+  deleteSession(id: string) {
+    // Delete all related data first (observations, memory)
+    run('DELETE FROM observations WHERE session_id = ?', id)
+    run('DELETE FROM preferences WHERE session_id = ?', id)
+    run('DELETE FROM knowledge_items WHERE session_id = ?', id)
+    run('DELETE FROM learned_patterns WHERE session_id = ?', id)
+    run('DELETE FROM tasks WHERE session_id = ?', id)
+    run('DELETE FROM contacts WHERE session_id = ?', id)
+    // Finally delete the session
+    run('DELETE FROM sessions WHERE id = ?', id)
+  },
+
   getSessions(opts: { project_id?: string; limit?: number; offset?: number; status?: string }) {
     const conditions: string[] = ['1=1']
     const params: any[] = []

@@ -14,6 +14,8 @@ export function broadcast(data: object): void {
   if (!wss) return
   const payload = JSON.stringify({ ...data, timestamp: Date.now() })
 
+  console.log('[Broadcast]', JSON.stringify(data))
+
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(payload)

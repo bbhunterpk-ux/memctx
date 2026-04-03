@@ -287,7 +287,7 @@ export default function ProjectDetail() {
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
             Sessions ({parsed.length})
           </h2>
-          {parsed.map((s: any) => <SessionCard key={s.id} session={s} />)}
+          {parsed.map((s: any) => <SessionCard key={s.id} session={s} onSessionUpdated={refetchSessions} />)}
         </>
       )}
 

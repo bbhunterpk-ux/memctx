@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
-import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap } from 'lucide-react'
+import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle } from 'lucide-react'
 import StatusBadge from './StatusBadge'
+import { api } from '../api/client'
+import { useState } from 'react'
 
 interface Props {
   session: any
+  onSessionUpdated?: () => void
 }
 
 const moodIcons: Record<string, any> = {
@@ -23,7 +26,8 @@ const complexityColors: Record<string, string> = {
   very_complex: 'var(--red)',
 }
 
-export default function SessionCard({ session }: Props) {
+export default function SessionCard({ session, onSessionUpdated }: Props) {
+  const [ending, setEnding] = useState(false)
   const startDate = new Date(session.started_at * 1000)
   const duration = session.duration_seconds
     ? Math.floor(session.duration_seconds / 60)
@@ -37,6 +41,29 @@ export default function SessionCard({ session }: Props) {
 
   const MoodIcon = session.summary_mood ? moodIcons[session.summary_mood] : null
   const complexityColor = session.summary_complexity ? complexityColors[session.summary_complexity] : 'var(--text-muted)'
+
+  const isActive = session.status === 'active' || (!session.status && !session.ended_at)
+
+  const handleForceEnd = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!confirm('Force end this session? This will mark it as completed and trigger AI summarization.')) {
+      return
+    }
+
+    setEnding(true)
+    try {
+      await api.forceEndSession(session.id)
+      if (onSessionUpdated) {
+        setTimeout(() => onSessionUpdated(), 1000)
+      }
+    } catch (error) {
+      alert('Failed to end session: ' + error)
+    } finally {
+      setEnding(false)
+    }
+  }
 
   return (
     <Link to={`/session/${session.id}`} style={{ display: 'block' }}>
@@ -132,7 +159,41 @@ export default function SessionCard({ session }: Props) {
             </div>
           </div>
 
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            {isActive && (
+              <button
+                onClick={handleForceEnd}
+                disabled={ending}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '4px 8px',
+                  background: ending ? 'var(--surface)' : 'var(--green)15',
+                  color: ending ? 'var(--text-muted)' : 'var(--green)',
+                  border: '1px solid',
+                  borderColor: ending ? 'var(--border)' : 'var(--green)30',
+                  borderRadius: 6,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: ending ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => {
+                  if (!ending) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--green)25'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!ending) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'var(--green)15'
+                  }
+                }}
+              >
+                <CheckCircle size={12} />
+                {ending ? 'Ending...' : 'Force End'}
+              </button>
+            )}
             <StatusBadge status={session.summary_status || session.status} />
           </div>
         </div>

@@ -36,6 +36,7 @@ export const api = {
   resyncProject: (projectId: string, force?: boolean) => apiFetch(`/api/resync/${projectId}${force ? '?force=true' : ''}`, { method: 'POST' }),
   resyncSession: (sessionId: string) => apiFetch(`/api/resync/session/${sessionId}`, { method: 'POST' }),
   resyncAll: (force?: boolean) => apiFetch(`/api/resync/all${force ? '?force=true' : ''}`, { method: 'POST' }),
+  forceEndSession: (sessionId: string) => apiFetch(`/api/force-end-session/${sessionId}`, { method: 'POST' }),
 }
 
 export function createWebSocket(): WebSocket {

@@ -54,8 +54,8 @@ export default function ProjectDetail() {
       ws.onmessage = (e) => {
         try {
           const event = JSON.parse(e.data)
-          // Refetch sessions on session_end or summary_ready events
-          if (event.type === 'session_end' || event.type === 'summary_ready') {
+          // Refetch sessions on session_start, session_end, or summary_ready events
+          if (event.type === 'session_start' || event.type === 'session_end' || event.type === 'summary_ready') {
             refetchSessions()
           }
         } catch {}

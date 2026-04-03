@@ -184,7 +184,7 @@ Rules:
 
     queries.updateSession(sessionId, {
       summary_title: summary.title,
-      summary_status: summary.status,
+      summary_status: 'completed', // Always mark summary as completed after successful AI processing
       summary_what_we_did: JSON.stringify(summary.what_we_did),
       summary_decisions: JSON.stringify(summary.decisions_made),
       summary_files_changed: JSON.stringify(summary.files_changed),

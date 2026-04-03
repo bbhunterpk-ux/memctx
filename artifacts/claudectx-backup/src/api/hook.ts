@@ -38,12 +38,25 @@ hookRouter.post('/', async (req, res) => {
     switch (event) {
       case 'SessionStart': {
         console.log('[Hook] SessionStart:', session_id.slice(0, 8))
-        queries.upsertSession({
-          id: session_id,
-          project_id: project.id,
-          started_at: Math.floor(Date.now() / 1000),
-          status: 'active'
-        })
+        const existingSession = queries.getSession(session_id)
+
+        // If resuming a completed session, reactivate it
+        if (existingSession && existingSession.status === 'completed') {
+          console.log('[Hook] Resuming completed session - reactivating')
+          queries.updateSession(session_id, {
+            status: 'active',
+            ended_at: null, // Clear ended_at since session is active again
+            last_activity: Math.floor(Date.now() / 1000)
+          })
+        } else {
+          // New session or already active
+          queries.upsertSession({
+            id: session_id,
+            project_id: project.id,
+            started_at: Math.floor(Date.now() / 1000),
+            status: 'active'
+          })
+        }
         broadcast({ type: 'session_start', session_id, project })
         break
       }

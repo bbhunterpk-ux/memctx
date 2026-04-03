@@ -3,10 +3,13 @@ import { useParams, Link } from 'react-router-dom'
 import { api } from '../api/client'
 import SessionCard from '../components/SessionCard'
 import ActivityChart from '../components/ActivityChart'
-import { ArrowLeft, GitBranch, FolderOpen, Brain } from 'lucide-react'
+import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
+  const [consolidating, setConsolidating] = useState(false)
+
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', id],
     queryFn: () => api.getProject(id!),
@@ -21,6 +24,19 @@ export default function ProjectDetail() {
   })
 
   const { data: health } = useQuery({ queryKey: ['health'], queryFn: api.getHealth })
+
+  const handleConsolidate = async () => {
+    if (!id) return
+    setConsolidating(true)
+    try {
+      await api.consolidateMemory(id)
+      alert('Memory consolidation complete!')
+    } catch (error) {
+      alert('Consolidation failed: ' + error)
+    } finally {
+      setConsolidating(false)
+    }
+  }
 
   const activityData = health?.uptime ? [] : [] // placeholder
 
@@ -85,27 +101,51 @@ export default function ProjectDetail() {
           ))}
         </div>
 
-        <Link
-          to={`/project/${id}/memory`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 14px',
-            background: 'var(--accent)',
-            color: 'white',
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 600,
-            textDecoration: 'none',
-            transition: 'opacity 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
-          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-        >
-          <Brain size={16} />
-          View Memory
-        </Link>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Link
+            to={`/project/${id}/memory`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: 'var(--accent)',
+              color: 'white',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            <Brain size={16} />
+            View Memory
+          </Link>
+
+          <button
+            onClick={handleConsolidate}
+            disabled={consolidating}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: consolidating ? 'var(--surface)' : 'var(--surface2)',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: consolidating ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={16} style={{ animation: consolidating ? 'spin 1s linear infinite' : 'none' }} />
+            {consolidating ? 'Consolidating...' : 'Consolidate Memory'}
+          </button>
+        </div>
       </div>
 
       {parsed.length === 0 ? (

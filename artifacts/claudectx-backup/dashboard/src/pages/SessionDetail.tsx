@@ -6,7 +6,7 @@ import StatusBadge from '../components/StatusBadge'
 import SummaryView from '../components/SummaryView'
 import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Zap, AlertCircle, CheckCircle } from 'lucide-react'
 
 function buildCopyText(session: any): string {
   const lines = [
@@ -16,6 +16,17 @@ function buildCopyText(session: any): string {
     '',
   ]
 
+  if (session.summary_mood) {
+    lines.push(`Mood: ${session.summary_mood}`)
+  }
+  if (session.summary_complexity) {
+    lines.push(`Complexity: ${session.summary_complexity}`)
+  }
+  if (session.summary_key_insight) {
+    lines.push(`Key Insight: ${session.summary_key_insight}`)
+    lines.push('')
+  }
+
   if (session.summary_what_we_did?.length) {
     lines.push('## What We Did')
     session.summary_what_we_did.forEach((i: string) => lines.push(`- ${i}`))
@@ -24,6 +35,16 @@ function buildCopyText(session: any): string {
   if (session.summary_decisions?.length) {
     lines.push('## Decisions Made')
     session.summary_decisions.forEach((i: string) => lines.push(`- ${i}`))
+    lines.push('')
+  }
+  if (session.summary_blockers?.length) {
+    lines.push('## Blockers')
+    session.summary_blockers.forEach((i: string) => lines.push(`- ${i}`))
+    lines.push('')
+  }
+  if (session.summary_resolved?.length) {
+    lines.push('## Resolved')
+    session.summary_resolved.forEach((i: string) => lines.push(`- ${i}`))
     lines.push('')
   }
   if (session.summary_files_changed?.length) {
@@ -97,6 +118,84 @@ export default function SessionDetail() {
           {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
           {session.total_tool_calls > 0 && <span>{session.total_tool_calls} tool calls</span>}
         </div>
+
+        {/* Enhanced v2.0 fields */}
+        {(session.summary_mood || session.summary_complexity || session.summary_key_insight) && (
+          <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {session.summary_mood && (
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                <strong>Mood:</strong> {session.summary_mood}
+              </div>
+            )}
+            {session.summary_complexity && (
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                <strong>Complexity:</strong> {session.summary_complexity.replace('_', ' ')}
+              </div>
+            )}
+            {session.summary_key_insight && (
+              <div style={{
+                padding: '10px 12px',
+                background: 'var(--accent)15',
+                border: '1px solid var(--accent)30',
+                borderRadius: 8,
+                fontSize: 13,
+                color: 'var(--text)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8
+              }}>
+                <Zap size={14} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <strong style={{ color: 'var(--accent)' }}>Key Insight:</strong> {session.summary_key_insight}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Blockers and Resolved */}
+        {(session.summary_blockers?.length > 0 || session.summary_resolved?.length > 0) && (
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+            {session.summary_blockers?.length > 0 && (
+              <div style={{
+                flex: 1,
+                minWidth: 200,
+                padding: '10px 12px',
+                background: 'var(--red)10',
+                border: '1px solid var(--red)30',
+                borderRadius: 8,
+                fontSize: 12
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
+                  <AlertCircle size={14} />
+                  Blockers
+                </div>
+                {JSON.parse(session.summary_blockers).map((b: string, i: number) => (
+                  <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {b}</div>
+                ))}
+              </div>
+            )}
+            {session.summary_resolved?.length > 0 && (
+              <div style={{
+                flex: 1,
+                minWidth: 200,
+                padding: '10px 12px',
+                background: 'var(--green)10',
+                border: '1px solid var(--green)30',
+                borderRadius: 8,
+                fontSize: 12
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--green)', fontWeight: 600 }}>
+                  <CheckCircle size={14} />
+                  Resolved
+                </div>
+                {JSON.parse(session.summary_resolved).map((r: string, i: number) => (
+                  <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {r}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {hasSummary && (

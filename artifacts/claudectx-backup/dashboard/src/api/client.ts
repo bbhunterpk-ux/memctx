@@ -31,6 +31,8 @@ export const api = {
   getPatterns: (projectId: string, type?: string) => apiFetch(`/api/memory/patterns?project_id=${projectId}${type ? `&type=${type}` : ''}`),
   getTasks: (projectId: string, status?: string) => apiFetch(`/api/memory/tasks?project_id=${projectId}${status ? `&status=${status}` : ''}`),
   getContacts: (projectId: string) => apiFetch(`/api/memory/contacts?project_id=${projectId}`),
+  getMetrics: () => apiFetch('/api/metrics'),
+  consolidateMemory: (projectId: string) => apiFetch(`/api/consolidate/${projectId}`, { method: 'POST' }),
 }
 
 export function createWebSocket(): WebSocket {

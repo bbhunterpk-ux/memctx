@@ -15,6 +15,12 @@ export default function Projects() {
   })
 
   const handleResyncAll = async (force: boolean = false) => {
+    const confirmMsg = force
+      ? 'Force resync ALL projects will regenerate ALL summaries with v2.0 fields. This may take a long time. Continue?'
+      : 'Resync will only process sessions without summaries. Use Force Resync to regenerate existing summaries. Continue?'
+
+    if (!confirm(confirmMsg)) return
+
     setResyncingAll(true)
     try {
       const result = await api.resyncAll(force)
@@ -40,28 +46,52 @@ export default function Projects() {
               All tracked workspaces — {projects?.length ?? 0} total
             </p>
           </div>
-          <button
-            onClick={() => handleResyncAll(false)}
-            disabled={resyncingAll}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 14px',
-              background: resyncingAll ? 'var(--surface)' : 'var(--blue)15',
-              color: resyncingAll ? 'var(--text-muted)' : 'var(--blue)',
-              border: '1px solid',
-              borderColor: resyncingAll ? 'var(--border)' : 'var(--blue)30',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: resyncingAll ? 'not-allowed' : 'pointer',
-              transition: 'all 0.15s',
-            }}
-          >
-            <RefreshCw size={16} style={{ animation: resyncingAll ? 'spin 1s linear infinite' : 'none' }} />
-            {resyncingAll ? 'Resyncing...' : 'Resync All'}
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => handleResyncAll(false)}
+              disabled={resyncingAll}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: resyncingAll ? 'var(--surface)' : 'var(--blue)15',
+                color: resyncingAll ? 'var(--text-muted)' : 'var(--blue)',
+                border: '1px solid',
+                borderColor: resyncingAll ? 'var(--border)' : 'var(--blue)30',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: resyncingAll ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              <RefreshCw size={16} style={{ animation: resyncingAll ? 'spin 1s linear infinite' : 'none' }} />
+              {resyncingAll ? 'Resyncing...' : 'Resync New'}
+            </button>
+            <button
+              onClick={() => handleResyncAll(true)}
+              disabled={resyncingAll}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: resyncingAll ? 'var(--surface)' : 'var(--orange)15',
+                color: resyncingAll ? 'var(--text-muted)' : 'var(--orange)',
+                border: '1px solid',
+                borderColor: resyncingAll ? 'var(--border)' : 'var(--orange)30',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: resyncingAll ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              <RefreshCw size={16} style={{ animation: resyncingAll ? 'spin 1s linear infinite' : 'none' }} />
+              {resyncingAll ? 'Resyncing...' : 'Force Resync All'}
+            </button>
+          </div>
         </div>
       </div>
 

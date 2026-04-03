@@ -41,6 +41,13 @@ export default function ProjectDetail() {
 
   const handleResync = async (force: boolean = false) => {
     if (!id) return
+
+    const confirmMsg = force
+      ? 'Force resync will regenerate ALL summaries with v2.0 fields. This may take a while. Continue?'
+      : 'Resync will only process sessions without summaries. Use Force Resync to regenerate existing summaries. Continue?'
+
+    if (!confirm(confirmMsg)) return
+
     setResyncing(true)
     try {
       const result = await api.resyncProject(id, force)
@@ -159,7 +166,30 @@ export default function ProjectDetail() {
             }}
           >
             <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
-            {resyncing ? 'Resyncing...' : 'Resync Sessions'}
+            {resyncing ? 'Resyncing...' : 'Resync New'}
+          </button>
+
+          <button
+            onClick={() => handleResync(true)}
+            disabled={resyncing}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: resyncing ? 'var(--surface)' : 'var(--orange)15',
+              color: resyncing ? 'var(--text-muted)' : 'var(--orange)',
+              border: '1px solid',
+              borderColor: resyncing ? 'var(--border)' : 'var(--orange)30',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: resyncing ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
+            {resyncing ? 'Resyncing...' : 'Force Resync All'}
           </button>
 
           <button

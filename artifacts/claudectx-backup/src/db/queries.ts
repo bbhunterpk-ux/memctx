@@ -208,79 +208,106 @@ export const queries = {
   // Memory System Queries
 
   // Preferences
-  getPreferences(category?: string) {
-    if (category) {
-      return all('SELECT * FROM preferences WHERE category = ? ORDER BY updated_at DESC', category)
+  getPreferences(projectId?: string, category?: string) {
+    const conditions: string[] = []
+    const params: any[] = []
+
+    if (projectId) {
+      conditions.push('project_id = ?')
+      params.push(projectId)
     }
-    return all('SELECT * FROM preferences ORDER BY category, key')
+    if (category) {
+      conditions.push('category = ?')
+      params.push(category)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    return all(`SELECT * FROM preferences ${where} ORDER BY category, key`, ...params)
   },
 
-  setPreference(category: string, key: string, value: string, confidence: number = 1.0, sessionId?: string) {
+  setPreference(category: string, key: string, value: string, confidence: number = 1.0, sessionId?: string, projectId?: string) {
     run(`
-      INSERT INTO preferences (category, key, value, confidence, source_session_id)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO preferences (category, key, value, confidence, source_session_id, project_id)
+      VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(category, key) DO UPDATE SET
         value = excluded.value,
         confidence = excluded.confidence,
         source_session_id = excluded.source_session_id,
+        project_id = excluded.project_id,
         updated_at = unixepoch()
-    `, category, key, value, confidence, sessionId ?? null)
+    `, category, key, value, confidence, sessionId ?? null, projectId ?? null)
   },
 
   // Knowledge
-  getKnowledge(category?: string, limit: number = 10) {
-    if (category) {
-      return all(`
-        SELECT * FROM knowledge_items
-        WHERE category = ?
-        ORDER BY confidence DESC, updated_at DESC
-        LIMIT ?
-      `, category, limit)
+  getKnowledge(category?: string, limit: number = 10, projectId?: string) {
+    const conditions: string[] = []
+    const params: any[] = []
+
+    if (projectId) {
+      conditions.push('project_id = ?')
+      params.push(projectId)
     }
+    if (category) {
+      conditions.push('category = ?')
+      params.push(category)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    params.push(limit)
+
     return all(`
       SELECT * FROM knowledge_items
+      ${where}
       ORDER BY confidence DESC, updated_at DESC
       LIMIT ?
-    `, limit)
+    `, ...params)
   },
 
-  addKnowledge(item: { id: string; category: string; topic: string; content: string; confidence?: number; sessionId?: string }) {
+  addKnowledge(item: { id: string; category: string; topic: string; content: string; confidence?: number; sessionId?: string; projectId?: string }) {
     run(`
-      INSERT INTO knowledge_items (id, category, topic, content, confidence, source_session_id)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO knowledge_items (id, category, topic, content, confidence, source_session_id, project_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         content = excluded.content,
         confidence = excluded.confidence,
         updated_at = unixepoch()
-    `, item.id, item.category, item.topic, item.content, item.confidence ?? 0.5, item.sessionId ?? null)
+    `, item.id, item.category, item.topic, item.content, item.confidence ?? 0.5, item.sessionId ?? null, item.projectId ?? null)
   },
 
   // Patterns
-  getPatterns(type?: string, limit: number = 10) {
-    if (type) {
-      return all(`
-        SELECT * FROM learned_patterns
-        WHERE pattern_type = ?
-        ORDER BY success_count DESC, last_used_at DESC
-        LIMIT ?
-      `, type, limit)
+  getPatterns(type?: string, limit: number = 10, projectId?: string) {
+    const conditions: string[] = []
+    const params: any[] = []
+
+    if (projectId) {
+      conditions.push('project_id = ?')
+      params.push(projectId)
     }
+    if (type) {
+      conditions.push('pattern_type = ?')
+      params.push(type)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    params.push(limit)
+
     return all(`
       SELECT * FROM learned_patterns
+      ${where}
       ORDER BY success_count DESC, last_used_at DESC
       LIMIT ?
-    `, limit)
+    `, ...params)
   },
 
-  addPattern(pattern: { id: string; type: string; title: string; description: string; example?: string }) {
+  addPattern(pattern: { id: string; type: string; title: string; description: string; example?: string; projectId?: string }) {
     run(`
-      INSERT INTO learned_patterns (id, pattern_type, title, description, example)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO learned_patterns (id, pattern_type, title, description, example, project_id)
+      VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         description = excluded.description,
         example = excluded.example,
         updated_at = unixepoch()
-    `, pattern.id, pattern.type, pattern.title, pattern.description, pattern.example ?? null)
+    `, pattern.id, pattern.type, pattern.title, pattern.description, pattern.example ?? null, pattern.projectId ?? null)
   },
 
   incrementPatternSuccess(id: string) {
@@ -337,24 +364,35 @@ export const queries = {
   },
 
   // Contacts
-  getContacts(type?: string) {
-    if (type) {
-      return all('SELECT * FROM contacts WHERE type = ? ORDER BY name', type)
+  getContacts(projectId?: string, type?: string) {
+    const conditions: string[] = []
+    const params: any[] = []
+
+    if (projectId) {
+      conditions.push('project_id = ?')
+      params.push(projectId)
     }
-    return all('SELECT * FROM contacts ORDER BY type, name')
+    if (type) {
+      conditions.push('type = ?')
+      params.push(type)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    return all(`SELECT * FROM contacts ${where} ORDER BY type, name`, ...params)
   },
 
-  addContact(contact: { id: string; name: string; type: string; role?: string; email?: string; metadata?: string }) {
+  addContact(contact: { id: string; name: string; type: string; role?: string; email?: string; metadata?: string; projectId?: string }) {
     run(`
-      INSERT INTO contacts (id, name, type, role, email, metadata)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO contacts (id, name, type, role, email, metadata, project_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         name = excluded.name,
         role = excluded.role,
         email = excluded.email,
         metadata = excluded.metadata,
+        project_id = excluded.project_id,
         updated_at = unixepoch()
-    `, contact.id, contact.name, contact.type, contact.role ?? null, contact.email ?? null, contact.metadata ?? null)
+    `, contact.id, contact.name, contact.type, contact.role ?? null, contact.email ?? null, contact.metadata ?? null, contact.projectId ?? null)
   },
 
   addInteraction(contactId: string, sessionId: string, type: string, context: string) {

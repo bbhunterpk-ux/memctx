@@ -25,6 +25,12 @@ export const api = {
       body: JSON.stringify({ query, project_id })
     }),
   getObservations: (session_id: string) => apiFetch(`/api/observations?session_id=${session_id}`),
+  getMemory: (projectId: string) => apiFetch(`/api/memory?project_id=${projectId}`),
+  getPreferences: (projectId: string) => apiFetch(`/api/memory/preferences?project_id=${projectId}`),
+  getKnowledge: (projectId: string, category?: string) => apiFetch(`/api/memory/knowledge?project_id=${projectId}${category ? `&category=${category}` : ''}`),
+  getPatterns: (projectId: string, type?: string) => apiFetch(`/api/memory/patterns?project_id=${projectId}${type ? `&type=${type}` : ''}`),
+  getTasks: (projectId: string, status?: string) => apiFetch(`/api/memory/tasks?project_id=${projectId}${status ? `&status=${status}` : ''}`),
+  getContacts: (projectId: string) => apiFetch(`/api/memory/contacts?project_id=${projectId}`),
 }
 
 export function createWebSocket(): WebSocket {

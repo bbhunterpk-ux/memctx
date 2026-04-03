@@ -10,6 +10,7 @@ import { contextRouter } from './api/context'
 import { searchRouter } from './api/search'
 import { healthRouter } from './api/health'
 import { observationsRouter } from './api/observations'
+import { memoryRouter } from './api/memory'
 import { startWatcher } from './services/watcher'
 import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
@@ -43,6 +44,7 @@ async function main() {
   app.use('/api/search', searchRouter)
   app.use('/api/health', healthRouter)
   app.use('/api/observations', observationsRouter)
+  app.use('/api/memory', memoryRouter)
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))

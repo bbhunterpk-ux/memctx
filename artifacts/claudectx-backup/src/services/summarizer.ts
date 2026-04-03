@@ -137,21 +137,21 @@ Rules:
     // Store extracted memory
     if (summary.preferences) {
       for (const pref of summary.preferences) {
-        queries.setPreference(pref.category, pref.key, pref.value, pref.confidence, sessionId)
+        queries.setPreference(pref.category, pref.key, pref.value, pref.confidence, sessionId, projectId)
       }
     }
 
     if (summary.knowledge) {
       for (const k of summary.knowledge) {
         const id = `${k.category}_${k.topic}`.replace(/\s+/g, '_').toLowerCase()
-        queries.addKnowledge({ id, category: k.category, topic: k.topic, content: k.content, confidence: k.confidence, sessionId })
+        queries.addKnowledge({ id, category: k.category, topic: k.topic, content: k.content, confidence: k.confidence, sessionId, projectId })
       }
     }
 
     if (summary.patterns) {
       for (const p of summary.patterns) {
         const id = `${p.type}_${p.title}`.replace(/\s+/g, '_').toLowerCase()
-        queries.addPattern({ id, type: p.type, title: p.title, description: p.description, example: p.example })
+        queries.addPattern({ id, type: p.type, title: p.title, description: p.description, example: p.example, projectId })
       }
     }
 
@@ -165,7 +165,7 @@ Rules:
     if (summary.contacts) {
       for (const c of summary.contacts) {
         const id = c.name.replace(/\s+/g, '_').toLowerCase()
-        queries.addContact({ id, name: c.name, type: c.type, role: c.role })
+        queries.addContact({ id, name: c.name, type: c.type, role: c.role, projectId })
         queries.addInteraction(id, sessionId, 'mentioned', c.context)
       }
     }

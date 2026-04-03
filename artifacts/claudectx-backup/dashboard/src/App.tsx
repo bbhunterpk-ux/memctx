@@ -5,6 +5,7 @@ import ProjectDetail from './pages/ProjectDetail'
 import SessionDetail from './pages/SessionDetail'
 import Search from './pages/Search'
 import Live from './pages/Live'
+import Memory from './pages/Memory'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Projects />} />
         <Route path="/project/:id" element={<ProjectDetail />} />
+        <Route path="/project/:id/memory" element={<Memory />} />
         <Route path="/session/:id" element={<SessionDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/live" element={<Live />} />

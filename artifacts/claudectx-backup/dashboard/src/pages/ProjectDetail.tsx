@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { api } from '../api/client'
 import SessionCard from '../components/SessionCard'
 import ActivityChart from '../components/ActivityChart'
-import { ArrowLeft, GitBranch, FolderOpen } from 'lucide-react'
+import { ArrowLeft, GitBranch, FolderOpen, Brain } from 'lucide-react'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
@@ -67,7 +67,7 @@ export default function ProjectDetail() {
           {project.root_path}
         </div>
 
-        <div style={{ display: 'flex', gap: 20 }}>
+        <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
           {[
             { label: 'Sessions', value: allSessions.length },
             { label: 'Files Changed', value: totalFiles },
@@ -84,6 +84,28 @@ export default function ProjectDetail() {
             </div>
           ))}
         </div>
+
+        <Link
+          to={`/project/${id}/memory`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 14px',
+            background: 'var(--accent)',
+            color: 'white',
+            borderRadius: 8,
+            fontSize: 13,
+            fontWeight: 600,
+            textDecoration: 'none',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
+          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+        >
+          <Brain size={16} />
+          View Memory
+        </Link>
       </div>
 
       {parsed.length === 0 ? (

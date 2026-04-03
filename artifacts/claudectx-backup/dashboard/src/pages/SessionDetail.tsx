@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
-import { api } from '../api/client'
+import { api, createWebSocket } from '../api/client'
 import { format, formatDistanceStrict } from 'date-fns'
 import StatusBadge from '../components/StatusBadge'
 import SummaryView from '../components/SummaryView'
 import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
 import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function buildCopyText(session: any): string {
   const lines = [
@@ -107,6 +107,36 @@ export default function SessionDetail() {
     enabled: !!id,
     refetchInterval: (data: any) => data?.status === 'active' ? 5000 : false,
   })
+
+  // WebSocket listener for real-time updates
+  useEffect(() => {
+    if (!id) return
+
+    let ws: WebSocket
+    try {
+      ws = createWebSocket()
+
+      ws.onmessage = (e) => {
+        try {
+          const event = JSON.parse(e.data)
+          // Refetch session on session_end, summary_ready, or any event for this session
+          if (event.session_id === id && (event.type === 'session_end' || event.type === 'summary_ready' || event.type === 'tool_use' || event.type === 'stop')) {
+            refetch()
+          }
+        } catch {}
+      }
+
+      ws.onerror = () => {
+        console.log('[SessionDetail] WebSocket error, falling back to polling')
+      }
+    } catch (err) {
+      console.log('[SessionDetail] WebSocket connection failed:', err)
+    }
+
+    return () => {
+      ws?.close()
+    }
+  }, [id, refetch])
 
   const handleResync = async () => {
     if (!id) return

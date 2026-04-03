@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams, Link } from 'react-router-dom'
-import { api } from '../api/client'
+import { api, createWebSocket } from '../api/client'
 import SessionCard from '../components/SessionCard'
 import ActivityChart from '../components/ActivityChart'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { toast } from '../components/Toast'
 
@@ -42,6 +42,36 @@ export default function ProjectDetail() {
   })
 
   const { data: health } = useQuery({ queryKey: ['health'], queryFn: api.getHealth })
+
+  // WebSocket listener for real-time updates
+  useEffect(() => {
+    if (!id) return
+
+    let ws: WebSocket
+    try {
+      ws = createWebSocket()
+
+      ws.onmessage = (e) => {
+        try {
+          const event = JSON.parse(e.data)
+          // Refetch sessions on session_end or summary_ready events
+          if (event.type === 'session_end' || event.type === 'summary_ready') {
+            refetchSessions()
+          }
+        } catch {}
+      }
+
+      ws.onerror = () => {
+        console.log('[ProjectDetail] WebSocket error, falling back to polling')
+      }
+    } catch (err) {
+      console.log('[ProjectDetail] WebSocket connection failed:', err)
+    }
+
+    return () => {
+      ws?.close()
+    }
+  }, [id, refetchSessions])
 
   const handleConsolidate = async () => {
     if (!id) return

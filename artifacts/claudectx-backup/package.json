@@ -11,9 +11,9 @@
   "scripts": {
     "dev": "NODE_NO_WARNINGS=1 tsx watch src/index.ts",
     "dev:dashboard": "cd dashboard && vite --port $PORT",
-    "build": "npm run build:worker && npm run build:dashboard",
+    "build": "pnpm run build:worker && pnpm run build:dashboard",
     "build:worker": "tsc -p tsconfig.worker.json",
-    "build:dashboard": "cd dashboard && vite build",
+    "build:dashboard": "cd dashboard && pnpm vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

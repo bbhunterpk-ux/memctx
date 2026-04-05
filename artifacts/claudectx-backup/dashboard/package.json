@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "catalog:",
     "date-fns": "^3.6.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -18,11 +19,11 @@
     "recharts": "^2.12.7"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "tailwindcss": "catalog:",
-    "@tailwindcss/vite": "catalog:",
     "typescript": "~5.9.2",
     "vite": "catalog:"
   }

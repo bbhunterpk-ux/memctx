@@ -7,6 +7,8 @@ import SummaryView from '../components/SummaryView'
 import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
 import DownloadButton from '../components/DownloadButton'
+import PDFDownloadButton from '../components/PDFDownloadButton'
+import ShareLinkButton from '../components/ShareLinkButton'
 import TagInput from '../components/TagInput'
 import NotesModal from '../components/NotesModal'
 import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText } from 'lucide-react'
@@ -541,6 +543,7 @@ export default function SessionDetail() {
             <FileText size={16} />
             {session.notes ? 'Edit Notes' : 'Add Notes'}
           </button>
+          <ShareLinkButton sessionId={session.id} />
           {hasSummary && (
             <>
               <CopyButton text={buildCopyText(session)} label="Copy as Markdown" />
@@ -549,6 +552,7 @@ export default function SessionDetail() {
                 filename={`session-${session.id.slice(0, 8)}-${format(new Date(session.started_at * 1000), 'yyyy-MM-dd')}.md`}
                 label="Download Markdown"
               />
+              <PDFDownloadButton session={session} />
             </>
           )}
           {session.status !== 'active' && session.transcript_path && (

@@ -8,6 +8,7 @@ import BulkTagModal from '../components/BulkTagModal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ProductivityWidget from '../components/ProductivityWidget'
 import SearchBar from '../components/SearchBar'
+import DateRangePicker from '../components/DateRangePicker'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -21,6 +22,7 @@ export default function ProjectDetail() {
   const [showBulkTagModal, setShowBulkTagModal] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null })
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -137,10 +139,10 @@ export default function ProjectDetail() {
   }
 
   const handleSelectAll = () => {
-    if (selectedSessions.size === searchedSessions.length) {
+    if (selectedSessions.size === dateFilteredSessions.length) {
       setSelectedSessions(new Set())
     } else {
-      setSelectedSessions(new Set(searchedSessions.map((s: any) => s.id)))
+      setSelectedSessions(new Set(dateFilteredSessions.map((s: any) => s.id)))
     }
   }
 
@@ -248,11 +250,25 @@ export default function ProjectDetail() {
       })
     : filteredSessions
 
+  // Apply date range filter
+  const dateFilteredSessions = (dateRange.start || dateRange.end)
+    ? searchedSessions.filter((s: any) => {
+        const sessionDate = new Date(s.started_at * 1000)
+        const startMatch = !dateRange.start || sessionDate >= dateRange.start
+        const endMatch = !dateRange.end || sessionDate <= new Date(dateRange.end.getTime() + 86400000) // Add 1 day to include end date
+        return startMatch && endMatch
+      })
+    : searchedSessions
+
   const totalFiles = new Set(
     parsed.flatMap((s: any) => Array.isArray(s.summary_files_changed) ? s.summary_files_changed : [])
   ).size
 
   const archivedCount = parsed.filter((s: any) => s.is_archived).length
+
+  const handleDateRangeChange = (start: Date | null, end: Date | null) => {
+    setDateRange({ start, end })
+  }
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
@@ -502,20 +518,22 @@ export default function ProjectDetail() {
         <>
           <ProductivityWidget projectId={id!} />
 
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
             <SearchBar onSearch={setSearchQuery} placeholder="Search by title, content, or files..." />
+            <DateRangePicker onDateRangeChange={handleDateRangeChange} />
           </div>
 
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
-            Sessions ({searchedSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
+            Sessions ({dateFilteredSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
             {searchQuery && ` • Filtered by "${searchQuery}"`}
+            {(dateRange.start || dateRange.end) && ` • Date filtered`}
           </h2>
-          {searchedSessions.length === 0 ? (
+          {dateFilteredSessions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
-              No sessions match your search
+              No sessions match your filters
             </div>
           ) : (
-            searchedSessions.map((s: any) => (
+            dateFilteredSessions.map((s: any) => (
               <SessionCard
                 key={s.id}
                 session={s}

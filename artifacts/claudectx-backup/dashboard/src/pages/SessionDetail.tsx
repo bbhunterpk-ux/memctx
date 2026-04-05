@@ -8,6 +8,7 @@ import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
 import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { toast } from '../components/Toast'
 
 function buildCopyText(session: any): string {
   const lines = [
@@ -141,12 +142,15 @@ export default function SessionDetail() {
   const handleResync = async () => {
     if (!id) return
     setResyncing(true)
+    const toastId = toast.loading('Queueing session for resync...')
     try {
       await api.resyncSession(id)
-      alert('Session queued for resync. Summary will be regenerated.')
+      toast.dismiss(toastId)
+      toast.success('Session queued for resync. Summary will be regenerated.')
       setTimeout(() => refetch(), 2000)
     } catch (error) {
-      alert('Resync failed: ' + error)
+      toast.dismiss(toastId)
+      toast.error('Resync failed: ' + error)
     } finally {
       setResyncing(false)
     }
@@ -183,26 +187,17 @@ export default function SessionDetail() {
           <StatusBadge status={session.summary_status || session.status} />
         </div>
 
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
-          <span>{format(new Date(session.started_at * 1000), 'PPpp')}</span>
-          {duration && <span>Duration: {duration}</span>}
-          {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
-          {session.total_tool_calls > 0 && <span>{session.total_tool_calls} tool calls</span>}
-        </div>
+        {/* 70-30 Split Layout */}
+        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+          {/* Left Side - 70% */}
+          <div style={{ flex: '0 0 70%' }}>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
+              <span>{format(new Date(session.started_at * 1000), 'PPpp')}</span>
+              {duration && <span>Duration: {duration}</span>}
+              {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
+              {session.total_tool_calls > 0 && <span>{session.total_tool_calls} tool calls</span>}
+            </div>
 
-        {/* Enhanced v2.0 fields */}
-        {(session.summary_mood || session.summary_complexity || session.summary_key_insight) && (
-          <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {session.summary_mood && (
-              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                <strong>Mood:</strong> {session.summary_mood}
-              </div>
-            )}
-            {session.summary_complexity && (
-              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                <strong>Complexity:</strong> {session.summary_complexity.replace('_', ' ')}
-              </div>
-            )}
             {session.summary_key_insight && (
               <div style={{
                 padding: '10px 12px',
@@ -213,7 +208,8 @@ export default function SessionDetail() {
                 color: 'var(--text)',
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: 8
+                gap: 8,
+                marginBottom: 16
               }}>
                 <Zap size={16} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
                 <div>
@@ -221,56 +217,286 @@ export default function SessionDetail() {
                 </div>
               </div>
             )}
-          </div>
-        )}
 
-        {/* Blockers and Resolved */}
+            {/* Info Cards Grid - 3 columns, 2 rows */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              {/* Total Events */}
+              {session.observations && session.observations.length > 0 && (
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  padding: '12px 14px'
+                }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                    Total Events
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>
+                    {session.observations.length}
+                  </div>
+                </div>
+              )}
+
+              {/* Tool Uses */}
+              {session.observations && session.observations.filter((o: any) => o.type === 'tool_use').length > 0 && (
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  padding: '12px 14px'
+                }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                    Tool Uses
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>
+                    {session.observations.filter((o: any) => o.type === 'tool_use').length}
+                  </div>
+                </div>
+              )}
+
+              {/* User Prompts */}
+              {session.observations && session.observations.filter((o: any) => o.type === 'user_prompt').length > 0 && (
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  padding: '12px 14px'
+                }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                    User Prompts
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--green)' }}>
+                    {session.observations.filter((o: any) => o.type === 'user_prompt').length}
+                  </div>
+                </div>
+              )}
+
+              {/* Files Changed */}
+              {(() => {
+                const files = session.summary_files_changed
+                  ? (Array.isArray(session.summary_files_changed)
+                      ? session.summary_files_changed
+                      : JSON.parse(session.summary_files_changed))
+                  : []
+
+                if (files.length === 0) return null
+
+                return (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      Files Changed
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--orange)' }}>
+                      {files.length}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {/* Decisions Made */}
+              {(() => {
+                const decisions = session.summary_decisions
+                  ? (Array.isArray(session.summary_decisions)
+                      ? session.summary_decisions
+                      : JSON.parse(session.summary_decisions))
+                  : []
+
+                if (decisions.length === 0) return null
+
+                return (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      Decisions Made
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>
+                      {decisions.length}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {/* Next Steps */}
+              {(() => {
+                const nextSteps = session.summary_next_steps
+                  ? (Array.isArray(session.summary_next_steps)
+                      ? session.summary_next_steps
+                      : JSON.parse(session.summary_next_steps))
+                  : []
+
+                if (nextSteps.length === 0) return null
+
+                return (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      Next Steps
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--yellow)' }}>
+                      {nextSteps.length}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {/* Gotchas */}
+              {(() => {
+                const gotchas = session.summary_gotchas
+                  ? (Array.isArray(session.summary_gotchas)
+                      ? session.summary_gotchas
+                      : JSON.parse(session.summary_gotchas))
+                  : []
+
+                if (gotchas.length === 0) return null
+
+                return (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      Gotchas
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--red)' }}>
+                      {gotchas.length}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {/* Tech Notes */}
+              {(() => {
+                const techNotes = session.summary_tech_notes
+                  ? (Array.isArray(session.summary_tech_notes)
+                      ? session.summary_tech_notes
+                      : JSON.parse(session.summary_tech_notes))
+                  : []
+
+                if (techNotes.length === 0) return null
+
+                return (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                      Tech Notes
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>
+                      {techNotes.length}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+
+          {/* Right Side - 30% Stats Cards */}
+          <div style={{ flex: '0 0 28%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Mood Card */}
+            {session.summary_mood && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+              }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                  Mood
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', textTransform: 'capitalize' }}>
+                  {session.summary_mood}
+                </div>
+              </div>
+            )}
+
+            {/* Complexity Card */}
+            {session.summary_complexity && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+              }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                  Complexity
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', textTransform: 'capitalize' }}>
+                  {session.summary_complexity.replace('_', ' ')}
+                </div>
+              </div>
+            )}
+
+            {/* Resolved Card */}
+            {(() => {
+              const resolved = session.summary_resolved ? JSON.parse(session.summary_resolved) : []
+              if (resolved.length === 0) return null
+
+              return (
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  padding: '14px 16px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <CheckCircle size={14} style={{ color: 'var(--green)' }} />
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Resolved
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {resolved.map((r: string, i: number) => (
+                      <div key={i} style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.4 }}>
+                        • {r}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+
+        {/* Blockers - Full Width Below */}
         {(() => {
           const blockers = session.summary_blockers ? JSON.parse(session.summary_blockers) : []
-          const resolved = session.summary_resolved ? JSON.parse(session.summary_resolved) : []
-
-          if (blockers.length === 0 && resolved.length === 0) return null
+          if (blockers.length === 0) return null
 
           return (
-            <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-              {blockers.length > 0 && (
-                <div style={{
-                  flex: 1,
-                  minWidth: 200,
-                  padding: '10px 12px',
-                  background: 'var(--red)10',
-                  border: '1px solid var(--red)30',
-                  borderRadius: 8,
-                  fontSize: 14
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
-                    <AlertCircle size={16} />
-                    Blockers
-                  </div>
-                  {blockers.map((b: string, i: number) => (
-                    <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {b}</div>
-                  ))}
+            <div style={{ marginTop: 16 }}>
+              <div style={{
+                padding: '10px 12px',
+                background: 'var(--red)10',
+                border: '1px solid var(--red)30',
+                borderRadius: 8,
+                fontSize: 14
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
+                  <AlertCircle size={16} />
+                  Blockers
                 </div>
-              )}
-              {resolved.length > 0 && (
-                <div style={{
-                  flex: 1,
-                  minWidth: 200,
-                  padding: '10px 12px',
-                  background: 'var(--green)10',
-                  border: '1px solid var(--green)30',
-                  borderRadius: 8,
-                  fontSize: 14
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--green)', fontWeight: 600 }}>
-                    <CheckCircle size={16} />
-                    Resolved
-                  </div>
-                  {resolved.map((r: string, i: number) => (
-                    <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {r}</div>
-                  ))}
-                </div>
-              )}
+                {blockers.map((b: string, i: number) => (
+                  <div key={i} style={{ color: 'var(--text-muted)', marginBottom: 4 }}>• {b}</div>
+                ))}
+              </div>
             </div>
           )
         })()}

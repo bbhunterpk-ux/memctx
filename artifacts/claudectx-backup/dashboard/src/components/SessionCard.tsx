@@ -5,6 +5,7 @@ import StatusBadge from './StatusBadge'
 import ConfirmDialog from './ConfirmDialog'
 import { api } from '../api/client'
 import { useState } from 'react'
+import { toast } from './Toast'
 
 interface Props {
   session: any
@@ -59,13 +60,17 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const confirmForceEnd = async () => {
     setShowForceEndDialog(false)
     setEnding(true)
+    const toastId = toast.loading('Ending session...')
     try {
       await api.forceEndSession(session.id)
+      toast.dismiss(toastId)
+      toast.success('Session ended successfully')
       if (onSessionUpdated) {
         setTimeout(() => onSessionUpdated(), 1000)
       }
     } catch (error) {
-      alert('Failed to end session: ' + error)
+      toast.dismiss(toastId)
+      toast.error('Failed to end session: ' + error)
     } finally {
       setEnding(false)
     }
@@ -80,13 +85,17 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const confirmDelete = async () => {
     setShowDeleteDialog(false)
     setDeleting(true)
+    const toastId = toast.loading('Deleting session...')
     try {
       await api.deleteSession(session.id)
+      toast.dismiss(toastId)
+      toast.success('Session deleted successfully')
       if (onSessionUpdated) {
         setTimeout(() => onSessionUpdated(), 500)
       }
     } catch (error) {
-      alert('Failed to delete session: ' + error)
+      toast.dismiss(toastId)
+      toast.error('Failed to delete session: ' + error)
     } finally {
       setDeleting(false)
     }

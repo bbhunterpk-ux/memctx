@@ -102,6 +102,10 @@ export const queries = {
     run('DELETE FROM sessions WHERE id = ?', id)
   },
 
+  updateSessionBookmark(id: string, bookmarked: number) {
+    run('UPDATE sessions SET is_bookmarked = ? WHERE id = ?', bookmarked, id)
+  },
+
   getSessions(opts: { project_id?: string; limit?: number; offset?: number; status?: string }) {
     const conditions: string[] = ['1=1']
     const params: any[] = []

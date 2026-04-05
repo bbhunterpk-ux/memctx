@@ -38,6 +38,10 @@ export const api = {
   resyncAll: (force?: boolean) => apiFetch(`/api/resync/all${force ? '?force=true' : ''}`, { method: 'POST' }),
   forceEndSession: (sessionId: string) => apiFetch(`/api/force-end-session/${sessionId}`, { method: 'POST' }),
   deleteSession: (sessionId: string) => apiFetch(`/api/sessions/${sessionId}`, { method: 'DELETE' }),
+  toggleBookmark: (sessionId: string, bookmarked: boolean) => apiFetch(`/api/sessions/${sessionId}/bookmark`, {
+    method: 'POST',
+    body: JSON.stringify({ bookmarked })
+  }),
 }
 
 export function createWebSocket(): WebSocket {

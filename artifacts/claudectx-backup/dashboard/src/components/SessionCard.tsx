@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
-import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2 } from 'lucide-react'
+import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2, Star } from 'lucide-react'
 import StatusBadge from './StatusBadge'
 import ConfirmDialog from './ConfirmDialog'
 import { api } from '../api/client'
@@ -31,6 +31,7 @@ const complexityColors: Record<string, string> = {
 export default function SessionCard({ session, onSessionUpdated }: Props) {
   const [ending, setEnding] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [bookmarking, setBookmarking] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showForceEndDialog, setShowForceEndDialog] = useState(false)
   const startDate = new Date(session.started_at * 1000)
@@ -50,6 +51,22 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
   const isActive = session.status === 'active' ||
                    (!session.status && !session.ended_at) ||
                    (session.summary_status && session.summary_status.toLowerCase() === 'in_progress')
+
+  const handleToggleBookmark = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setBookmarking(true)
+    try {
+      await api.toggleBookmark(session.id, !session.is_bookmarked)
+      if (onSessionUpdated) {
+        onSessionUpdated()
+      }
+    } catch (error) {
+      toast.error('Failed to update bookmark: ' + error)
+    } finally {
+      setBookmarking(false)
+    }
+  }
 
   const handleForceEnd = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -197,6 +214,39 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
           </div>
 
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={handleToggleBookmark}
+              disabled={bookmarking}
+              title={session.is_bookmarked ? 'Remove bookmark' : 'Bookmark session'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                background: 'transparent',
+                color: session.is_bookmarked ? 'var(--yellow)' : 'var(--text-muted)',
+                border: '1px solid var(--border)',
+                borderRadius: 6,
+                cursor: bookmarking ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!bookmarking) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--yellow)15'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--yellow)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--yellow)30'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!bookmarking) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = session.is_bookmarked ? 'var(--yellow)' : 'var(--text-muted)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
+                }
+              }}
+            >
+              <Star size={14} fill={session.is_bookmarked ? 'var(--yellow)' : 'none'} />
+            </button>
             {isActive && (
               <button
                 onClick={handleForceEnd}

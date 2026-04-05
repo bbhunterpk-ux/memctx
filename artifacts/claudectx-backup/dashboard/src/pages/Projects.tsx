@@ -6,6 +6,7 @@ import { FolderGit2, Clock, Layers, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { toast } from '../components/Toast'
+import SkeletonCard from '../components/SkeletonCard'
 
 export default function Projects() {
   const [resyncingAll, setResyncingAll] = useState(false)
@@ -199,8 +200,16 @@ export default function Projects() {
 
 function Loading() {
   return (
-    <div style={{ padding: 32, color: 'var(--text-muted)', fontSize: 13 }}>
-      Loading projects...
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Projects</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading...</p>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
     </div>
   )
 }

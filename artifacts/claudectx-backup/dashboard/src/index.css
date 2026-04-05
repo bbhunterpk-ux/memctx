@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Dark theme (default) */
   --bg: #0d0d0f;
   --surface: #16161a;
   --surface2: #1e1e24;
@@ -14,6 +15,40 @@
   --red: #ef4444;
   --blue: #3b82f6;
   --orange: #f97316;
+}
+
+:root.dark {
+  /* Dark theme */
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: #2a2a35;
+  --text: #e8e8f0;
+  --text-muted: #7a7a99;
+  --accent: #7c6cfc;
+  --accent-hover: #9181fd;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --orange: #f97316;
+}
+
+:root:not(.dark) {
+  /* Light theme */
+  --bg: #ffffff;
+  --surface: #f9fafb;
+  --surface2: #f3f4f6;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --accent: #7c6cfc;
+  --accent-hover: #6b5ce8;
+  --green: #16a34a;
+  --yellow: #ca8a04;
+  --red: #dc2626;
+  --blue: #2563eb;
+  --orange: #ea580c;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,4 +86,9 @@ a { color: inherit; text-decoration: none; }
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

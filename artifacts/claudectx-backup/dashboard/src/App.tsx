@@ -9,8 +9,12 @@ import Memory from './pages/Memory'
 import MetricsDashboard from './pages/MetricsDashboard'
 import Logs from './pages/Logs'
 import ToastContainer from './components/Toast'
+import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 
 export default function App() {
+  useKeyboardShortcuts()
+
   return (
     <>
       <Layout>
@@ -26,6 +30,7 @@ export default function App() {
         </Routes>
       </Layout>
       <ToastContainer />
+      <KeyboardShortcutsHelp />
     </>
   )
 }

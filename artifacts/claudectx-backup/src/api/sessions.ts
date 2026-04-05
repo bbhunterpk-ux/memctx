@@ -74,6 +74,26 @@ sessionsRouter.delete('/:id', (req, res) => {
   }
 })
 
+sessionsRouter.post('/:id/bookmark', (req, res) => {
+  try {
+    const { bookmarked } = req.body
+    const session = queries.getSession(req.params.id)
+
+    if (!session) {
+      res.status(404).json({ error: 'Session not found' })
+      return
+    }
+
+    queries.updateSessionBookmark(req.params.id, bookmarked ? 1 : 0)
+
+    console.log(`[API] ${bookmarked ? 'Bookmarked' : 'Unbookmarked'} session: ${req.params.id.slice(0, 8)}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[API] Error updating bookmark:', err)
+    res.status(500).json({ error: String(err) })
+  }
+})
+
 function tryParse(val: any): any {
   if (!val) return null
   try { return JSON.parse(val) } catch { return val }

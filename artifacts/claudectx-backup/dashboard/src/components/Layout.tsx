@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText } from 'lucide-react'
+import ThemeToggle from './ThemeToggle'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const loc = useLocation()
@@ -80,20 +81,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {health && (
-          <div style={{
-            padding: '16px 20px',
-            borderTop: '1px solid var(--border)',
-            fontSize: 12,
-            color: 'var(--text-muted)',
-            lineHeight: 1.8
-          }}>
-            <div>DB: {health.db}</div>
-            <div>AI: {health.api_key ? 'enabled' : 'no key'}</div>
-            <div>Queue: {health.queue_size ?? 0} pending</div>
-            <div>v{health.version}</div>
-          </div>
-        )}
+        <div style={{
+          padding: '16px 20px',
+          borderTop: '1px solid var(--border)',
+        }}>
+          <ThemeToggle />
+          {health && (
+            <div style={{
+              marginTop: 16,
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              lineHeight: 1.8
+            }}>
+              <div>DB: {health.db}</div>
+              <div>AI: {health.api_key ? 'enabled' : 'no key'}</div>
+              <div>Queue: {health.queue_size ?? 0} pending</div>
+              <div>v{health.version}</div>
+            </div>
+          )}
+        </div>
       </aside>
 
       <main style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>

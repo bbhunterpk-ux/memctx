@@ -22,7 +22,7 @@ export default function Search() {
   })
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 800 }}>
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Search</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>

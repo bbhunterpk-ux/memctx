@@ -21,7 +21,7 @@ export default function Memory() {
                   stats.total_patterns > 0 || stats.total_tasks > 0 || stats.total_contacts > 0
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
           <Brain size={24} color="var(--accent)" />

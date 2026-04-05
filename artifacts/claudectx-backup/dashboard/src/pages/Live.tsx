@@ -74,7 +74,7 @@ export default function Live() {
   }, [])
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 800 }}>
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>Live Feed</h1>

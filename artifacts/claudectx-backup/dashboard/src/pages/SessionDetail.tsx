@@ -167,7 +167,7 @@ export default function SessionDetail() {
   const hasSummary = !!session.summary_title
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 900 }}>
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
       <Link
         to={`/project/${session.project_id}`}
         style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 12, marginBottom: 20 }}

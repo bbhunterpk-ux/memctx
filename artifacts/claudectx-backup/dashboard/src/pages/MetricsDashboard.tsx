@@ -66,7 +66,7 @@ export default function MetricsDashboard() {
   ]
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
+    <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>System Metrics</h1>
 
       {/* Summarization Stats */}

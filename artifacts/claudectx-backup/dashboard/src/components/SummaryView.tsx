@@ -54,7 +54,7 @@ export default function SummaryView(props: Props) {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+      gridTemplateColumns: 'repeat(3, 1fr)',
       gap: 12,
     }}>
       <Panel icon={CheckCircle2} title="What We Did" items={props.summary_what_we_did} color="var(--green)" />

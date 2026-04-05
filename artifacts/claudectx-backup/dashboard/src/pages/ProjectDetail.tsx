@@ -9,6 +9,8 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import ProductivityWidget from '../components/ProductivityWidget'
 import SearchBar from '../components/SearchBar'
 import DateRangePicker from '../components/DateRangePicker'
+import ViewToggle from '../components/ViewToggle'
+import TableView from '../components/TableView'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -23,6 +25,10 @@ export default function ProjectDetail() {
   const [showArchived, setShowArchived] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null })
+  const [viewMode, setViewMode] = useState<'card' | 'table'>(() => {
+    const saved = localStorage.getItem('sessionViewMode')
+    return (saved === 'card' || saved === 'table') ? saved : 'card'
+  })
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -268,6 +274,11 @@ export default function ProjectDetail() {
 
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
     setDateRange({ start, end })
+  }
+
+  const handleViewToggle = (mode: 'card' | 'table') => {
+    setViewMode(mode)
+    localStorage.setItem('sessionViewMode', mode)
   }
 
   return (
@@ -518,9 +529,12 @@ export default function ProjectDetail() {
         <>
           <ProductivityWidget projectId={id!} />
 
-          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
             <SearchBar onSearch={setSearchQuery} placeholder="Search by title, content, or files..." />
             <DateRangePicker onDateRangeChange={handleDateRangeChange} />
+            <div style={{ marginLeft: 'auto' }}>
+              <ViewToggle viewMode={viewMode} onToggle={handleViewToggle} />
+            </div>
           </div>
 
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
@@ -532,6 +546,13 @@ export default function ProjectDetail() {
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
               No sessions match your filters
             </div>
+          ) : viewMode === 'table' ? (
+            <TableView
+              sessions={dateFilteredSessions}
+              selectionMode={selectionMode}
+              selectedSessions={selectedSessions}
+              onSelectionChange={handleSessionSelectionChange}
+            />
           ) : (
             dateFilteredSessions.map((s: any) => (
               <SessionCard

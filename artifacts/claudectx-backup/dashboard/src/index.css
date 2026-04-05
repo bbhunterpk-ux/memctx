@@ -92,3 +92,58 @@ a { color: inherit; text-decoration: none; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  /* Tablet */
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Mobile */
+  body {
+    font-size: 14px;
+  }
+
+  /* Hide scrollbars on mobile for cleaner look */
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  /* Adjust grid layouts for mobile */
+  .projects-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stack cards vertically on mobile */
+  [style*="gridTemplateColumns: 'repeat(3, 1fr')"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Reduce padding on mobile */
+  [style*="padding: '28px 32px'"] {
+    padding: 16px !important;
+  }
+}
+
+/* Utility classes for responsive layouts */
+.mobile-hidden {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}

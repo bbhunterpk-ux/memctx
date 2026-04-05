@@ -436,5 +436,39 @@ export const queries = {
 
   deletePattern(id: string) {
     run('DELETE FROM learned_patterns WHERE id = ?', id)
+  },
+
+  // Tags
+  getTags(projectId: string) {
+    return all('SELECT * FROM tags WHERE project_id = ? ORDER BY name', projectId)
+  },
+
+  createTag(projectId: string, name: string, color?: string) {
+    const result = run(
+      'INSERT INTO tags (project_id, name, color) VALUES (?, ?, ?) ON CONFLICT(project_id, name) DO UPDATE SET color = excluded.color RETURNING id',
+      projectId, name, color ?? null
+    )
+    return result.lastInsertRowid
+  },
+
+  getSessionTags(sessionId: string) {
+    return all(`
+      SELECT t.* FROM tags t
+      JOIN session_tags st ON st.tag_id = t.id
+      WHERE st.session_id = ?
+      ORDER BY t.name
+    `, sessionId)
+  },
+
+  addSessionTag(sessionId: string, tagId: number) {
+    run('INSERT OR IGNORE INTO session_tags (session_id, tag_id) VALUES (?, ?)', sessionId, tagId)
+  },
+
+  removeSessionTag(sessionId: string, tagId: number) {
+    run('DELETE FROM session_tags WHERE session_id = ? AND tag_id = ?', sessionId, tagId)
+  },
+
+  deleteTag(tagId: number) {
+    run('DELETE FROM tags WHERE id = ?', tagId)
   }
 }

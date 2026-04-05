@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
-import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText } from 'lucide-react'
+import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText, Menu, X } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
+import { useState } from 'react'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const loc = useLocation()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: health } = useQuery({
     queryKey: ['health'],
     queryFn: api.getHealth,
@@ -22,7 +24,43 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ]
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        style={{
+          position: 'fixed',
+          top: 16,
+          left: 16,
+          zIndex: 1001,
+          display: 'none',
+          padding: 8,
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 8,
+          color: 'var(--text)',
+          cursor: 'pointer',
+        }}
+        className="mobile-only"
+      >
+        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Overlay for mobile menu */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 999,
+            display: 'none',
+          }}
+          className="mobile-only"
+        />
+      )}
+
       <aside style={{
         width: 240,
         background: 'var(--surface)',
@@ -30,7 +68,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         display: 'flex',
         flexDirection: 'column',
         flexShrink: 0,
-      }}>
+        position: 'fixed',
+        height: '100vh',
+        left: mobileMenuOpen ? 0 : -240,
+        top: 0,
+        zIndex: 1000,
+        transition: 'left 0.3s ease',
+      }}
+      className="sidebar"
+      >
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Zap size={22} color="var(--accent)" />
@@ -60,6 +106,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link
                 key={path}
                 to={path}
+                onClick={() => setMobileMenuOpen(false)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -102,9 +149,31 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      <main style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+      <main style={{
+        flex: 1,
+        overflow: 'auto',
+        minWidth: 0,
+        marginLeft: 240,
+        transition: 'margin-left 0.3s ease',
+      }}
+      className="main-content"
+      >
         {children}
       </main>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-only {
+            display: block !important;
+          }
+          .sidebar {
+            left: ${mobileMenuOpen ? '0' : '-240px'} !important;
+          }
+          .main-content {
+            margin-left: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

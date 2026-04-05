@@ -39,6 +39,9 @@ sessionsRouter.get('/:id', (req, res) => {
       return
     }
 
+    // Get tags for this session
+    const tags = queries.getSessionTags(req.params.id)
+
     res.json({
       ...session,
       summary_what_we_did: tryParse(session.summary_what_we_did),
@@ -49,6 +52,7 @@ sessionsRouter.get('/:id', (req, res) => {
       summary_tech_notes: tryParse(session.summary_tech_notes),
       files_touched: tryParse(session.files_touched),
       tools_used: tryParse(session.tools_used),
+      tags,
     })
   } catch (err) {
     res.status(500).json({ error: String(err) })

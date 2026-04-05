@@ -42,6 +42,20 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ bookmarked })
   }),
+  getTags: (projectId: string) => apiFetch(`/api/tags?project_id=${projectId}`),
+  createTag: (projectId: string, name: string, color?: string) => apiFetch('/api/tags', {
+    method: 'POST',
+    body: JSON.stringify({ project_id: projectId, name, color })
+  }),
+  deleteTag: (tagId: number) => apiFetch(`/api/tags/${tagId}`, { method: 'DELETE' }),
+  getSessionTags: (sessionId: string) => apiFetch(`/api/tags/session/${sessionId}`),
+  addSessionTag: (sessionId: string, tagId: number) => apiFetch(`/api/tags/session/${sessionId}`, {
+    method: 'POST',
+    body: JSON.stringify({ tag_id: tagId })
+  }),
+  removeSessionTag: (sessionId: string, tagId: number) => apiFetch(`/api/tags/session/${sessionId}/${tagId}`, {
+    method: 'DELETE'
+  }),
 }
 
 export function createWebSocket(): WebSocket {

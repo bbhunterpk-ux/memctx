@@ -128,7 +128,13 @@ export default function Projects() {
       {!projects || projects.length === 0 ? (
         <EmptyState />
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          gap: 14,
+        }}
+        className="projects-grid"
+        >
           {projects.map((p: any) => (
             <Link key={p.id} to={`/project/${p.id}`} style={{ display: 'block' }}>
               <div style={{

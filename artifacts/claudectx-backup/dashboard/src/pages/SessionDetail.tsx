@@ -6,6 +6,8 @@ import StatusBadge from '../components/StatusBadge'
 import SummaryView from '../components/SummaryView'
 import ObservationList from '../components/ObservationList'
 import CopyButton from '../components/CopyButton'
+import DownloadButton from '../components/DownloadButton'
+import TagInput from '../components/TagInput'
 import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -196,6 +198,16 @@ export default function SessionDetail() {
               {duration && <span>Duration: {duration}</span>}
               {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
               {session.total_tool_calls > 0 && <span>{session.total_tool_calls} tool calls</span>}
+            </div>
+
+            {/* Tags */}
+            <div style={{ marginBottom: 16 }}>
+              <TagInput
+                sessionId={session.id}
+                projectId={session.project_id}
+                sessionTags={session.tags || []}
+                onUpdate={refetch}
+              />
             </div>
 
             {session.summary_key_insight && (
@@ -503,7 +515,14 @@ export default function SessionDetail() {
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {hasSummary && (
-            <CopyButton text={buildCopyText(session)} label="Copy as Markdown" />
+            <>
+              <CopyButton text={buildCopyText(session)} label="Copy as Markdown" />
+              <DownloadButton
+                text={buildCopyText(session)}
+                filename={`session-${session.id.slice(0, 8)}-${format(new Date(session.started_at * 1000), 'yyyy-MM-dd')}.md`}
+                label="Download Markdown"
+              />
+            </>
           )}
           {session.status !== 'active' && session.transcript_path && (
             <button

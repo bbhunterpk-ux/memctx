@@ -70,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         flexShrink: 0,
         position: 'fixed',
         height: '100vh',
-        left: mobileMenuOpen ? 0 : -240,
+        left: 0,
         top: 0,
         zIndex: 1000,
         transition: 'left 0.3s ease',

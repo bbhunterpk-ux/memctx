@@ -177,13 +177,13 @@ export default function SessionDetail() {
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, flex: 1 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, flex: 1 }}>
             {session.summary_title || 'Session ' + session.id.slice(0, 12)}
           </h1>
           <StatusBadge status={session.summary_status || session.status} />
         </div>
 
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--text-muted)', fontSize: 12, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
           <span>{format(new Date(session.started_at * 1000), 'PPpp')}</span>
           {duration && <span>Duration: {duration}</span>}
           {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
@@ -194,12 +194,12 @@ export default function SessionDetail() {
         {(session.summary_mood || session.summary_complexity || session.summary_key_insight) && (
           <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {session.summary_mood && (
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                 <strong>Mood:</strong> {session.summary_mood}
               </div>
             )}
             {session.summary_complexity && (
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                 <strong>Complexity:</strong> {session.summary_complexity.replace('_', ' ')}
               </div>
             )}
@@ -209,13 +209,13 @@ export default function SessionDetail() {
                 background: 'var(--accent)15',
                 border: '1px solid var(--accent)30',
                 borderRadius: 8,
-                fontSize: 13,
+                fontSize: 15,
                 color: 'var(--text)',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 8
               }}>
-                <Zap size={14} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
+                <Zap size={16} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
                 <div>
                   <strong style={{ color: 'var(--accent)' }}>Key Insight:</strong> {session.summary_key_insight}
                 </div>
@@ -241,10 +241,10 @@ export default function SessionDetail() {
                   background: 'var(--red)10',
                   border: '1px solid var(--red)30',
                   borderRadius: 8,
-                  fontSize: 12
+                  fontSize: 14
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--red)', fontWeight: 600 }}>
-                    <AlertCircle size={14} />
+                    <AlertCircle size={16} />
                     Blockers
                   </div>
                   {blockers.map((b: string, i: number) => (
@@ -260,10 +260,10 @@ export default function SessionDetail() {
                   background: 'var(--green)10',
                   border: '1px solid var(--green)30',
                   borderRadius: 8,
-                  fontSize: 12
+                  fontSize: 14
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--green)', fontWeight: 600 }}>
-                    <CheckCircle size={14} />
+                    <CheckCircle size={16} />
                     Resolved
                   </div>
                   {resolved.map((r: string, i: number) => (

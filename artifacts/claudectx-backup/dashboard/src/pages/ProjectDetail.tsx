@@ -7,6 +7,7 @@ import BulkActionsBar from '../components/BulkActionsBar'
 import BulkTagModal from '../components/BulkTagModal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ProductivityWidget from '../components/ProductivityWidget'
+import SearchBar from '../components/SearchBar'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -19,6 +20,7 @@ export default function ProjectDetail() {
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
   const [showBulkTagModal, setShowBulkTagModal] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -135,10 +137,10 @@ export default function ProjectDetail() {
   }
 
   const handleSelectAll = () => {
-    if (selectedSessions.size === filteredSessions.length) {
+    if (selectedSessions.size === searchedSessions.length) {
       setSelectedSessions(new Set())
     } else {
-      setSelectedSessions(new Set(filteredSessions.map((s: any) => s.id)))
+      setSelectedSessions(new Set(searchedSessions.map((s: any) => s.id)))
     }
   }
 
@@ -229,6 +231,22 @@ export default function ProjectDetail() {
   const filteredSessions = showArchived
     ? parsed
     : parsed.filter((s: any) => !s.is_archived)
+
+  // Apply search filter
+  const searchedSessions = searchQuery
+    ? filteredSessions.filter((s: any) => {
+        const query = searchQuery.toLowerCase()
+        const title = (s.summary_title || '').toLowerCase()
+        const whatWeDid = Array.isArray(s.summary_what_we_did)
+          ? s.summary_what_we_did.join(' ').toLowerCase()
+          : ''
+        const files = Array.isArray(s.summary_files_changed)
+          ? s.summary_files_changed.join(' ').toLowerCase()
+          : ''
+
+        return title.includes(query) || whatWeDid.includes(query) || files.includes(query)
+      })
+    : filteredSessions
 
   const totalFiles = new Set(
     parsed.flatMap((s: any) => Array.isArray(s.summary_files_changed) ? s.summary_files_changed : [])
@@ -484,19 +502,30 @@ export default function ProjectDetail() {
         <>
           <ProductivityWidget projectId={id!} />
 
+          <div style={{ marginBottom: 16 }}>
+            <SearchBar onSearch={setSearchQuery} placeholder="Search by title, content, or files..." />
+          </div>
+
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
-            Sessions ({filteredSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
+            Sessions ({searchedSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
+            {searchQuery && ` • Filtered by "${searchQuery}"`}
           </h2>
-          {filteredSessions.map((s: any) => (
-            <SessionCard
-              key={s.id}
-              session={s}
-              onSessionUpdated={refetchSessions}
-              selectionMode={selectionMode}
-              selected={selectedSessions.has(s.id)}
-              onSelectionChange={(selected) => handleSessionSelectionChange(s.id, selected)}
-            />
-          ))}
+          {searchedSessions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              No sessions match your search
+            </div>
+          ) : (
+            searchedSessions.map((s: any) => (
+              <SessionCard
+                key={s.id}
+                session={s}
+                onSessionUpdated={refetchSessions}
+                selectionMode={selectionMode}
+                selected={selectedSessions.has(s.id)}
+                onSelectionChange={(selected) => handleSessionSelectionChange(s.id, selected)}
+              />
+            ))
+          )}
         </>
       )}
 

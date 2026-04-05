@@ -98,6 +98,26 @@ sessionsRouter.post('/:id/bookmark', (req, res) => {
   }
 })
 
+sessionsRouter.post('/:id/notes', (req, res) => {
+  try {
+    const { notes } = req.body
+    const session = queries.getSession(req.params.id)
+
+    if (!session) {
+      res.status(404).json({ error: 'Session not found' })
+      return
+    }
+
+    queries.updateSessionNotes(req.params.id, notes || '')
+
+    console.log(`[API] Updated notes for session: ${req.params.id.slice(0, 8)}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[API] Error updating notes:', err)
+    res.status(500).json({ error: String(err) })
+  }
+})
+
 function tryParse(val: any): any {
   if (!val) return null
   try { return JSON.parse(val) } catch { return val }

@@ -56,6 +56,10 @@ export const api = {
   removeSessionTag: (sessionId: string, tagId: number) => apiFetch(`/api/tags/session/${sessionId}/${tagId}`, {
     method: 'DELETE'
   }),
+  updateSessionNotes: (sessionId: string, notes: string) => apiFetch(`/api/sessions/${sessionId}/notes`, {
+    method: 'POST',
+    body: JSON.stringify({ notes })
+  }),
 }
 
 export function createWebSocket(): WebSocket {

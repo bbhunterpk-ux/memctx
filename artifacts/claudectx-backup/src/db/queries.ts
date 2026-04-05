@@ -470,5 +470,9 @@ export const queries = {
 
   deleteTag(tagId: number) {
     run('DELETE FROM tags WHERE id = ?', tagId)
+  },
+
+  updateSessionNotes(sessionId: string, notes: string) {
+    run('UPDATE sessions SET notes = ? WHERE id = ?', notes, sessionId)
   }
 }

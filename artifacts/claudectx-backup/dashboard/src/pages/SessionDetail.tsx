@@ -517,7 +517,7 @@ export default function SessionDetail() {
           )
         })()}
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 20 }}>
           <button
             onClick={() => setNotesModalOpen(true)}
             style={{
@@ -562,17 +562,26 @@ export default function SessionDetail() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 6,
                 padding: '8px 14px',
-                background: resyncing ? 'var(--surface)' : 'var(--blue)15',
-                color: resyncing ? 'var(--text-muted)' : 'var(--blue)',
-                border: '1px solid',
-                borderColor: resyncing ? 'var(--border)' : 'var(--blue)30',
+                background: resyncing ? 'var(--surface)' : 'var(--surface2)',
+                color: resyncing ? 'var(--text-muted)' : 'var(--text)',
+                border: '1px solid var(--border)',
                 borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: resyncing ? 'not-allowed' : 'pointer',
                 transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!resyncing) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!resyncing) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+                }
               }}
             >
               <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />

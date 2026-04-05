@@ -23,31 +23,27 @@ export default function DownloadButton({ text, filename, label = 'Download' }: P
     <button
       onClick={handleDownload}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        padding: '6px 12px',
+        padding: '8px 14px',
         background: 'var(--surface2)',
         color: 'var(--text)',
         border: '1px solid var(--border)',
-        borderRadius: 6,
-        fontSize: 12,
-        fontWeight: 500,
+        borderRadius: 8,
+        fontSize: 13,
+        fontWeight: 600,
         cursor: 'pointer',
-        transition: 'all 0.2s',
+        transition: 'all 0.15s',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)15'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--blue)30'
-        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--blue)'
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
-        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text)'
       }}
     >
-      <Download size={13} />
+      <Download size={16} />
       {label}
     </button>
   )

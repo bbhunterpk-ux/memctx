@@ -95,20 +95,20 @@ export default function PDFDownloadButton({ session }: Props) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        padding: '6px 12px',
-        background: 'var(--red)15',
-        color: 'var(--red)',
-        border: '1px solid var(--red)30',
+        padding: '8px 14px',
+        background: 'var(--surface2)',
+        color: 'var(--text)',
+        border: '1px solid var(--border)',
         borderRadius: 8,
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 600,
         cursor: 'pointer',
         transition: 'all 0.15s',
       }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'var(--red)25')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'var(--red)15')}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface2)')}
     >
-      <Download size={14} />
+      <Download size={16} />
       PDF
     </button>
   )

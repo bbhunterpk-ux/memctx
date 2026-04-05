@@ -30,10 +30,10 @@ export default function ShareLinkButton({ sessionId }: Props) {
         alignItems: 'center',
         gap: 6,
         padding: '8px 14px',
-        background: copied ? 'var(--green)15' : 'var(--accent)15',
-        color: copied ? 'var(--green)' : 'var(--accent)',
+        background: copied ? 'var(--green)15' : 'var(--surface2)',
+        color: copied ? 'var(--green)' : 'var(--text)',
         border: '1px solid',
-        borderColor: copied ? 'var(--green)30' : 'var(--accent)30',
+        borderColor: copied ? 'var(--green)30' : 'var(--border)',
         borderRadius: 8,
         fontSize: 13,
         fontWeight: 600,
@@ -42,12 +42,12 @@ export default function ShareLinkButton({ sessionId }: Props) {
       }}
       onMouseEnter={e => {
         if (!copied) {
-          (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent)25'
+          (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
         }
       }}
       onMouseLeave={e => {
         if (!copied) {
-          (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent)15'
+          (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
         }
       }}
     >

@@ -21,21 +21,32 @@ export default function CopyButton({ text, label = 'Copy' }: Props) {
     <button
       onClick={handleCopy}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        padding: '6px 12px',
-        background: copied ? '#16301e' : 'var(--surface2)',
+        padding: '8px 14px',
+        background: copied ? 'var(--green)15' : 'var(--surface2)',
         color: copied ? 'var(--green)' : 'var(--text)',
-        border: `1px solid ${copied ? 'var(--green)' : 'var(--border)'}`,
-        borderRadius: 6,
-        fontSize: 12,
-        fontWeight: 500,
+        border: '1px solid',
+        borderColor: copied ? 'var(--green)30' : 'var(--border)',
+        borderRadius: 8,
+        fontSize: 13,
+        fontWeight: 600,
         cursor: 'pointer',
-        transition: 'all 0.2s',
+        transition: 'all 0.15s',
+      }}
+      onMouseEnter={e => {
+        if (!copied) {
+          (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+        }
+      }}
+      onMouseLeave={e => {
+        if (!copied) {
+          (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+        }
       }}
     >
-      {copied ? <Check size={13} /> : <Copy size={13} />}
+      {copied ? <Check size={16} /> : <Copy size={16} />}
       {copied ? 'Copied!' : label}
     </button>
   )

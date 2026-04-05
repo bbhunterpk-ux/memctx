@@ -281,7 +281,7 @@ export default function ProjectDetail() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               padding: '8px 14px',
               background: selectionMode ? 'var(--accent)' : 'var(--surface2)',
               color: selectionMode ? 'white' : 'var(--text)',
@@ -292,6 +292,16 @@ export default function ProjectDetail() {
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!selectionMode) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!selectionMode) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
             }}
           >
             {selectionMode ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -304,7 +314,7 @@ export default function ProjectDetail() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 6,
                 padding: '8px 14px',
                 background: 'var(--surface2)',
                 color: 'var(--text)',
@@ -315,6 +325,8 @@ export default function ProjectDetail() {
                 cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface2)')}
             >
               {selectedSessions.size === filteredSessions.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -325,18 +337,19 @@ export default function ProjectDetail() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               padding: '8px 14px',
-              background: 'var(--accent)',
-              color: 'white',
+              background: 'var(--surface2)',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
               textDecoration: 'none',
-              transition: 'opacity 0.15s',
+              transition: 'all 0.15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface2)')}
           >
             <Brain size={16} />
             View Memory
@@ -348,17 +361,26 @@ export default function ProjectDetail() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               padding: '8px 14px',
-              background: resyncing ? 'var(--surface)' : 'var(--blue)15',
-              color: resyncing ? 'var(--text-muted)' : 'var(--blue)',
-              border: '1px solid',
-              borderColor: resyncing ? 'var(--border)' : 'var(--blue)30',
+              background: resyncing ? 'var(--surface)' : 'var(--surface2)',
+              color: resyncing ? 'var(--text-muted)' : 'var(--text)',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
               cursor: resyncing ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!resyncing) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!resyncing) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
             }}
           >
             <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
@@ -371,17 +393,26 @@ export default function ProjectDetail() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               padding: '8px 14px',
-              background: resyncing ? 'var(--surface)' : 'var(--orange)15',
-              color: resyncing ? 'var(--text-muted)' : 'var(--orange)',
-              border: '1px solid',
-              borderColor: resyncing ? 'var(--border)' : 'var(--orange)30',
+              background: resyncing ? 'var(--surface)' : 'var(--surface2)',
+              color: resyncing ? 'var(--text-muted)' : 'var(--text)',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
               cursor: resyncing ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!resyncing) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!resyncing) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
             }}
           >
             <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
@@ -394,16 +425,26 @@ export default function ProjectDetail() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               padding: '8px 14px',
               background: consolidating ? 'var(--surface)' : 'var(--surface2)',
-              color: 'var(--text)',
+              color: consolidating ? 'var(--text-muted)' : 'var(--text)',
               border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
               cursor: consolidating ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!consolidating) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!consolidating) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
             }}
           >
             <RefreshCw size={16} style={{ animation: consolidating ? 'spin 1s linear infinite' : 'none' }} />

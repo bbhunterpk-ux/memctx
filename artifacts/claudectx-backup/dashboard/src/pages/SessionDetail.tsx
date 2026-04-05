@@ -104,6 +104,7 @@ function buildCopyText(session: any): string {
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>()
   const [resyncing, setResyncing] = useState(false)
+  const [notesModalOpen, setNotesModalOpen] = useState(false)
 
   const { data: session, isLoading, refetch } = useQuery({
     queryKey: ['session', id],
@@ -515,6 +516,31 @@ export default function SessionDetail() {
         })()}
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setNotesModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 14px',
+              background: 'var(--surface2)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+            }}
+          >
+            <FileText size={16} />
+            {session.notes ? 'Edit Notes' : 'Add Notes'}
+          </button>
           {hasSummary && (
             <>
               <CopyButton text={buildCopyText(session)} label="Copy as Markdown" />
@@ -590,6 +616,13 @@ export default function SessionDetail() {
           <ObservationList observations={session.observations} />
         </div>
       )}
+
+      <NotesModal
+        sessionId={session.id}
+        initialNotes={session.notes || ''}
+        isOpen={notesModalOpen}
+        onClose={() => setNotesModalOpen(false)}
+      />
     </div>
   )
 }

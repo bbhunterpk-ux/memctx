@@ -106,6 +106,10 @@ export const queries = {
     run('UPDATE sessions SET is_bookmarked = ? WHERE id = ?', bookmarked, id)
   },
 
+  updateSessionArchived(id: string, archived: number) {
+    run('UPDATE sessions SET is_archived = ? WHERE id = ?', archived, id)
+  },
+
   getSessions(opts: { project_id?: string; limit?: number; offset?: number; status?: string }) {
     const conditions: string[] = ['1=1']
     const params: any[] = []

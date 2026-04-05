@@ -60,6 +60,10 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ notes })
   }),
+  toggleArchive: (sessionId: string, archived: boolean) => apiFetch(`/api/sessions/${sessionId}/archive`, {
+    method: 'POST',
+    body: JSON.stringify({ archived })
+  }),
 }
 
 export function createWebSocket(): WebSocket {

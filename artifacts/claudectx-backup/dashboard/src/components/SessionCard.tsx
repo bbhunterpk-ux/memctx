@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
-import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2, Star } from 'lucide-react'
+import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2, Star, Archive, ArchiveRestore } from 'lucide-react'
 import StatusBadge from './StatusBadge'
 import ConfirmDialog from './ConfirmDialog'
+import Checkbox from './Checkbox'
 import { api } from '../api/client'
 import { useState } from 'react'
 import { toast } from './Toast'
@@ -10,6 +11,9 @@ import { toast } from './Toast'
 interface Props {
   session: any
   onSessionUpdated?: () => void
+  selectionMode?: boolean
+  selected?: boolean
+  onSelectionChange?: (selected: boolean) => void
 }
 
 const moodIcons: Record<string, any> = {
@@ -28,10 +32,11 @@ const complexityColors: Record<string, string> = {
   very_complex: 'var(--red)',
 }
 
-export default function SessionCard({ session, onSessionUpdated }: Props) {
+export default function SessionCard({ session, onSessionUpdated, selectionMode, selected, onSelectionChange }: Props) {
   const [ending, setEnding] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [bookmarking, setBookmarking] = useState(false)
+  const [archiving, setArchiving] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showForceEndDialog, setShowForceEndDialog] = useState(false)
   const startDate = new Date(session.started_at * 1000)
@@ -99,6 +104,23 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
     setShowDeleteDialog(true)
   }
 
+  const handleToggleArchive = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setArchiving(true)
+    try {
+      await api.toggleArchive(session.id, !session.is_archived)
+      toast.success(session.is_archived ? 'Session unarchived' : 'Session archived')
+      if (onSessionUpdated) {
+        onSessionUpdated()
+      }
+    } catch (error) {
+      toast.error('Failed to update archive status: ' + error)
+    } finally {
+      setArchiving(false)
+    }
+  }
+
   const confirmDelete = async () => {
     setShowDeleteDialog(false)
     setDeleting(true)
@@ -140,6 +162,14 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+          {selectionMode && (
+            <div style={{ paddingTop: 2, marginRight: 8 }}>
+              <Checkbox
+                checked={selected || false}
+                onChange={(checked) => onSelectionChange?.(checked)}
+              />
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
               <div style={{
@@ -246,6 +276,39 @@ export default function SessionCard({ session, onSessionUpdated }: Props) {
               }}
             >
               <Star size={14} fill={session.is_bookmarked ? 'var(--yellow)' : 'none'} />
+            </button>
+            <button
+              onClick={handleToggleArchive}
+              disabled={archiving}
+              title={session.is_archived ? 'Unarchive session' : 'Archive session'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                background: 'transparent',
+                color: session.is_archived ? 'var(--blue)' : 'var(--text-muted)',
+                border: '1px solid var(--border)',
+                borderRadius: 6,
+                cursor: archiving ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                if (!archiving) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)15'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--blue)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--blue)30'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!archiving) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLButtonElement).style.color = session.is_archived ? 'var(--blue)' : 'var(--text-muted)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
+                }
+              }}
+            >
+              {session.is_archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
             </button>
             {isActive && (
               <button

@@ -118,6 +118,26 @@ sessionsRouter.post('/:id/notes', (req, res) => {
   }
 })
 
+sessionsRouter.post('/:id/archive', (req, res) => {
+  try {
+    const { archived } = req.body
+    const session = queries.getSession(req.params.id)
+
+    if (!session) {
+      res.status(404).json({ error: 'Session not found' })
+      return
+    }
+
+    queries.updateSessionArchived(req.params.id, archived ? 1 : 0)
+
+    console.log(`[API] ${archived ? 'Archived' : 'Unarchived'} session: ${req.params.id.slice(0, 8)}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[API] Error updating archive status:', err)
+    res.status(500).json({ error: String(err) })
+  }
+})
+
 function tryParse(val: any): any {
   if (!val) return null
   try { return JSON.parse(val) } catch { return val }

@@ -3,15 +3,22 @@ import { useParams, Link } from 'react-router-dom'
 import { api, createWebSocket } from '../api/client'
 import SessionCard from '../components/SessionCard'
 import ActivityChart from '../components/ActivityChart'
-import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import BulkActionsBar from '../components/BulkActionsBar'
+import BulkTagModal from '../components/BulkTagModal'
 import ConfirmDialog from '../components/ConfirmDialog'
+import ProductivityWidget from '../components/ProductivityWidget'
+import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
   const [consolidating, setConsolidating] = useState(false)
   const [resyncing, setResyncing] = useState(false)
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
+  const [showBulkTagModal, setShowBulkTagModal] = useState(false)
+  const [showArchived, setShowArchived] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -122,6 +129,83 @@ export default function ProjectDetail() {
     })
   }
 
+  const handleToggleSelectionMode = () => {
+    setSelectionMode(!selectionMode)
+    setSelectedSessions(new Set())
+  }
+
+  const handleSelectAll = () => {
+    if (selectedSessions.size === filteredSessions.length) {
+      setSelectedSessions(new Set())
+    } else {
+      setSelectedSessions(new Set(filteredSessions.map((s: any) => s.id)))
+    }
+  }
+
+  const handleSessionSelectionChange = (sessionId: string, selected: boolean) => {
+    const newSelection = new Set(selectedSessions)
+    if (selected) {
+      newSelection.add(sessionId)
+    } else {
+      newSelection.delete(sessionId)
+    }
+    setSelectedSessions(newSelection)
+  }
+
+  const handleBulkDelete = () => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Sessions',
+      message: `This will permanently delete ${selectedSessions.size} sessions and all their data. This action cannot be undone.`,
+      confirmText: 'Delete',
+      confirmColor: 'var(--red)',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        const toastId = toast.loading(`Deleting ${selectedSessions.size} sessions...`)
+        try {
+          await Promise.all(
+            Array.from(selectedSessions).map(sessionId => api.deleteSession(sessionId))
+          )
+          toast.dismiss(toastId)
+          toast.success(`Deleted ${selectedSessions.size} sessions`)
+          setSelectedSessions(new Set())
+          setSelectionMode(false)
+          refetchSessions()
+        } catch (error) {
+          toast.dismiss(toastId)
+          toast.error('Failed to delete sessions: ' + error)
+        }
+      }
+    })
+  }
+
+  const handleBulkBookmark = async () => {
+    const toastId = toast.loading(`Bookmarking ${selectedSessions.size} sessions...`)
+    try {
+      await Promise.all(
+        Array.from(selectedSessions).map(sessionId => api.toggleBookmark(sessionId, true))
+      )
+      toast.dismiss(toastId)
+      toast.success(`Bookmarked ${selectedSessions.size} sessions`)
+      setSelectedSessions(new Set())
+      setSelectionMode(false)
+      refetchSessions()
+    } catch (error) {
+      toast.dismiss(toastId)
+      toast.error('Failed to bookmark sessions: ' + error)
+    }
+  }
+
+  const handleBulkTag = () => {
+    setShowBulkTagModal(true)
+  }
+
+  const handleBulkTagComplete = () => {
+    setSelectedSessions(new Set())
+    setSelectionMode(false)
+    refetchSessions()
+  }
+
   const activityData = health?.uptime ? [] : [] // placeholder
 
   if (isLoading) {
@@ -142,9 +226,15 @@ export default function ProjectDetail() {
     summary_gotchas: tryParse(s.summary_gotchas),
   }))
 
+  const filteredSessions = showArchived
+    ? parsed
+    : parsed.filter((s: any) => !s.is_archived)
+
   const totalFiles = new Set(
     parsed.flatMap((s: any) => Array.isArray(s.summary_files_changed) ? s.summary_files_changed : [])
   ).size
+
+  const archivedCount = parsed.filter((s: any) => s.is_archived).length
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: '100%', width: '100%' }}>
@@ -186,6 +276,50 @@ export default function ProjectDetail() {
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={handleToggleSelectionMode}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: selectionMode ? 'var(--accent)' : 'var(--surface2)',
+              color: selectionMode ? 'white' : 'var(--text)',
+              border: '1px solid',
+              borderColor: selectionMode ? 'var(--accent)' : 'var(--border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            {selectionMode ? <CheckSquare size={16} /> : <Square size={16} />}
+            {selectionMode ? 'Exit Selection' : 'Select Sessions'}
+          </button>
+
+          {selectionMode && parsed.length > 0 && (
+            <button
+              onClick={handleSelectAll}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: 'var(--surface2)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {selectedSessions.size === filteredSessions.length ? 'Deselect All' : 'Select All'}
+            </button>
+          )}
+
           <Link
             to={`/project/${id}/memory`}
             style={{
@@ -275,6 +409,29 @@ export default function ProjectDetail() {
             <RefreshCw size={16} style={{ animation: consolidating ? 'spin 1s linear infinite' : 'none' }} />
             {consolidating ? 'Consolidating...' : 'Consolidate Memory'}
           </button>
+
+          {archivedCount > 0 && (
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: showArchived ? 'var(--accent)15' : 'var(--surface2)',
+                color: showArchived ? 'var(--accent)' : 'var(--text)',
+                border: '1px solid',
+                borderColor: showArchived ? 'var(--accent)30' : 'var(--border)',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {showArchived ? 'Hide Archived' : `Show Archived (${archivedCount})`}
+            </button>
+          )}
         </div>
       </div>
 
@@ -284,10 +441,21 @@ export default function ProjectDetail() {
         </div>
       ) : (
         <>
+          <ProductivityWidget projectId={id!} />
+
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
-            Sessions ({parsed.length})
+            Sessions ({filteredSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
           </h2>
-          {parsed.map((s: any) => <SessionCard key={s.id} session={s} onSessionUpdated={refetchSessions} />)}
+          {filteredSessions.map((s: any) => (
+            <SessionCard
+              key={s.id}
+              session={s}
+              onSessionUpdated={refetchSessions}
+              selectionMode={selectionMode}
+              selected={selectedSessions.has(s.id)}
+              onSelectionChange={(selected) => handleSessionSelectionChange(s.id, selected)}
+            />
+          ))}
         </>
       )}
 
@@ -300,6 +468,24 @@ export default function ProjectDetail() {
         confirmColor={confirmDialog.confirmColor}
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+      />
+
+      <BulkActionsBar
+        selectedCount={selectedSessions.size}
+        onBulkDelete={handleBulkDelete}
+        onBulkBookmark={handleBulkBookmark}
+        onBulkTag={handleBulkTag}
+        onClearSelection={() => {
+          setSelectedSessions(new Set())
+          setSelectionMode(false)
+        }}
+      />
+
+      <BulkTagModal
+        isOpen={showBulkTagModal}
+        sessionIds={Array.from(selectedSessions)}
+        onClose={() => setShowBulkTagModal(false)}
+        onComplete={handleBulkTagComplete}
       />
     </div>
   )

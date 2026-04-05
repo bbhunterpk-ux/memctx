@@ -23,28 +23,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <aside style={{
-        width: 220,
+        width: 240,
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
         display: 'flex',
         flexDirection: 'column',
         flexShrink: 0,
       }}>
-        <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Zap size={18} color="var(--accent)" />
-            <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)' }}>ClaudeContext</span>
+        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Zap size={22} color="var(--accent)" />
+            <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>ClaudeContext</span>
           </div>
           <div style={{
-            marginTop: 8,
-            fontSize: 11,
+            marginTop: 10,
+            fontSize: 12,
             color: health?.status === 'ok' ? 'var(--green)' : 'var(--red)',
             display: 'flex',
             alignItems: 'center',
-            gap: 4
+            gap: 6
           }}>
             <span style={{
-              width: 6, height: 6, borderRadius: '50%',
+              width: 7, height: 7, borderRadius: '50%',
               background: health?.status === 'ok' ? 'var(--green)' : 'var(--red)',
               display: 'inline-block'
             }} />
@@ -52,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <nav style={{ padding: '8px 8px', flex: 1 }}>
+        <nav style={{ padding: '12px 10px', flex: 1 }}>
           {nav.map(({ path, icon: Icon, label }) => {
             const active = loc.pathname === path || (path !== '/' && loc.pathname.startsWith(path))
             return (
@@ -62,18 +62,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
-                  padding: '8px 10px',
-                  borderRadius: 6,
-                  marginBottom: 2,
+                  gap: 12,
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  marginBottom: 4,
                   color: active ? 'var(--text)' : 'var(--text-muted)',
                   background: active ? 'var(--surface2)' : 'transparent',
                   transition: 'all 0.15s',
-                  fontSize: 13,
-                  fontWeight: active ? 500 : 400,
+                  fontSize: 14,
+                  fontWeight: active ? 600 : 500,
                 }}
               >
-                <Icon size={15} />
+                <Icon size={17} />
                 {label}
               </Link>
             )
@@ -82,9 +82,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {health && (
           <div style={{
-            padding: '12px 16px',
+            padding: '16px 20px',
             borderTop: '1px solid var(--border)',
-            fontSize: 11,
+            fontSize: 12,
             color: 'var(--text-muted)',
             lineHeight: 1.8
           }}>

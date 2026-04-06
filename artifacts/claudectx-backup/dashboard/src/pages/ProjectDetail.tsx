@@ -12,7 +12,8 @@ import DateRangePicker from '../components/DateRangePicker'
 import ViewToggle from '../components/ViewToggle'
 import TableView from '../components/TableView'
 import CalendarView from '../components/CalendarView'
-import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar } from 'lucide-react'
+import AnalyticsDashboard from '../components/AnalyticsDashboard'
+import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
@@ -32,6 +33,10 @@ export default function ProjectDetail() {
   })
   const [showCalendar, setShowCalendar] = useState(() => {
     const saved = localStorage.getItem('showCalendar')
+    return saved === 'true'
+  })
+  const [showAnalytics, setShowAnalytics] = useState(() => {
+    const saved = localStorage.getItem('showAnalytics')
     return saved === 'true'
   })
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Date | null>(null)
@@ -299,6 +304,12 @@ export default function ProjectDetail() {
     const newValue = !showCalendar
     setShowCalendar(newValue)
     localStorage.setItem('showCalendar', String(newValue))
+  }
+
+  const handleAnalyticsToggle = () => {
+    const newValue = !showAnalytics
+    setShowAnalytics(newValue)
+    localStorage.setItem('showAnalytics', String(newValue))
   }
 
   const handleCalendarDateClick = (date: Date) => {
@@ -579,6 +590,38 @@ export default function ProjectDetail() {
             <Calendar size={16} />
             {showCalendar ? 'Hide Calendar' : 'Show Calendar'}
           </button>
+
+          <button
+            onClick={handleAnalyticsToggle}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: showAnalytics ? 'var(--accent)15' : 'var(--surface2)',
+              color: showAnalytics ? 'var(--accent)' : 'var(--text)',
+              border: '1px solid',
+              borderColor: showAnalytics ? 'var(--accent)30' : 'var(--border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!showAnalytics) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!showAnalytics) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
+            }}
+          >
+            <BarChart3 size={16} />
+            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+          </button>
         </div>
       </div>
 
@@ -589,6 +632,10 @@ export default function ProjectDetail() {
       ) : (
         <>
           <ProductivityWidget projectId={id!} />
+
+          {showAnalytics && (
+            <AnalyticsDashboard sessions={parsed} />
+          )}
 
           {showCalendar && (
             <CalendarView

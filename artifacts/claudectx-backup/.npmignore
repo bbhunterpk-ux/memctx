@@ -1,0 +1,33 @@
+# Source files
+src/
+dashboard/src/
+dashboard/node_modules/
+*.ts
+!*.d.ts
+tsconfig*.json
+
+# Development
+node_modules/
+.git/
+.github/
+*.log
+*.tmp
+.DS_Store
+.env
+.env.*
+
+# Testing
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation (keep README.md)
+docs/
+examples/
+
+# Build artifacts to exclude
+.replit-artifact/
+
+# Keep only these in dist
+!dist/

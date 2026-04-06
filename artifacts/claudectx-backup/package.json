@@ -1,19 +1,48 @@
 {
-  "name": "@workspace/claudectx",
+  "name": "claudectx",
   "version": "1.0.0",
-  "description": "Autonomous session memory for Claude Code",
-  "private": true,
+  "description": "Autonomous session memory for Claude Code - automatically captures, analyzes, and summarizes your development sessions",
+  "author": "ClaudeContext Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/claudectx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/claudectx/issues"
+  },
+  "homepage": "https://github.com/yourusername/claudectx#readme",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "memory",
+    "context",
+    "session-tracking",
+    "anthropic",
+    "development-tools",
+    "productivity"
+  ],
   "type": "commonjs",
   "main": "dist/index.js",
   "bin": {
     "claudectx": "./dist/bin/claudectx.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
+    "prepublishOnly": "pnpm run build",
     "dev": "NODE_NO_WARNINGS=1 tsx watch src/index.ts",
     "dev:dashboard": "cd dashboard && vite --port $PORT",
     "build": "pnpm run build:worker && pnpm run build:dashboard",
     "build:worker": "tsc -p tsconfig.worker.json",
-    "build:dashboard": "cd dashboard && pnpm vite build",
+    "build:dashboard": "cd dashboard && pnpm install && pnpm vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

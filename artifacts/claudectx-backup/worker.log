@@ -103,3 +103,93 @@ API Key: configured
 [Hook] UserPromptSubmit: now here http://localhost:9999/project/c6d8edec13b
 [Hook] Updated last_activity for session: f5189fa1
 [Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"now here http://localhost:9999/project/c6d8edec13ba353f show all 4 in one row Current Streak\n5\ndays in a row\nLongest Streak\n5\ndays record\nPersonal Bests\nLongest Session\n15h 59m\nMemory System Implementation for Claude Context\nApr 2, 2026\nMost Files Changed\n13 files\nClaudeContext Phase 1 - 8 Major Features Shipped\nApr 5, 2026"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Read file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Read","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Read file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Read","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Read file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Read","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Edit file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Edit","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+Error: ENOENT: no such file or directory, stat '/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/dist/index.html'
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: Stop session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] Stop event - session: f5189fa1
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"stop","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"Done! The dashboard has been rebuilt. Now all 4 stats (Current Streak, Longest Streak, Longest Session, and Most Files Changed) will display in one row on the project detail page at http://localhost:9999/project/c6d8edec13ba353f.\n\nRefresh your browser to see the updated layout."}
+[Hook] Received event: UserPromptSubmit session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] UserPromptSubmit: row broken use same style for all 4 and make sure 
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"row broken use same style for all 4 and make sure full width use"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Read file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/StreakCounter.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Read","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/StreakCounter.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Read file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/PersonalBests.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Read","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/PersonalBests.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Write file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/StatsRow.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Write","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/components/StatsRow.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Edit file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Edit","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Edit file: /home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Edit","file_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dashboard/src/pages/ProjectDetail.tsx"}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: Stop session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] Stop event - session: f5189fa1
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"stop","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"Done! All 4 stats (Current Streak, Longest Streak, Longest Session, and Most Files Changed) are now displayed in a single row with consistent styling and full width using a 4-column grid layout.\n\nRefresh your browser at http://localhost:9999/project/c6d8edec13ba353f to see the updated layout."}
+[Queue] Enqueued high priority job for session 5828cda0-fec1-4276-95e4-38a719ccf4d3
+[Queue] Processing job for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 (attempt 1/3)
+[2026-04-06T09:59:44.029Z] [INFO] [Summarizer] Starting summarization for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"model":"claude-sonnet-4-6","transcriptLength":271}
+[2026-04-06T09:59:45.287Z] [ERROR] [Summarizer] Summarization failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"error":{"cause":{"message":"request to http://127.0.0.1:1337/v1/messages failed, reason: connect ECONNREFUSED 127.0.0.1:1337","type":"system","errno":"ECONNREFUSED","code":"ECONNREFUSED"}}}
+[Queue] Job failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3: Connection error.
+[Queue] Retrying session 5828cda0-fec1-4276-95e4-38a719ccf4d3 in 5000ms (attempt 2/3)
+[Queue] Processing job for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 (attempt 2/3)
+[2026-04-06T09:59:50.322Z] [INFO] [Summarizer] Starting summarization for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"model":"claude-sonnet-4-6","transcriptLength":271}
+[2026-04-06T09:59:51.625Z] [ERROR] [Summarizer] Summarization failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"error":{"cause":{"message":"request to http://127.0.0.1:1337/v1/messages failed, reason: connect ECONNREFUSED 127.0.0.1:1337","type":"system","errno":"ECONNREFUSED","code":"ECONNREFUSED"}}}
+[Queue] Job failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3: Connection error.
+[Queue] Retrying session 5828cda0-fec1-4276-95e4-38a719ccf4d3 in 15000ms (attempt 3/3)
+[Queue] Processing job for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 (attempt 3/3)
+[2026-04-06T10:00:06.633Z] [INFO] [Summarizer] Starting summarization for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"model":"claude-sonnet-4-6","transcriptLength":271}
+[2026-04-06T10:00:07.905Z] [ERROR] [Summarizer] Summarization failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3 {"error":{"cause":{"message":"request to http://127.0.0.1:1337/v1/messages failed, reason: connect ECONNREFUSED 127.0.0.1:1337","type":"system","errno":"ECONNREFUSED","code":"ECONNREFUSED"}}}
+[Queue] Job failed for session 5828cda0-fec1-4276-95e4-38a719ccf4d3: Connection error.
+[Queue] Max retries reached for session 5828cda0-fec1-4276-95e4-38a719ccf4d3, giving up
+[Hook] Received event: SessionStart session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] SessionStart: f5189fa1
+[Hook] Resuming completed session - reactivating
+[Broadcast] {"type":"session_start","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","project":{"id":"c6d8edec13ba353f","name":"Claude-Context","root_path":"/home/max/All_Projects_Files/April 2026 Projects/Claude-Context"}}
+[Hook] Received event: UserPromptSubmit session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] UserPromptSubmit: [Queue] Job failed for session c8ddd532-6799-4d3d-
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"[Queue] Job failed for session c8ddd532-6799-4d3d-a0a1-d9f55852c1e9: Connection error.\n[Queue] Max retries reached for session c8ddd532-6799-4d3d-a0a1-d9f55852c1e9, giving up\n[2026-04-06T09:49:06.770Z] [ERROR] [Summarizer] Summarization failed for session c8ddd532-6799-4d3d-a0a1-d9f55852c1e9 {\"error\":{\"cause\":{\"message\":\"request to http://127.0.0.1:1337/v1/messages failed, reason: connect ECONNREFUSED 127.0.0.1:1337\",\"type\":\"system\",\"errno\":\"ECONNREFUSED\",\"code\":\"ECONNREFUSED\"}}}\n[Queue] Job fai"}

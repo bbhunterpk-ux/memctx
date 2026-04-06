@@ -13,8 +13,7 @@ import ViewToggle from '../components/ViewToggle'
 import TableView from '../components/TableView'
 import CalendarView from '../components/CalendarView'
 import AnalyticsDashboard from '../components/AnalyticsDashboard'
-import StreakCounter from '../components/StreakCounter'
-import PersonalBests from '../components/PersonalBests'
+import StatsRow from '../components/StatsRow'
 import MultiSelectFilter from '../components/MultiSelectFilter'
 import TimelineView from '../components/TimelineView'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar, BarChart3 } from 'lucide-react'
@@ -752,9 +751,7 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
         <>
           <ProductivityWidget projectId={id!} />
 
-          <StreakCounter sessions={parsed} />
-
-          <PersonalBests sessions={parsed} />
+          <StatsRow sessions={parsed} />
 
           {showAnalytics && (
             <AnalyticsDashboard sessions={parsed} />

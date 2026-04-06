@@ -1,8 +1,8 @@
-import { LayoutGrid, List } from 'lucide-react'
+import { LayoutGrid, List, Clock } from 'lucide-react'
 
 interface Props {
-  viewMode: 'card' | 'table'
-  onToggle: (mode: 'card' | 'table') => void
+  viewMode: 'card' | 'table' | 'timeline'
+  onToggle: (mode: 'card' | 'table' | 'timeline') => void
 }
 
 export default function ViewToggle({ viewMode, onToggle }: Props) {
@@ -74,6 +74,36 @@ export default function ViewToggle({ viewMode, onToggle }: Props) {
       >
         <List size={16} />
         Table
+      </button>
+      <button
+        onClick={() => onToggle('timeline')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '6px 12px',
+          background: viewMode === 'timeline' ? 'var(--surface)' : 'transparent',
+          color: viewMode === 'timeline' ? 'var(--text)' : 'var(--text-muted)',
+          border: viewMode === 'timeline' ? '1px solid var(--border)' : '1px solid transparent',
+          borderRadius: 6,
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: 'all 0.15s'
+        }}
+        onMouseEnter={(e) => {
+          if (viewMode !== 'timeline') {
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (viewMode !== 'timeline') {
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+          }
+        }}
+      >
+        <Clock size={16} />
+        Timeline
       </button>
     </div>
   )

@@ -16,6 +16,7 @@ import AnalyticsDashboard from '../components/AnalyticsDashboard'
 import StreakCounter from '../components/StreakCounter'
 import PersonalBests from '../components/PersonalBests'
 import MultiSelectFilter from '../components/MultiSelectFilter'
+import TimelineView from '../components/TimelineView'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -35,9 +36,9 @@ export default function ProjectDetail() {
   const [selectedComplexity, setSelectedComplexity] = useState<string[]>([])
   const [selectedStatus, setSelectedStatus] = useState<string[]>([])
   const [selectedTech, setSelectedTech] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'card' | 'table'>(() => {
+  const [viewMode, setViewMode] = useState<'card' | 'table' | 'timeline'>(() => {
     const saved = localStorage.getItem('sessionViewMode')
-    return (saved === 'card' || saved === 'table') ? saved : 'card'
+    return (saved === 'card' || saved === 'table' || saved === 'timeline') ? saved : 'card'
   })
   const [showCalendar, setShowCalendar] = useState(() => {
     const saved = localStorage.getItem('showCalendar')
@@ -390,7 +391,7 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
     setDateRange({ start, end })
   }
 
-  const handleViewToggle = (mode: 'card' | 'table') => {
+  const handleViewToggle = (mode: 'card' | 'table' | 'timeline') => {
     setViewMode(mode)
     localStorage.setItem('sessionViewMode', mode)
   }
@@ -816,6 +817,13 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
             </div>
           ) : viewMode === 'table' ? (
             <TableView
+              sessions={calendarFilteredSessions}
+              selectionMode={selectionMode}
+              selectedSessions={selectedSessions}
+              onSelectionChange={handleSessionSelectionChange}
+            />
+          ) : viewMode === 'timeline' ? (
+            <TimelineView
               sessions={calendarFilteredSessions}
               selectionMode={selectionMode}
               selectedSessions={selectedSessions}

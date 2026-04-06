@@ -11,7 +11,8 @@ import SearchBar from '../components/SearchBar'
 import DateRangePicker from '../components/DateRangePicker'
 import ViewToggle from '../components/ViewToggle'
 import TableView from '../components/TableView'
-import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square } from 'lucide-react'
+import CalendarView from '../components/CalendarView'
+import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
@@ -29,6 +30,11 @@ export default function ProjectDetail() {
     const saved = localStorage.getItem('sessionViewMode')
     return (saved === 'card' || saved === 'table') ? saved : 'card'
   })
+  const [showCalendar, setShowCalendar] = useState(() => {
+    const saved = localStorage.getItem('showCalendar')
+    return saved === 'true'
+  })
+  const [calendarSelectedDate, setCalendarSelectedDate] = useState<Date | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -145,10 +151,10 @@ export default function ProjectDetail() {
   }
 
   const handleSelectAll = () => {
-    if (selectedSessions.size === dateFilteredSessions.length) {
+    if (selectedSessions.size === calendarFilteredSessions.length) {
       setSelectedSessions(new Set())
     } else {
-      setSelectedSessions(new Set(dateFilteredSessions.map((s: any) => s.id)))
+      setSelectedSessions(new Set(calendarFilteredSessions.map((s: any) => s.id)))
     }
   }
 
@@ -266,6 +272,14 @@ export default function ProjectDetail() {
       })
     : searchedSessions
 
+  // Apply calendar date filter
+  const calendarFilteredSessions = calendarSelectedDate
+    ? dateFilteredSessions.filter((s: any) => {
+        const sessionDate = new Date(s.started_at * 1000)
+        return sessionDate.toDateString() === calendarSelectedDate.toDateString()
+      })
+    : dateFilteredSessions
+
   const totalFiles = new Set(
     parsed.flatMap((s: any) => Array.isArray(s.summary_files_changed) ? s.summary_files_changed : [])
   ).size
@@ -279,6 +293,21 @@ export default function ProjectDetail() {
   const handleViewToggle = (mode: 'card' | 'table') => {
     setViewMode(mode)
     localStorage.setItem('sessionViewMode', mode)
+  }
+
+  const handleCalendarToggle = () => {
+    const newValue = !showCalendar
+    setShowCalendar(newValue)
+    localStorage.setItem('showCalendar', String(newValue))
+  }
+
+  const handleCalendarDateClick = (date: Date) => {
+    if (calendarSelectedDate && calendarSelectedDate.toDateString() === date.toDateString()) {
+      // Clicking same date clears the filter
+      setCalendarSelectedDate(null)
+    } else {
+      setCalendarSelectedDate(date)
+    }
   }
 
   return (
@@ -518,6 +547,38 @@ export default function ProjectDetail() {
               {showArchived ? 'Hide Archived' : `Show Archived (${archivedCount})`}
             </button>
           )}
+
+          <button
+            onClick={handleCalendarToggle}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              background: showCalendar ? 'var(--accent)15' : 'var(--surface2)',
+              color: showCalendar ? 'var(--accent)' : 'var(--text)',
+              border: '1px solid',
+              borderColor: showCalendar ? 'var(--accent)30' : 'var(--border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => {
+              if (!showCalendar) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+              }
+            }}
+            onMouseLeave={e => {
+              if (!showCalendar) {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+              }
+            }}
+          >
+            <Calendar size={16} />
+            {showCalendar ? 'Hide Calendar' : 'Show Calendar'}
+          </button>
         </div>
       </div>
 
@@ -529,6 +590,14 @@ export default function ProjectDetail() {
         <>
           <ProductivityWidget projectId={id!} />
 
+          {showCalendar && (
+            <CalendarView
+              sessions={dateFilteredSessions}
+              onDateClick={handleCalendarDateClick}
+              selectedDate={calendarSelectedDate}
+            />
+          )}
+
           <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
             <SearchBar onSearch={setSearchQuery} placeholder="Search by title, content, or files..." />
             <DateRangePicker onDateRangeChange={handleDateRangeChange} />
@@ -538,23 +607,24 @@ export default function ProjectDetail() {
           </div>
 
           <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
-            Sessions ({dateFilteredSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
+            Sessions ({calendarFilteredSessions.length}{!showArchived && archivedCount > 0 ? ` • ${archivedCount} archived` : ''})
             {searchQuery && ` • Filtered by "${searchQuery}"`}
             {(dateRange.start || dateRange.end) && ` • Date filtered`}
+            {calendarSelectedDate && ` • ${calendarFilteredSessions.length} on ${calendarSelectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
           </h2>
-          {dateFilteredSessions.length === 0 ? (
+          {calendarFilteredSessions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
               No sessions match your filters
             </div>
           ) : viewMode === 'table' ? (
             <TableView
-              sessions={dateFilteredSessions}
+              sessions={calendarFilteredSessions}
               selectionMode={selectionMode}
               selectedSessions={selectedSessions}
               onSelectionChange={handleSessionSelectionChange}
             />
           ) : (
-            dateFilteredSessions.map((s: any) => (
+            calendarFilteredSessions.map((s: any) => (
               <SessionCard
                 key={s.id}
                 session={s}

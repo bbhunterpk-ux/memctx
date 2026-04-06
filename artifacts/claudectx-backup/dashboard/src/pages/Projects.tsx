@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { FolderGit2, Clock, Layers, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog'
+import MainDashboard from '../components/MainDashboard'
 import { toast } from '../components/Toast'
 import SkeletonCard from '../components/SkeletonCard'
 
@@ -128,14 +129,29 @@ export default function Projects() {
       {!projects || projects.length === 0 ? (
         <EmptyState />
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-          gap: 14,
-        }}
-        className="projects-grid"
-        >
-          {projects.map((p: any) => (
+        <>
+          <MainDashboard projects={projects} />
+
+          <h2 style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            marginBottom: 16,
+            marginTop: 32
+          }}>
+            All Projects
+          </h2>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            gap: 14,
+          }}
+          className="projects-grid"
+          >
+            {projects.map((p: any) => (
             <Link key={p.id} to={`/project/${p.id}`} style={{ display: 'block' }}>
               <div style={{
                 background: 'var(--surface)',
@@ -188,6 +204,7 @@ export default function Projects() {
             </Link>
           ))}
         </div>
+        </>
       )}
 
       <ConfirmDialog

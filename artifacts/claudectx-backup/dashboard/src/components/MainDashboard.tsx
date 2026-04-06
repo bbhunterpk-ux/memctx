@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../api/client'
 import { TrendingUp, Clock, FileText, Wrench, CheckCircle, Flame } from 'lucide-react'
 
 interface Props {
@@ -5,8 +7,18 @@ interface Props {
 }
 
 export default function MainDashboard({ projects }: Props) {
-  // Calculate overall stats across all projects
-  const allSessions = projects.flatMap(p => p.sessions || [])
+  // Fetch all sessions across all projects
+  const { data: allSessionsData } = useQuery({
+    queryKey: ['all-sessions'],
+    queryFn: async () => {
+      const sessionPromises = projects.map(p => api.getSessions({ project_id: p.id, limit: 1000 }))
+      const results = await Promise.all(sessionPromises)
+      return results.flat()
+    },
+    enabled: projects.length > 0
+  })
+
+  const allSessions = allSessionsData || []
 
   const totalSessions = allSessions.length
   const completedSessions = allSessions.filter(s => s.status === 'completed').length

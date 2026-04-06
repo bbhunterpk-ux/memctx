@@ -13,6 +13,8 @@ import ViewToggle from '../components/ViewToggle'
 import TableView from '../components/TableView'
 import CalendarView from '../components/CalendarView'
 import AnalyticsDashboard from '../components/AnalyticsDashboard'
+import StreakCounter from '../components/StreakCounter'
+import PersonalBests from '../components/PersonalBests'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -25,6 +27,7 @@ export default function ProjectDetail() {
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
   const [showBulkTagModal, setShowBulkTagModal] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
+  const [showBookmarked, setShowBookmarked] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null })
   const [viewMode, setViewMode] = useState<'card' | 'table'>(() => {
@@ -221,6 +224,70 @@ export default function ProjectDetail() {
     setShowBulkTagModal(true)
   }
 
+  const handleBulkExport = async () => {
+    const toastId = toast.loading(`Exporting ${selectedSessions.size} sessions...`)
+    try {
+      // Dynamically import JSZip
+      const JSZip = (await import('jszip')).default
+      const zip = new JSZip()
+
+      // Fetch all selected sessions
+      const sessionPromises = Array.from(selectedSessions).map(sessionId =>
+        api.getSession(sessionId)
+      )
+      const sessionsData = await Promise.all(sessionPromises)
+
+      // Add each session as a markdown file
+      sessionsData.forEach((session: any) => {
+        const title = session.summary_title || 'Untitled Session'
+        const date = new Date(session.started_at * 1000).toISOString().split('T')[0]
+        const filename = `${date}_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md`
+
+        const content = `# ${title}
+
+**Date:** ${new Date(session.started_at * 1000).toLocaleString()}
+**Status:** ${session.status}
+**Duration:** ${session.ended_at ? Math.round((session.ended_at - session.started_at) / 60) : 0} minutes
+
+## What We Did
+${Array.isArray(session.summary_what_we_did) ? session.summary_what_we_did.map((item: string) => `- ${item}`).join('\n') : 'N/A'}
+
+## Decisions Made
+${Array.isArray(session.summary_decisions) ? session.summary_decisions.map((item: string) => `- ${item}`).join('\n') : 'N/A'}
+
+## Files Changed
+${Array.isArray(session.summary_files_changed) ? session.summary_files_changed.map((file: string) => `- ${file}`).join('\n') : 'N/A'}
+
+## Next Steps
+${Array.isArray(session.summary_next_steps) ? session.summary_next_steps.map((item: string) => `- ${item}`).join('\n') : 'N/A'}
+
+## Gotchas
+${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: string) => `- ${item}`).join('\n') : 'N/A'}
+`
+        zip.file(filename, content)
+      })
+
+      // Generate ZIP file
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `sessions_export_${new Date().toISOString().split('T')[0]}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      toast.dismiss(toastId)
+      toast.success(`Exported ${selectedSessions.size} sessions as ZIP`)
+      setSelectedSessions(new Set())
+      setSelectionMode(false)
+    } catch (error) {
+      toast.dismiss(toastId)
+      toast.error('Failed to export sessions: ' + error)
+    }
+  }
+
   const handleBulkTagComplete = () => {
     setSelectedSessions(new Set())
     setSelectionMode(false)
@@ -251,9 +318,14 @@ export default function ProjectDetail() {
     ? parsed
     : parsed.filter((s: any) => !s.is_archived)
 
+  // Apply bookmark filter
+  const bookmarkFilteredSessions = showBookmarked
+    ? filteredSessions.filter((s: any) => s.is_bookmarked)
+    : filteredSessions
+
   // Apply search filter
   const searchedSessions = searchQuery
-    ? filteredSessions.filter((s: any) => {
+    ? bookmarkFilteredSessions.filter((s: any) => {
         const query = searchQuery.toLowerCase()
         const title = (s.summary_title || '').toLowerCase()
         const whatWeDid = Array.isArray(s.summary_what_we_did)
@@ -265,7 +337,7 @@ export default function ProjectDetail() {
 
         return title.includes(query) || whatWeDid.includes(query) || files.includes(query)
       })
-    : filteredSessions
+    : bookmarkFilteredSessions
 
   // Apply date range filter
   const dateFilteredSessions = (dateRange.start || dateRange.end)
@@ -290,6 +362,7 @@ export default function ProjectDetail() {
   ).size
 
   const archivedCount = parsed.filter((s: any) => s.is_archived).length
+  const bookmarkedCount = parsed.filter((s: any) => s.is_bookmarked).length
 
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
     setDateRange({ start, end })
@@ -559,6 +632,29 @@ export default function ProjectDetail() {
             </button>
           )}
 
+          {bookmarkedCount > 0 && (
+            <button
+              onClick={() => setShowBookmarked(!showBookmarked)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: showBookmarked ? 'var(--accent)15' : 'var(--surface2)',
+                color: showBookmarked ? 'var(--accent)' : 'var(--text)',
+                border: '1px solid',
+                borderColor: showBookmarked ? 'var(--accent)30' : 'var(--border)',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {showBookmarked ? 'Show All' : `Show Bookmarked (${bookmarkedCount})`}
+            </button>
+          )}
+
           <button
             onClick={handleCalendarToggle}
             style={{
@@ -633,6 +729,10 @@ export default function ProjectDetail() {
         <>
           <ProductivityWidget projectId={id!} />
 
+          <StreakCounter sessions={parsed} />
+
+          <PersonalBests sessions={parsed} />
+
           {showAnalytics && (
             <AnalyticsDashboard sessions={parsed} />
           )}
@@ -658,6 +758,7 @@ export default function ProjectDetail() {
             {searchQuery && ` • Filtered by "${searchQuery}"`}
             {(dateRange.start || dateRange.end) && ` • Date filtered`}
             {calendarSelectedDate && ` • ${calendarFilteredSessions.length} on ${calendarSelectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+            {showBookmarked && ` • Bookmarked only`}
           </h2>
           {calendarFilteredSessions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
@@ -701,6 +802,7 @@ export default function ProjectDetail() {
         onBulkDelete={handleBulkDelete}
         onBulkBookmark={handleBulkBookmark}
         onBulkTag={handleBulkTag}
+        onBulkExport={handleBulkExport}
         onClearSelection={() => {
           setSelectedSessions(new Set())
           setSelectionMode(false)

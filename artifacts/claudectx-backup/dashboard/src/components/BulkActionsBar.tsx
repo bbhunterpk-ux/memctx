@@ -1,10 +1,11 @@
-import { Trash2, Star, Tag, X } from 'lucide-react'
+import { Trash2, Star, Tag, X, Download } from 'lucide-react'
 
 interface Props {
   selectedCount: number
   onBulkDelete: () => void
   onBulkBookmark: () => void
   onBulkTag: () => void
+  onBulkExport: () => void
   onClearSelection: () => void
 }
 
@@ -13,6 +14,7 @@ export default function BulkActionsBar({
   onBulkDelete,
   onBulkBookmark,
   onBulkTag,
+  onBulkExport,
   onClearSelection,
 }: Props) {
   if (selectedCount === 0) return null
@@ -84,6 +86,30 @@ export default function BulkActionsBar({
         >
           <Tag size={14} />
           Tag
+        </button>
+
+        <button
+          onClick={onBulkExport}
+          title="Export as ZIP"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            background: 'var(--blue)15',
+            color: 'var(--blue)',
+            border: '1px solid var(--blue)30',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--blue)25')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'var(--blue)15')}
+        >
+          <Download size={14} />
+          Export ZIP
         </button>
 
         <button

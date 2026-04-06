@@ -24,25 +24,18 @@ PORT="${CLAUDECTX_PORT:-9999}"
 LOG_FILE="/tmp/claudectx.log"
 PID_FILE="/tmp/claudectx.pid"
 
-# Check if already running
-if [ -f "$PID_FILE" ]; then
-    OLD_PID=$(cat "$PID_FILE")
-    if ps -p "$OLD_PID" > /dev/null 2>&1; then
-        echo -e "${YELLOW}⚠️  ClaudeContext is already running (PID: $OLD_PID)${NC}"
-        echo -e "${BLUE}   Dashboard: http://localhost:$PORT${NC}"
-        echo ""
-        read -p "Do you want to restart it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            echo -e "${YELLOW}Stopping existing process...${NC}"
-            kill "$OLD_PID" 2>/dev/null || true
-            sleep 2
-        else
-            echo -e "${GREEN}✅ Service already running${NC}"
-            exit 0
-        fi
-    fi
+# Kill any existing ClaudeContext processes
+echo -e "${BLUE}🔍 Checking for existing processes...${NC}"
+EXISTING_PIDS=$(ps aux | grep "node dist/src/index.js" | grep -v grep | awk '{print $2}')
+if [ -n "$EXISTING_PIDS" ]; then
+    echo -e "${YELLOW}⚠️  Found existing ClaudeContext processes, killing them...${NC}"
+    echo "$EXISTING_PIDS" | xargs kill 2>/dev/null || true
+    sleep 2
+    echo -e "${GREEN}✅ Old processes killed${NC}"
 fi
+
+# Clean up old PID file
+rm -f "$PID_FILE"
 
 # Check if worker is built
 if [ ! -f "$WORKER_DIR/dist/src/index.js" ]; then

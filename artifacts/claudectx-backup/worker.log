@@ -1,0 +1,105 @@
+Applying migration: 002_add_project_id_to_memory.sql
+✗ Failed to apply 002_add_project_id_to_memory.sql: SqliteError: duplicate column name: project_id
+    at Database.exec (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/node_modules/.pnpm/better-sqlite3@12.8.0/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)
+    at runMigrations (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/db/migrate.js:39:16)
+    at initDB (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/db/client.js:26:9)
+    at main (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/index.js:37:25)
+    at Object.<anonymous> (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/index.js:89:1)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+  code: 'SQLITE_ERROR'
+}
+Migration error: SqliteError: duplicate column name: project_id
+    at Database.exec (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/node_modules/.pnpm/better-sqlite3@12.8.0/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)
+    at runMigrations (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/db/migrate.js:39:16)
+    at initDB (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/db/client.js:26:9)
+    at main (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/index.js:37:25)
+    at Object.<anonymous> (/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup/dist/src/index.js:89:1)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+  code: 'SQLITE_ERROR'
+}
+File watcher started for /home/max/.claude/projects
+[Decay] Decay scheduler started (runs every 24 hours)
+[SessionTimeout] Session timeout checker started (5 minute inactivity threshold)
+ClaudeContext running at http://localhost:9999
+API Key: configured
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[SessionTimeout] Marking inactive session as completed: f5189fa1
+[SessionTimeout] Last activity: 2026-04-06T09:50:26.000Z
+[Broadcast] {"type":"session_end","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","reason":"inactivity_timeout"}
+[2026-04-06T09:56:05.590Z] [INFO] [SessionTimeout] Session f5189fa1-3bf7-4303-9e55-7d0fc535ddc7 marked as completed due to inactivity
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: PostToolUse session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] PostToolUse: Bash file: null
+[Broadcast] {"type":"tool_use","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","tool_name":"Bash","file_path":null}
+[Hook] Received event: Stop session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] Stop event - session: f5189fa1
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"stop","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"Done! The dashboard should now work properly. The issue was:\n\n1. Worker was running on port 8000, but dashboard expected port 9999\n2. Migration files weren't copied to the `dist` folder during build\n3. Tags table migration hadn't been applied to the database\n\nFixed by:\n- Restarting worker on port 99"}
+[Hook] Received event: UserPromptSubmit session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] UserPromptSubmit: <task-notification>
+<task-id>b387wg57h</task-id>
+<
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"<task-notification>\n<task-id>b387wg57h</task-id>\n<tool-use-id>tooluse_PCj3rphwipEI6MaLhsQlQh</tool-use-id>\n<output-file>/tmp/claude-1000/-home-max-All-Projects-Files-April-2026-Projects-Claude-Context/f5189fa1-3bf7-4303-9e55-7d0fc535ddc7/tasks/b387wg57h.output</output-file>\n<status>completed</status>\n<summary>Background command \"Start worker on port 9999\" completed (exit code 0)</summary>\n</task-notification>"}
+[Hook] Received event: UserPromptSubmit session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] UserPromptSubmit: <task-notification>
+<task-id>b2fe3v419</task-id>
+<
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"<task-notification>\n<task-id>b2fe3v419</task-id>\n<tool-use-id>tooluse_Xlyo9ABZSEjdXmaFnJU9Nu</tool-use-id>\n<output-file>/tmp/claude-1000/-home-max-All-Projects-Files-April-2026-Projects-Claude-Context/f5189fa1-3bf7-4303-9e55-7d0fc535ddc7/tasks/b2fe3v419.output</output-file>\n<status>completed</status>\n<summary>Background command \"Start worker on port 9999\" completed (exit code 0)</summary>\n</task-notification>"}
+[Hook] Received event: Stop session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] Stop event - session: f5189fa1
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"stop","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"Perfect! Both worker processes have completed successfully. The ClaudeContext dashboard is now fully operational on port 9999 with all migrations applied. You should be able to view sessions, use tags, bookmarks, and all other features without any errors."}
+[Hook] Received event: UserPromptSubmit session: f5189fa1
+[Hook] Project detected: Claude-Context id: c6d8edec
+[Hook] UserPromptSubmit: now here http://localhost:9999/project/c6d8edec13b
+[Hook] Updated last_activity for session: f5189fa1
+[Broadcast] {"type":"user_prompt","session_id":"f5189fa1-3bf7-4303-9e55-7d0fc535ddc7","preview":"now here http://localhost:9999/project/c6d8edec13ba353f show all 4 in one row Current Streak\n5\ndays in a row\nLongest Streak\n5\ndays record\nPersonal Bests\nLongest Session\n15h 59m\nMemory System Implementation for Claude Context\nApr 2, 2026\nMost Files Changed\n13 files\nClaudeContext Phase 1 - 8 Major Features Shipped\nApr 5, 2026"}

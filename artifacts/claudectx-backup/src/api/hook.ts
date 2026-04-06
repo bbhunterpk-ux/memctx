@@ -147,11 +147,36 @@ hookRouter.post('/', async (req, res) => {
         }
         queries.insertObservation(obs)
 
-        // Update session last_activity timestamp
-        queries.updateSession(session_id, {
-          last_activity: Math.floor(Date.now() / 1000)
-        })
-        console.log('[Hook] Updated last_activity for session:', session_id.slice(0, 8))
+        const now = Math.floor(Date.now() / 1000)
+
+        // End the session immediately on Stop event
+        const session = queries.getSession(session_id)
+        if (session && session.status === 'active') {
+          console.log('[Hook] Ending session on Stop event:', session_id.slice(0, 8))
+          queries.updateSession(session_id, {
+            ended_at: now,
+            status: 'completed',
+            last_activity: now
+          })
+
+          // Queue for summarization if transcript exists
+          if (session.transcript_path) {
+            console.log('[Hook] Queuing summarization for:', session_id.slice(0, 8))
+            summarizationQueue.enqueue({
+              sessionId: session_id,
+              transcriptPath: session.transcript_path,
+              projectId: project.id,
+              priority: 'normal'
+            })
+          }
+
+          broadcast({ type: 'session_end', session_id })
+        } else {
+          // Just update last_activity if already completed
+          queries.updateSession(session_id, {
+            last_activity: now
+          })
+        }
 
         broadcast({ type: 'stop', session_id, preview: data.message_preview })
         break

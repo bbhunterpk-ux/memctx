@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Fixed Dashboard Stats Horizontal Layout Build Issue — COMPLETED
-**Completed:** Modified StreakCounter.tsx to use flexbox horizontal layout instead of grid, Debugged Vite build caching preventing changes from appearing, Cleared Vite cache and node_modules/.vite to force fresh rebuild
-**Up next:** User needs to hard refresh browser (Ctrl+Shift+R) to see changes
-**Remember:** Vite aggressively caches builds - need to clear node_modules/.vite and dist for source changes to take effect
+**Last session:** Fixed auto-summarization on session stop — COMPLETED
+**Completed:** Created kill.sh script to stop all ClaudeContext worker processes, Modified start.sh to auto-kill existing processes before starting fresh, Fixed Stop event handler to immediately end session and trigger summarization
+**Up next:** Restart worker with ./start.sh to load the new Stop handler
+**Remember:** Worker must be restarted after code changes - running worker still has old Stop handler
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

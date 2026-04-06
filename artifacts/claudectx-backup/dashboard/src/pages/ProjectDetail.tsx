@@ -15,6 +15,7 @@ import CalendarView from '../components/CalendarView'
 import AnalyticsDashboard from '../components/AnalyticsDashboard'
 import StreakCounter from '../components/StreakCounter'
 import PersonalBests from '../components/PersonalBests'
+import MultiSelectFilter from '../components/MultiSelectFilter'
 import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square, Calendar, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -30,6 +31,10 @@ export default function ProjectDetail() {
   const [showBookmarked, setShowBookmarked] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null })
+  const [selectedMoods, setSelectedMoods] = useState<string[]>([])
+  const [selectedComplexity, setSelectedComplexity] = useState<string[]>([])
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([])
+  const [selectedTech, setSelectedTech] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'card' | 'table'>(() => {
     const saved = localStorage.getItem('sessionViewMode')
     return (saved === 'card' || saved === 'table') ? saved : 'card'
@@ -339,9 +344,26 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
       })
     : bookmarkFilteredSessions
 
+  // Apply multi-select filters (mood, complexity, status)
+  const multiFilteredSessions = searchedSessions.filter((s: any) => {
+    const moodMatch = selectedMoods.length === 0 || (s.summary_mood && selectedMoods.includes(s.summary_mood))
+    const complexityMatch = selectedComplexity.length === 0 || (s.summary_complexity && selectedComplexity.includes(s.summary_complexity))
+    const statusMatch = selectedStatus.length === 0 || selectedStatus.includes(s.status)
+
+    // Technology filter - check file extensions
+    let techMatch = true
+    if (selectedTech.length > 0 && Array.isArray(s.summary_files_changed)) {
+      techMatch = s.summary_files_changed.some((file: string) =>
+        selectedTech.some(tech => file.endsWith(tech))
+      )
+    }
+
+    return moodMatch && complexityMatch && statusMatch && techMatch
+  })
+
   // Apply date range filter
   const dateFilteredSessions = (dateRange.start || dateRange.end)
-    ? searchedSessions.filter((s: any) => {
+    ? multiFilteredSessions.filter((s: any) => {
         const sessionDate = new Date(s.started_at * 1000)
         const startMatch = !dateRange.start || sessionDate >= dateRange.start
         const endMatch = !dateRange.end || sessionDate <= new Date(dateRange.end.getTime() + 86400000) // Add 1 day to include end date
@@ -748,6 +770,34 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
           <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
             <SearchBar onSearch={setSearchQuery} placeholder="Search by title, content, or files..." />
             <DateRangePicker onDateRangeChange={handleDateRangeChange} />
+            <MultiSelectFilter
+              label="Mood"
+              options={['productive', 'struggling', 'learning', 'blocked', 'flow']}
+              selected={selectedMoods}
+              onChange={setSelectedMoods}
+              placeholder="Filter by mood"
+            />
+            <MultiSelectFilter
+              label="Complexity"
+              options={['simple', 'moderate', 'complex', 'very-complex']}
+              selected={selectedComplexity}
+              onChange={setSelectedComplexity}
+              placeholder="Filter by complexity"
+            />
+            <MultiSelectFilter
+              label="Status"
+              options={['active', 'completed']}
+              selected={selectedStatus}
+              onChange={setSelectedStatus}
+              placeholder="Filter by status"
+            />
+            <MultiSelectFilter
+              label="Technology"
+              options={['.ts', '.tsx', '.js', '.jsx', '.py', '.go', '.java', '.rs', '.md', '.json']}
+              selected={selectedTech}
+              onChange={setSelectedTech}
+              placeholder="Filter by file type"
+            />
             <div style={{ marginLeft: 'auto' }}>
               <ViewToggle viewMode={viewMode} onToggle={handleViewToggle} />
             </div>

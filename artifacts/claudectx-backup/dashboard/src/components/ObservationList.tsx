@@ -35,6 +35,9 @@ export default function ObservationList({ observations }: { observations: Observ
     )
   }
 
+  // Sort observations by created_at descending (newest first)
+  const sortedObservations = [...observations].sort((a, b) => b.created_at - a.created_at)
+
   return (
     <div style={{ position: 'relative' }}>
       <div style={{
@@ -46,7 +49,7 @@ export default function ObservationList({ observations }: { observations: Observ
         background: 'var(--border)',
       }} />
 
-      {observations.map((obs, i) => {
+      {sortedObservations.map((obs, i) => {
         const Icon = EVENT_ICONS[obs.event_type] || Terminal
         const color = EVENT_COLORS[obs.event_type] || 'var(--text-muted)'
         const time = format(new Date(obs.created_at * 1000), 'HH:mm:ss')

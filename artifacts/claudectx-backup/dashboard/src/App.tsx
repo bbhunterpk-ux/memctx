@@ -8,6 +8,7 @@ import Live from './pages/Live'
 import Memory from './pages/Memory'
 import MetricsDashboard from './pages/MetricsDashboard'
 import Logs from './pages/Logs'
+import Settings from './pages/Settings'
 import ToastContainer from './components/Toast'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/live" element={<Live />} />
           <Route path="/metrics" element={<MetricsDashboard />} />
           <Route path="/logs" element={<Logs />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>
       <ToastContainer />

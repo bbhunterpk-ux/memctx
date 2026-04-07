@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
-import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText, Menu, X } from 'lucide-react'
+import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText, Settings, Menu, X } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
 import { useState } from 'react'
 
@@ -20,6 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { path: '/live', icon: Radio, label: 'Live' },
     { path: '/metrics', icon: BarChart3, label: 'Metrics' },
     { path: '/logs', icon: FileText, label: 'Logs' },
+    { path: '/settings', icon: Settings, label: 'Settings' },
   ]
 
   return (

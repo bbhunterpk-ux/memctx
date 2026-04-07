@@ -67,6 +67,11 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ archived })
   }),
+  getSettings: () => apiFetch('/api/settings'),
+  updateSettings: (settings: any) => apiFetch('/api/settings', {
+    method: 'POST',
+    body: JSON.stringify(settings)
+  }),
 }
 
 export function createWebSocket(): WebSocket {

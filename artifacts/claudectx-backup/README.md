@@ -55,11 +55,32 @@ That's it! ClaudeContext will now automatically capture all your Claude Code ses
 
 ## Configuration
 
-### Environment Variables
+### Settings Dashboard (Recommended)
+
+The easiest way to configure ClaudeContext is through the Settings page in the dashboard:
+
+1. Open `http://localhost:9999/settings`
+2. Configure your preferences:
+   - **API Provider**: Direct (Anthropic) or Proxy (9router, etc.)
+   - **API Key**: Your Anthropic or proxy API key
+   - **Base URL**: Custom proxy endpoint (if using proxy)
+   - **Model**: Choose Claude Opus, Sonnet, Haiku, or AWS default
+   - **Disable Summaries**: Toggle to save API costs
+3. Click "Save Settings"
+4. Restart worker: `claudectx restart`
+
+Settings are saved to `~/.claudectx/settings.json` and persist across restarts.
+
+### Environment Variables (Alternative)
+
+You can also configure via environment variables:
 
 ```bash
 # Required for AI summaries
 export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Optional: Use proxy (like 9router)
+export ANTHROPIC_BASE_URL="https://your-proxy.com/v1"
 
 # Optional: Custom port (default: 9999)
 export CLAUDECTX_PORT=8080
@@ -71,13 +92,16 @@ export CLAUDECTX_DB_PATH="/path/to/db.sqlite"
 export CLAUDECTX_CONTEXT_SESSIONS=5
 ```
 
-### Configuration File
+**Configuration Priority:** Settings Dashboard > Environment Variables > Defaults
 
-ClaudeContext stores its configuration in `~/.claudectx/`:
+### Configuration Files
+
+ClaudeContext stores its data in `~/.claudectx/`:
 
 ```
 ~/.claudectx/
 ├── db.sqlite          # Session database
+├── settings.json      # User preferences (API key, model, etc.)
 ├── hooks/             # Claude Code hooks
 └── logs/              # Service logs
 ```
@@ -118,6 +142,7 @@ Access the dashboard at `http://localhost:9999` (or your custom port).
 - **Live** - Real-time monitoring of active sessions
 - **Metrics** - System performance and statistics
 - **Logs** - View service logs
+- **Settings** - Configure API provider, model, and preferences
 
 ### Features
 

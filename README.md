@@ -2,32 +2,56 @@
 
 # 🧠 MemCTX
 
-### Autonomous Session Memory for Claude Code
+<h3 align="center">Autonomous Session Memory for Claude Code</h3>
 
-*Never lose context. Never repeat yourself. Your AI pair programmer, now with perfect memory.*
+<p align="center">
+  <strong>Never lose context. Never repeat yourself. Your AI pair programmer, now with perfect memory.</strong>
+</p>
 
-[![npm version](https://img.shields.io/npm/v/memctx.svg?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/memctx)
-[![npm downloads](https://img.shields.io/npm/dm/memctx.svg?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/memctx)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Node Version](https://img.shields.io/node/v/memctx.svg?style=for-the-badge&logo=node.js&color=339933)](https://nodejs.org)
+<p align="center">
+  <a href="https://www.npmjs.com/package/memctx"><img src="https://img.shields.io/npm/v/memctx.svg?style=for-the-badge&logo=npm&color=CB3837" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/memctx"><img src="https://img.shields.io/npm/dm/memctx.svg?style=for-the-badge&logo=npm&color=CB3837" alt="npm downloads" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License: MIT" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/memctx.svg?style=for-the-badge&logo=node.js&color=339933" alt="Node Version" /></a>
+</p>
 
-[🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [✨ Features](#-features) • [🎯 Demo](#-demo) • [💬 Community](#-community)
+<p align="center">
+  <a href="#-quick-start">🚀 Quick Start</a> •
+  <a href="#-documentation">📖 Documentation</a> •
+  <a href="#-features">✨ Features</a> •
+  <a href="#-demo">🎯 Demo</a> •
+  <a href="#-community">💬 Community</a>
+</p>
 
-<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/hero.png" alt="MemCTX Dashboard" width="800" />
+<br />
+
+<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/hero.png" alt="MemCTX Dashboard" width="100%" style="max-width: 1200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
+
+<br />
+<br />
 
 </div>
 
+<br />
+
 ---
+
+<br />
 
 ## 🎯 What is MemCTX?
 
-MemCTX transforms Claude Code into a **context-aware development companion** by automatically capturing, analyzing, and intelligently injecting your development history. Think of it as giving Claude a **photographic memory** of your entire project journey.
+<p align="center" style="font-size: 1.1em; max-width: 900px; margin: 0 auto;">
+MemCTX transforms Claude Code into a <strong>context-aware development companion</strong> by automatically capturing, analyzing, and intelligently injecting your development history. Think of it as giving Claude a <strong>photographic memory</strong> of your entire project journey.
+</p>
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 😫 Before MemCTX
+
 - ❌ Repeat context every session
 - ❌ Lost conversation history
 - ❌ Manual session notes
@@ -35,9 +59,10 @@ MemCTX transforms Claude Code into a **context-aware development companion** by 
 - ❌ Context switching overhead
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### ✨ With MemCTX
+
 - ✅ Automatic context injection
 - ✅ Searchable session history
 - ✅ AI-powered summaries
@@ -48,79 +73,102 @@ MemCTX transforms Claude Code into a **context-aware development companion** by 
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 ## ✨ Features
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🧠 Smart Memory
+
 Automatically captures every Claude Code session with full context preservation
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🤖 AI Summaries
+
 Claude analyzes each session and generates structured summaries with key insights
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📊 Beautiful Dashboard
+
 Modern, responsive UI to browse, search, and analyze your development history
 
 </td>
 </tr>
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🔍 Full-Text Search
+
 Lightning-fast search across all sessions, conversations, and code snippets
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📈 Live Monitoring
+
 Real-time view of active sessions with WebSocket updates
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🎯 Context Injection
+
 Automatically injects relevant history into new sessions for perfect continuity
 
 </td>
 </tr>
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🏷️ Tags & Bookmarks
+
 Organize sessions with custom tags and bookmark important moments
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📝 Session Notes
+
 Add custom notes and annotations to any session
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🌓 Dark/Light Theme
+
 Beautiful themes that adapt to your preference
 
 </td>
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 ## 🚀 Quick Start
 
+<br />
+
 <details open>
-<summary><b>📦 Installation</b></summary>
+<summary><h3>📦 Installation</h3></summary>
+
+<br />
 
 ```bash
 # Install globally with npm
@@ -133,10 +181,16 @@ pnpm add -g memctx
 yarn global add memctx
 ```
 
+**Current Version:** `1.0.4` | **Node Required:** `>=18.0.0`
+
 </details>
 
+<br />
+
 <details open>
-<summary><b>⚡ Setup (30 seconds)</b></summary>
+<summary><h3>⚡ Setup (30 seconds)</h3></summary>
+
+<br />
 
 ```bash
 # 1. Install and configure hooks
@@ -149,14 +203,18 @@ memctx start
 memctx open
 ```
 
-**That's it!** MemCTX is now capturing your Claude Code sessions automatically. 🎉
+<p align="center"><strong>That's it! 🎉</strong> MemCTX is now capturing your Claude Code sessions automatically.</p>
 
 </details>
 
-<details>
-<summary><b>🔧 Configuration</b></summary>
+<br />
 
-### Settings Dashboard (Recommended)
+<details>
+<summary><h3>🔧 Configuration</h3></summary>
+
+<br />
+
+#### Settings Dashboard (Recommended)
 
 Open `http://localhost:9999/settings` and configure:
 
@@ -165,7 +223,9 @@ Open `http://localhost:9999/settings` and configure:
 - **Model**: Choose Claude Opus, Sonnet, Haiku, or AWS default
 - **Disable Summaries**: Toggle to save API costs
 
-### Environment Variables (Alternative)
+<br />
+
+#### Environment Variables (Alternative)
 
 ```bash
 # Required for AI summaries
@@ -183,11 +243,17 @@ export MEMCTX_DB_PATH="/path/to/db.sqlite"
 
 </details>
 
+<br />
+
 ---
+
+<br />
 
 ## 💻 CLI Commands
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
 <th width="30%">Command</th>
 <th width="70%">Description</th>
@@ -234,29 +300,47 @@ export MEMCTX_DB_PATH="/path/to/db.sqlite"
 </tr>
 </table>
 
+<br />
+
 ---
 
+<br />
+
 ## 🎯 Demo
+
+<br />
 
 <div align="center">
 
 ### Dashboard Overview
 
-<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/dashboard.png" alt="Dashboard" width="800" />
+<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/dashboard.png" alt="Dashboard" width="100%" style="max-width: 1200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
+
+<br />
+<br />
 
 ### Session Details
 
-<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/session-detail.png" alt="Session Detail" width="800" />
+<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/session-detail.png" alt="Session Detail" width="100%" style="max-width: 1200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
+
+<br />
+<br />
 
 ### Search & Filter
 
-<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/search.png" alt="Search" width="800" />
+<img src="https://raw.githubusercontent.com/bbhunterpk-ux/memctx/main/assets/search.png" alt="Search" width="100%" style="max-width: 1200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
 
 </div>
 
+<br />
+
 ---
 
+<br />
+
 ## 🏗️ How It Works
+
+<br />
 
 ```mermaid
 graph LR
@@ -276,8 +360,12 @@ graph LR
     style F fill:#3498DB
 ```
 
+<br />
+
 <details>
-<summary><b>📋 Detailed Flow</b></summary>
+<summary><h3>📋 Detailed Flow</h3></summary>
+
+<br />
 
 1. **Session Start**: Claude Code session begins → `session-start` hook fires
 2. **Capture**: MemCTX worker creates session record in SQLite
@@ -290,9 +378,15 @@ graph LR
 
 </details>
 
+<br />
+
 ---
 
+<br />
+
 ## 📖 Documentation
+
+<br />
 
 <div align="center">
 
@@ -300,11 +394,14 @@ graph LR
 
 </div>
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 📚 For Users
+
 - [📦 Installation Guide](./docs/user/installation.md)
 - [⚙️ Configuration](./docs/user/configuration.md)
 - [💻 CLI Reference](./docs/user/cli-reference.md)
@@ -312,9 +409,10 @@ graph LR
 - [🔧 Troubleshooting](./docs/user/troubleshooting.md)
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🛠️ For Developers
+
 - [🏗️ Architecture](./docs/developer/architecture.md)
 - [🔌 API Reference](./docs/developer/api-reference.md)
 - [🤝 Contributing Guide](./docs/developer/contributing.md)
@@ -325,23 +423,31 @@ graph LR
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 ## 🔧 Requirements
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### System Requirements
+
 - **Node.js**: 18.0.0 or higher
 - **Claude Code**: CLI installed
 - **OS**: Linux, macOS, or Windows (WSL)
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### Build Tools (for installation)
+
 - **Linux**: `build-essential`, `python3`
 - **macOS**: Xcode Command Line Tools
 - **Windows**: Visual Studio Build Tools
@@ -350,8 +456,12 @@ graph LR
 </tr>
 </table>
 
+<br />
+
 <details>
-<summary><b>🔨 Installing Build Tools</b></summary>
+<summary><h3>🔨 Installing Build Tools</h3></summary>
+
+<br />
 
 **Linux (Ubuntu/Debian):**
 ```bash
@@ -368,79 +478,102 @@ Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads
 
 </details>
 
+<br />
+
 ---
+
+<br />
 
 ## 🎨 Dashboard Features
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📊 Projects View
+
 Browse all projects and their sessions organized by directory
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🔍 Search
+
 Full-text search with filters, tags, and date ranges
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📈 Live Monitor
+
 Real-time view of active sessions with WebSocket updates
 
 </td>
 </tr>
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📝 Session Details
+
 View full conversation history, summaries, and observations
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🏷️ Tags & Notes
+
 Organize with custom tags and add notes to sessions
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📊 Metrics
+
 System performance, API usage, and statistics
 
 </td>
 </tr>
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🌓 Themes
+
 Beautiful dark and light themes
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### ⌨️ Shortcuts
+
 Keyboard shortcuts for power users (press `?`)
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 📤 Export
+
 Export sessions as markdown or screenshots
 
 </td>
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 ## 🚨 Troubleshooting
 
+<br />
+
 <details>
-<summary><b>Service won't start</b></summary>
+<summary><h3>Service won't start</h3></summary>
+
+<br />
 
 ```bash
 # Check if port is in use
@@ -455,8 +588,12 @@ memctx restart
 
 </details>
 
+<br />
+
 <details>
-<summary><b>Hooks not working</b></summary>
+<summary><h3>Hooks not working</h3></summary>
+
+<br />
 
 ```bash
 # Verify hooks are registered
@@ -469,8 +606,12 @@ memctx install
 
 </details>
 
+<br />
+
 <details>
-<summary><b>SQLite compilation errors</b></summary>
+<summary><h3>SQLite compilation errors</h3></summary>
+
+<br />
 
 ```bash
 # Rebuild native modules
@@ -483,8 +624,12 @@ npm install -g memctx
 
 </details>
 
+<br />
+
 <details>
-<summary><b>AI summaries not working</b></summary>
+<summary><h3>AI summaries not working</h3></summary>
+
+<br />
 
 ```bash
 # Check API key is set
@@ -500,37 +645,52 @@ memctx open
 
 </details>
 
+<br />
+
 ---
+
+<br />
 
 ## 🤝 Contributing
 
-We love contributions! MemCTX is open source and community-driven.
+<br />
 
-<table>
+<p align="center">We love contributions! MemCTX is open source and community-driven.</p>
+
+<br />
+
+<table width="100%">
 <tr>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🐛 Report Bugs
+
 [Open an issue](https://github.com/bbhunterpk-ux/memctx/issues/new?template=bug_report.md)
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 💡 Request Features
+
 [Suggest a feature](https://github.com/bbhunterpk-ux/memctx/issues/new?template=feature_request.md)
 
 </td>
-<td width="33%" align="center">
+<td width="33%" align="center" valign="top">
 
 ### 🔧 Submit PRs
+
 [Contributing Guide](https://github.com/bbhunterpk-ux/memctx/blob/main/CONTRIBUTING.md)
 
 </td>
 </tr>
 </table>
 
+<br />
+
 <details>
-<summary><b>Development Setup</b></summary>
+<summary><h3>Development Setup</h3></summary>
+
+<br />
 
 ```bash
 # Clone repository
@@ -553,9 +713,15 @@ memctx start
 
 </details>
 
+<br />
+
 ---
 
+<br />
+
 ## 💬 Community
+
+<br />
 
 <div align="center">
 
@@ -565,13 +731,43 @@ memctx start
 
 </div>
 
-- **GitHub Discussions**: Ask questions, share ideas
-- **Discord**: Real-time chat with the community
-- **Twitter**: Follow for updates and tips
+<br />
+
+<table width="100%">
+<tr>
+<td width="33%" align="center" valign="top">
+
+### 💬 GitHub Discussions
+
+Ask questions, share ideas
+
+</td>
+<td width="33%" align="center" valign="top">
+
+### 💭 Discord
+
+Real-time chat with the community
+
+</td>
+<td width="33%" align="center" valign="top">
+
+### 🐦 Twitter
+
+Follow for updates and tips
+
+</td>
+</tr>
+</table>
+
+<br />
 
 ---
 
+<br />
+
 ## 📊 Stats
+
+<br />
 
 <div align="center">
 
@@ -581,11 +777,17 @@ memctx start
 
 </div>
 
+<br />
+
 ---
+
+<br />
 
 ## 🗺️ Roadmap
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
 <th width="33%">✅ v1.0 (Current)</th>
 <th width="33%">🚧 v1.1 (Next)</th>
@@ -625,11 +827,19 @@ memctx start
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 ## 📄 License
 
-MemCTX is [MIT licensed](LICENSE).
+<br />
+
+<p align="center">MemCTX is <a href="LICENSE">MIT licensed</a>.</p>
+
+<br />
 
 ```
 MIT License
@@ -647,11 +857,19 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 ```
 
+<br />
+
 ---
+
+<br />
 
 ## 🙏 Acknowledgments
 
-Built with ❤️ using:
+<br />
+
+<p align="center"><strong>Built with ❤️ using:</strong></p>
+
+<br />
 
 <div align="center">
 
@@ -663,60 +881,112 @@ Built with ❤️ using:
 
 </div>
 
-Special thanks to:
-- [Anthropic](https://anthropic.com) for Claude AI
-- The Claude Code community
-- All our contributors and users
+<br />
+
+<p align="center"><strong>Special thanks to:</strong></p>
+
+<table width="100%">
+<tr>
+<td width="33%" align="center" valign="top">
+
+### 🤖 Anthropic
+
+For Claude AI
+
+</td>
+<td width="33%" align="center" valign="top">
+
+### 👥 Community
+
+The Claude Code community
+
+</td>
+<td width="33%" align="center" valign="top">
+
+### 🙌 Contributors
+
+All our contributors and users
+
+</td>
+</tr>
+</table>
+
+<br />
 
 ---
 
+<br />
+
 ## 📞 Support
 
-<table>
+<br />
+
+<table width="100%">
 <tr>
-<td width="50%" align="center">
+<td width="50%" align="center" valign="top">
 
 ### 📧 Email
+
 [info@memctx.dev](mailto:info@memctx.dev)
 
 </td>
-<td width="50%" align="center">
+<td width="50%" align="center" valign="top">
 
 ### 🌐 Website
+
 [memctx.dev](https://memctx.dev)
 
 </td>
 </tr>
 <tr>
-<td width="50%" align="center">
+<td width="50%" align="center" valign="top">
 
 ### 🐛 Issues
+
 [GitHub Issues](https://github.com/bbhunterpk-ux/memctx/issues)
 
 </td>
-<td width="50%" align="center">
+<td width="50%" align="center" valign="top">
 
 ### 💬 Discussions
+
 [GitHub Discussions](https://github.com/bbhunterpk-ux/memctx/discussions)
 
 </td>
 </tr>
 </table>
 
+<br />
+
 ---
+
+<br />
 
 <div align="center">
 
+<br />
+
 ### ⭐ Star us on GitHub — it motivates us a lot!
+
+<br />
 
 [![Star History Chart](https://api.star-history.com/svg?repos=bbhunterpk-ux/memctx&type=Date)](https://star-history.com/#bbhunterpk-ux/memctx&Date)
 
+<br />
+<br />
+
 ---
+
+<br />
 
 **Made with ❤️ by [Fahad Aziz Qureshi](https://memctx.dev)**
 
 *Empowering developers with perfect AI memory*
 
+<br />
+
 [⬆ Back to Top](#-memctx)
+
+<br />
 
 </div>

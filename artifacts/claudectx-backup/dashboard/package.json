@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",
     "lucide-react": "catalog:",

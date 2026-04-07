@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/bbhunterpk-ux/memctx/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 💭 Discord Community
+    url: https://discord.gg/memctx
+    about: Join our Discord server for real-time chat
+  - name: 📧 Email Support
+    url: mailto:info@memctx.dev
+    about: Contact us directly via email

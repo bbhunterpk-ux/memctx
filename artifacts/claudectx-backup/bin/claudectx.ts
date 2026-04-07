@@ -131,7 +131,7 @@ async function run() {
     }
 
     case 'start': {
-      const workerPath = path.join(__dirname, '..', 'dist', 'src', 'index.js')
+      const workerPath = path.join(__dirname, '..', 'src', 'index.js')
       if (!fs.existsSync(workerPath)) {
         console.error('Worker not built. Run: npm run build')
         process.exit(1)

@@ -23,7 +23,7 @@ export const CONFIG = {
   claudeProjectsDir: path.join(homedir(), '.claude', 'projects'),
   claudeSettingsPath: path.join(homedir(), '.claude', 'settings.json'),
 
-  port: parseInt(process.env.MEMCTX_PORT || process.env.PORT || '8000'),
+  port: parseInt(process.env.MEMCTX_PORT || process.env.PORT || '9999'),
 
   // API configuration - prioritize user settings, then env vars, then defaults
   apiBaseUrl: userSettings.baseURL || process.env.ANTHROPIC_BASE_URL || 'http://localhost:20128/v1',

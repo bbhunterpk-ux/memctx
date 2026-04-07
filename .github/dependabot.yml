@@ -1,0 +1,84 @@
+# Dependabot configuration for MemCTX
+# Automatically creates PRs for dependency updates
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Root workspace dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "bbhunterpk-ux"
+    assignees:
+      - "bbhunterpk-ux"
+
+  # Worker package (claudectx-backup)
+  - package-ecosystem: "npm"
+    directory: "/artifacts/claudectx-backup"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "worker"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "bbhunterpk-ux"
+    assignees:
+      - "bbhunterpk-ux"
+
+  # Dashboard package
+  - package-ecosystem: "npm"
+    directory: "/artifacts/claudectx-backup/dashboard"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "dashboard"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "bbhunterpk-ux"
+    assignees:
+      - "bbhunterpk-ux"
+
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    reviewers:
+      - "bbhunterpk-ux"
+    assignees:
+      - "bbhunterpk-ux"

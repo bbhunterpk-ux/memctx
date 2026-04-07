@@ -107,6 +107,7 @@ export default function SessionDetail() {
   const { id } = useParams<{ id: string }>()
   const [resyncing, setResyncing] = useState(false)
   const [notesModalOpen, setNotesModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'overview' | 'timeline'>('overview')
 
   const { data: session, isLoading, refetch } = useQuery({
     queryKey: ['session', id],
@@ -193,6 +194,53 @@ export default function SessionDetail() {
           <StatusBadge status={session.summary_status || session.status} />
         </div>
 
+        {/* Tab Navigation */}
+        <div style={{
+          display: 'flex',
+          gap: 8,
+          borderBottom: '1px solid var(--border)',
+          marginBottom: 24,
+          marginTop: 20
+        }}>
+          <button
+            onClick={() => setActiveTab('overview')}
+            style={{
+              padding: '10px 16px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'overview' ? '2px solid var(--accent)' : '2px solid transparent',
+              color: activeTab === 'overview' ? 'var(--accent)' : 'var(--text-muted)',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              marginBottom: -1
+            }}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('timeline')}
+            style={{
+              padding: '10px 16px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'timeline' ? '2px solid var(--accent)' : '2px solid transparent',
+              color: activeTab === 'timeline' ? 'var(--accent)' : 'var(--text-muted)',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              marginBottom: -1
+            }}
+          >
+            Timeline ({session.observations?.length || 0} events)
+          </button>
+        </div>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+        <>
         {/* 70-30 Split Layout */}
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
           {/* Left Side - 70% */}
@@ -589,7 +637,6 @@ export default function SessionDetail() {
             </button>
           )}
         </div>
-      </div>
 
       {hasSummary && (
         <div style={{ marginBottom: 28 }}>
@@ -620,12 +667,13 @@ export default function SessionDetail() {
           Session is active. Summary will be generated when the session ends.
         </div>
       )}
+      </>
+      )}
+      </div>
 
-      {session.observations && session.observations.length > 0 && (
+      {/* Timeline Tab */}
+      {activeTab === 'timeline' && session.observations && session.observations.length > 0 && (
         <div>
-          <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>
-            Timeline ({session.observations.length} events)
-          </h2>
           <ObservationList observations={session.observations} />
         </div>
       )}

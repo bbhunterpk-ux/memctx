@@ -15,5 +15,14 @@
   "devDependencies": {
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "path-to-regexp": ">=8.4.0",
+      "lodash": ">=4.17.21",
+      "picomatch": ">=4.0.2",
+      "brace-expansion": ">=2.0.1",
+      "yaml": ">=2.6.1"
+    }
   }
 }

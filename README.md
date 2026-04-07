@@ -294,26 +294,32 @@ graph LR
 
 ## 📖 Documentation
 
+<div align="center">
+
+### [📚 Complete Documentation →](docs/README.md)
+
+</div>
+
 <table>
 <tr>
 <td width="50%">
 
 ### 📚 For Users
-- [Installation Guide](https://memctx.dev/docs/installation)
-- [Configuration](https://memctx.dev/docs/configuration)
-- [CLI Reference](https://memctx.dev/docs/cli)
-- [Dashboard Guide](https://memctx.dev/docs/dashboard)
-- [Troubleshooting](https://memctx.dev/docs/troubleshooting)
+- [📦 Installation Guide](docs/user/installation.md)
+- [⚙️ Configuration](docs/user/configuration.md)
+- [💻 CLI Reference](docs/user/cli-reference.md)
+- [🎨 Dashboard Guide](docs/user/dashboard.md)
+- [🔧 Troubleshooting](docs/user/troubleshooting.md)
 
 </td>
 <td width="50%">
 
 ### 🛠️ For Developers
-- [Architecture](https://memctx.dev/docs/architecture)
-- [API Reference](https://memctx.dev/docs/api)
-- [Contributing Guide](https://github.com/bbhunterpk-ux/memctx/blob/main/CONTRIBUTING.md)
-- [Development Setup](https://memctx.dev/docs/development)
-- [Plugin System](https://memctx.dev/docs/plugins)
+- [🏗️ Architecture](docs/developer/architecture.md)
+- [🔌 API Reference](docs/developer/api-reference.md)
+- [🤝 Contributing Guide](docs/developer/contributing.md)
+- [🔧 Development Setup](docs/developer/development.md)
+- [🔌 Plugin System](docs/developer/plugin-system.md)
 
 </td>
 </tr>

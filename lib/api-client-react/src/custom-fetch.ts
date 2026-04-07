@@ -26,7 +26,13 @@ let _authTokenGetter: AuthTokenGetter | null = null;
  * Pass `null` to clear the base URL.
  */
 export function setBaseUrl(url: string | null): void {
-  _baseUrl = url ? url.replace(/\/+$/, "") : null;
+  // Remove trailing slashes safely without ReDoS vulnerability
+  if (url) {
+    while (url.endsWith('/')) {
+      url = url.slice(0, -1)
+    }
+  }
+  _baseUrl = url || null
 }
 
 /**

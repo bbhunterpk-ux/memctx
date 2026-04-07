@@ -1,13 +1,14 @@
 import { Router } from 'express'
 import { spawn } from 'child_process'
 import { CONFIG } from '../config'
+import { standardRateLimit, strictRateLimit } from '../middleware/rate-limit'
 
 export const logsRouter: Router = Router()
 
 const LOG_FILE = '/tmp/memctx.log'
 
 // Get logs with optional filtering
-logsRouter.get('/', (req, res) => {
+logsRouter.get('/', standardRateLimit, (req, res) => {
   try {
     const lines = parseInt(req.query.lines as string || '100')
     const level = req.query.level as string // info, error, warn, etc.
@@ -54,7 +55,7 @@ logsRouter.get('/', (req, res) => {
 })
 
 // Stream logs in real-time (SSE)
-logsRouter.get('/stream', (req, res) => {
+logsRouter.get('/stream', strictRateLimit, (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')

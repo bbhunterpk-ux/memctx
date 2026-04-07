@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express'
 import fs from 'fs'
 import path from 'path'
 import { homedir } from 'os'
+import { standardRateLimit } from '../middleware/rate-limit'
 
 const router: Router = Router()
 
@@ -29,7 +30,7 @@ function ensureSettingsFile() {
  * GET /api/settings
  * Get current settings
  */
-router.get('/', (req: Request, res: Response) => {
+router.get('/', standardRateLimit, (req: Request, res: Response) => {
   try {
     ensureSettingsFile()
     const settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'))
@@ -58,7 +59,7 @@ router.get('/', (req: Request, res: Response) => {
  * POST /api/settings
  * Update settings
  */
-router.post('/', (req: Request, res: Response) => {
+router.post('/', standardRateLimit, (req: Request, res: Response) => {
   try {
     ensureSettingsFile()
     const currentSettings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'))

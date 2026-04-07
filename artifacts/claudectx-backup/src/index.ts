@@ -23,6 +23,7 @@ import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
 import { memoryDecay } from './services/memory-decay'
 import { startSessionTimeoutChecker } from './services/session-timeout'
+import { standardRateLimit } from './middleware/rate-limit'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -45,6 +46,9 @@ async function main() {
     if (req.method === 'OPTIONS') { res.sendStatus(200); return }
     next()
   })
+
+  // Apply rate limiting to all API routes
+  app.use('/api', standardRateLimit)
 
   app.use('/api/hook', hookRouter)
   app.use('/api/sessions', sessionsRouter)

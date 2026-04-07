@@ -1,23 +1,40 @@
 import { createHash } from 'crypto'
 import { execSync } from 'child_process'
 import path from 'path'
+import fs from 'fs'
 import { queries } from '../db/queries'
 
 export async function detectProject(cwd: string): Promise<{ id: string; name: string; root_path: string }> {
-  let rootPath = cwd
+  // Sanitize and validate the path to prevent path traversal
+  const sanitizedCwd = path.resolve(cwd)
+
+  // Verify the path exists and is a directory
+  try {
+    const stats = fs.statSync(sanitizedCwd)
+    if (!stats.isDirectory()) {
+      throw new Error('Path is not a directory')
+    }
+  } catch (err) {
+    throw new Error(`Invalid directory path: ${sanitizedCwd}`)
+  }
+
+  let rootPath = sanitizedCwd
   let gitRemote: string | null = null
 
   try {
     const gitRoot = execSync('git rev-parse --show-toplevel', {
-      cwd,
+      cwd: sanitizedCwd,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe']
     }).trim()
-    rootPath = gitRoot
+
+    // Validate git root is also a real path
+    const sanitizedGitRoot = path.resolve(gitRoot)
+    rootPath = sanitizedGitRoot
 
     try {
       gitRemote = execSync('git remote get-url origin', {
-        cwd: gitRoot,
+        cwd: sanitizedGitRoot,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe']
       }).trim()

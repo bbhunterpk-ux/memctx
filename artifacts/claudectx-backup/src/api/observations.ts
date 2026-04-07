@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { getDB } from '../db/client'
+import { standardRateLimit } from '../middleware/rate-limit'
 
 export const observationsRouter: import("express").Router = Router()
 
-observationsRouter.get('/', (req, res) => {
+observationsRouter.get('/', standardRateLimit, (req, res) => {
   try {
     const db = getDB()
     const session_id = req.query.session_id as string

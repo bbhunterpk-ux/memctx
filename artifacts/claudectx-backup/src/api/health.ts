@@ -2,11 +2,12 @@ import { Router } from 'express'
 import { CONFIG } from '../config'
 import { getDB } from '../db/client'
 import { getQueueSize } from '../services/queue'
+import { standardRateLimit } from '../middleware/rate-limit'
 
 export const healthRouter: import("express").Router = Router()
 const startTime = Date.now()
 
-healthRouter.get('/', (_req, res) => {
+healthRouter.get('/', standardRateLimit, (_req, res) => {
   let dbConnected = false
   try {
     getDB().prepare('SELECT 1').get()

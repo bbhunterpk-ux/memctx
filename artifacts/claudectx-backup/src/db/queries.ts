@@ -68,11 +68,22 @@ export const queries = {
     const keys = Object.keys(fields)
     if (keys.length === 0) return
 
+    // Whitelist allowed columns to prevent SQL injection
+    const allowedColumns = [
+      'status', 'ended_at', 'summary_title', 'summary_completed',
+      'summary_next', 'summary_remember', 'summary_blockers',
+      'summary_productivity', 'summary_complexity', 'total_turns',
+      'total_tool_calls', 'files_touched', 'is_bookmarked', 'is_archived', 'notes'
+    ]
+
+    const validKeys = keys.filter(k => allowedColumns.includes(k))
+    if (validKeys.length === 0) return
+
     let attempts = 0
     while (attempts < 3) {
       try {
-        const setClauses = keys.map(k => `${k} = ?`).join(', ')
-        const values = keys.map(k => fields[k])
+        const setClauses = validKeys.map(k => `${k} = ?`).join(', ')
+        const values = validKeys.map(k => fields[k])
         run(`UPDATE sessions SET ${setClauses} WHERE id = ?`, ...values, id)
         return
       } catch (err: any) {
@@ -223,13 +234,15 @@ export const queries = {
   },
 
   getRecentActivity(days: number = 14) {
+    // Validate days is a positive integer to prevent SQL injection
+    const safeDays = Math.max(1, Math.min(365, Math.floor(Math.abs(days))))
     return all(`
       SELECT date(started_at, 'unixepoch') as day, COUNT(*) as session_count
       FROM sessions
-      WHERE started_at > unixepoch('now', '-${days} days')
+      WHERE started_at > unixepoch('now', ? || ' days')
       GROUP BY day
       ORDER BY day ASC
-    `)
+    `, `-${safeDays}`)
   },
 
   // Memory System Queries

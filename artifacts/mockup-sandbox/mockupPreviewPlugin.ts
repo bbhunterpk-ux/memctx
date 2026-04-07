@@ -52,7 +52,13 @@ export function mockupPreviewPlugin(): Plugin {
   }
 
   function generateSource(components: Array<DiscoveredComponent>): string {
-    const entries = components
+    // Sanitize paths to prevent code injection
+    const sanitizedComponents = components.map(c => ({
+      globKey: c.globKey.replace(/[^\w\-./]/g, '_'),
+      importPath: c.importPath.replace(/[^\w\-./]/g, '_')
+    }))
+
+    const entries = sanitizedComponents
       .map(
         (c) =>
           `  ${JSON.stringify(c.globKey)}: () => import(${JSON.stringify(c.importPath)})`,

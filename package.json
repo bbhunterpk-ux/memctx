@@ -20,9 +20,10 @@
     "overrides": {
       "path-to-regexp": ">=8.4.0",
       "lodash": ">=4.17.21",
-      "picomatch": ">=4.0.2",
-      "brace-expansion": ">=2.0.1",
-      "yaml": ">=2.6.1"
+      "picomatch": ">=4.0.4",
+      "brace-expansion": ">=2.0.3",
+      "yaml": ">=2.8.3",
+      "esbuild": ">=0.25.0"
     }
   }
 }

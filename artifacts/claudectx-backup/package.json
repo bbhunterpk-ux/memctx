@@ -52,7 +52,7 @@
     "@anthropic-ai/sdk": "^0.26.0",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.8.0",
-    "chokidar": "^3.6.0",
+    "chokidar": "^5.0.0",
     "express": "^5.2.1",
     "p-queue": "^8.0.1",
     "ws": "^8.17.0"

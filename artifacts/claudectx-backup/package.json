@@ -2,16 +2,16 @@
   "name": "memctx",
   "version": "1.0.0",
   "description": "Autonomous session memory for Claude Code - automatically captures, analyzes, and summarizes your development sessions",
-  "author": "MemCTX Contributors",
+  "author": "Fahad Aziz Qureshi <info@memctx.dev> (https://memctx.dev)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/memctx.git"
+    "url": "https://github.com/bbhunterpk-ux/memctx.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/memctx/issues"
+    "url": "https://github.com/bbhunterpk-ux/memctx/issues"
   },
-  "homepage": "https://github.com/yourusername/memctx#readme",
+  "homepage": "https://memctx.dev",
   "keywords": [
     "claude",
     "claude-code",

@@ -60,6 +60,18 @@ export default function App() {
         }
       }
 
+      // If opening a project and a session from that project exists, replace the session tab
+      if (type === 'project') {
+        const sessionTabIndex = prev.findIndex(t => t.projectId === id && t.type === 'session')
+        console.log('Looking for session tab from project:', id, 'found at index:', sessionTabIndex)
+        if (sessionTabIndex !== -1) {
+          const newTabs = [...prev]
+          newTabs[sessionTabIndex] = { id, name, type }
+          console.log('Replaced session tab with project tab')
+          return newTabs
+        }
+      }
+
       // Add new tab
       console.log('Adding new tab')
       return [...prev, { id, name, type, projectId }]

@@ -1,5 +1,7 @@
 import { getDB } from './client'
 
+// Parameterized query helpers - all queries use prepared statements
+// to prevent SQL injection
 function run(sql: string, ...params: any[]) {
   const db = getDB()
   const stmt = db.prepare(sql)

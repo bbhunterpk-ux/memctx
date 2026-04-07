@@ -52,15 +52,23 @@ export function mockupPreviewPlugin(): Plugin {
   }
 
   function generateSource(components: Array<DiscoveredComponent>): string {
-    // Sanitize paths to prevent code injection
-    const sanitizedComponents = components.map(c => ({
-      globKey: c.globKey.replace(/[^\w\-./]/g, '_'),
-      importPath: c.importPath.replace(/[^\w\-./]/g, '_')
-    }))
+    // Validate and sanitize paths to prevent code injection
+    const sanitizedComponents = components
+      .filter(c => {
+        // Only allow safe path characters
+        const safePathRegex = /^[a-zA-Z0-9_\-./]+$/
+        return safePathRegex.test(c.globKey) && safePathRegex.test(c.importPath)
+      })
+      .map(c => ({
+        // Additional sanitization: remove any remaining suspicious characters
+        globKey: c.globKey.replace(/[^\w\-./]/g, '_'),
+        importPath: c.importPath.replace(/[^\w\-./]/g, '_')
+      }))
 
     const entries = sanitizedComponents
       .map(
         (c) =>
+          // JSON.stringify provides proper escaping for string literals
           `  ${JSON.stringify(c.globKey)}: () => import(${JSON.stringify(c.importPath)})`,
       )
       .join(",\n");

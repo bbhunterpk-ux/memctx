@@ -17,7 +17,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router-dom": "^6.24.0",
-    "recharts": "^2.12.7"
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

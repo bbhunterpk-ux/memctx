@@ -1,0 +1,50 @@
+MEMCTX DOCUMENTATION INDEX
+==========================
+
+Quick Access Guide
+------------------
+
+USER DOCUMENTATION
+├── Installation Guide       → docs/user/installation.md
+├── Configuration           → docs/user/configuration.md
+├── CLI Reference           → docs/user/cli-reference.md
+├── Dashboard Guide         → docs/user/dashboard.md
+└── Troubleshooting         → docs/user/troubleshooting.md
+
+DEVELOPER DOCUMENTATION
+├── Architecture            → docs/developer/architecture.md
+├── API Reference           → docs/developer/api-reference.md
+├── Contributing Guide      → docs/developer/contributing.md
+├── Development Setup       → docs/developer/development.md
+└── Plugin System           → docs/developer/plugin-system.md
+
+NAVIGATION
+├── Main Index              → docs/README.md
+├── Visual Map              → docs/MAP.md
+└── Summary                 → docs/SUMMARY.md
+
+STATISTICS
+----------
+Total Files:     13 markdown files
+Total Lines:     5,438 lines
+Code Examples:   100+ examples
+Tables:          50+ reference tables
+File Sizes:      ~100KB total
+
+QUICK START PATHS
+-----------------
+New User:        installation.md → cli-reference.md → dashboard.md
+Power User:      configuration.md → cli-reference.md → troubleshooting.md
+Developer:       architecture.md → development.md → api-reference.md
+Plugin Dev:      architecture.md → plugin-system.md → api-reference.md
+
+ACCESS
+------
+Local:   file://$(pwd)/docs/README.md
+GitHub:  https://github.com/bbhunterpk-ux/memctx/tree/main/docs
+Web:     https://memctx.dev/docs (when published)
+
+LAST UPDATED
+------------
+Date: 2026-04-07
+Time: 15:50 GMT+5

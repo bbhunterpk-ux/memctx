@@ -154,6 +154,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         overflow: 'auto',
         minWidth: 0,
         marginLeft: 240,
+        paddingBottom: 60,
         transition: 'margin-left 0.3s ease',
       }}
       className="main-content"

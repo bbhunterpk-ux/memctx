@@ -20,7 +20,11 @@ import { ArrowLeft, GitBranch, FolderOpen, Brain, RefreshCw, CheckSquare, Square
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
-export default function ProjectDetail() {
+interface Props {
+  onOpenProject: (id: string, name: string) => void
+}
+
+export default function ProjectDetail({ onOpenProject }: Props) {
   const { id } = useParams<{ id: string }>()
   const [consolidating, setConsolidating] = useState(false)
   const [resyncing, setResyncing] = useState(false)
@@ -78,6 +82,13 @@ export default function ProjectDetail() {
   })
 
   const { data: health } = useQuery({ queryKey: ['health'], queryFn: api.getHealth })
+
+  // Add project to tabs when it loads
+  useEffect(() => {
+    if (project && id) {
+      onOpenProject(id, project.name)
+    }
+  }, [project, id, onOpenProject])
 
   // WebSocket listener for real-time updates
   useEffect(() => {

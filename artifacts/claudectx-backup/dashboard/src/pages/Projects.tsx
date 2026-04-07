@@ -9,7 +9,11 @@ import MainDashboard from '../components/MainDashboard'
 import { toast } from '../components/Toast'
 import SkeletonCard from '../components/SkeletonCard'
 
-export default function Projects() {
+interface Props {
+  onOpenProject: (id: string, name: string) => void
+}
+
+export default function Projects({ onOpenProject }: Props) {
   const [resyncingAll, setResyncingAll] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -130,7 +134,7 @@ export default function Projects() {
         <EmptyState />
       ) : (
         <>
-          <MainDashboard projects={projects} />
+          <MainDashboard projects={projects} onOpenProject={onOpenProject} />
 
           <h2 style={{
             fontSize: 16,

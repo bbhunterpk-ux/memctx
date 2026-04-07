@@ -103,7 +103,11 @@ function buildCopyText(session: any): string {
   return lines.join('\n')
 }
 
-export default function SessionDetail() {
+interface Props {
+  onOpenSession: (id: string, name: string, projectId: string) => void
+}
+
+export default function SessionDetail({ onOpenSession }: Props) {
   const { id } = useParams<{ id: string }>()
   const [resyncing, setResyncing] = useState(false)
   const [notesModalOpen, setNotesModalOpen] = useState(false)
@@ -115,6 +119,13 @@ export default function SessionDetail() {
     enabled: !!id,
     refetchInterval: (data: any) => data?.status === 'active' ? 5000 : false,
   })
+
+  // Add session to tabs when it loads
+  useEffect(() => {
+    if (session && id) {
+      onOpenSession(id, session.summary_title || `Session ${id.slice(0, 8)}`, session.project_id)
+    }
+  }, [session, id, onOpenSession])
 
   // WebSocket listener for real-time updates
   useEffect(() => {

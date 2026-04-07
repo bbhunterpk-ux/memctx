@@ -4,9 +4,10 @@ import { TrendingUp, Clock, FileText, Wrench, CheckCircle, Flame } from 'lucide-
 
 interface Props {
   projects: any[]
+  onOpenProject: (id: string, name: string) => void
 }
 
-export default function MainDashboard({ projects }: Props) {
+export default function MainDashboard({ projects, onOpenProject }: Props) {
   // Fetch all sessions across all projects
   const { data: allSessionsData } = useQuery({
     queryKey: ['all-sessions'],
@@ -285,7 +286,23 @@ export default function MainDashboard({ projects }: Props) {
               {projectActivity.slice(0, 5).map((project, index) => (
                 <div key={index}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 500 }}>{project.name}</span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: 'var(--accent)',
+                        cursor: 'pointer',
+                        textDecoration: 'none'
+                      }}
+                      onClick={() => {
+                        onOpenProject(project.id, project.name)
+                        window.location.href = `/project/${project.id}`
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                      onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                    >
+                      {project.name}
+                    </span>
                     <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{project.sessions}</span>
                   </div>
                   <div style={{

@@ -31,7 +31,7 @@ export default function BulkTagModal({ isOpen, sessionIds, onClose, onComplete }
         sessionIds.map(sessionId =>
           Promise.all(
             selectedTags.map(tag =>
-              fetch(`http://localhost:8001/api/sessions/${sessionId}/tags`, {
+              fetch(`/api/sessions/${sessionId}/tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tag_id: tag.id }),

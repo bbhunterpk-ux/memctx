@@ -11,10 +11,10 @@ const command = args[0]
 
 function printUsage() {
   console.log(`
-Usage: claudectx <command>
+Usage: memctx <command>
 
 Commands:
-  install     Install ClaudeContext — registers hooks, starts daemon
+  install     Install MemCTX — registers hooks, starts daemon
   uninstall   Remove hooks and stop daemon
   start       Start the worker daemon
   stop        Stop the worker daemon
@@ -54,7 +54,7 @@ async function checkHealth(): Promise<any> {
 async function run() {
   switch (command) {
     case 'install': {
-      console.log('\n🚀 Installing ClaudeContext...\n')
+      console.log('\n🚀 Installing MemCTX...\n')
 
       // 1. Create directories
       const dirs = [CONFIG.dataDir, CONFIG.hooksDir, CONFIG.logsDir]
@@ -116,14 +116,14 @@ async function run() {
         console.log('  Set it with: export ANTHROPIC_API_KEY=sk-ant-...')
       }
 
-      console.log('\n✅ ClaudeContext installed!')
+      console.log('\n✅ MemCTX installed!')
       console.log(`   Dashboard: http://localhost:${CONFIG.port}`)
       console.log('   Claude Code will now automatically capture and summarize sessions.\n')
       break
     }
 
     case 'uninstall': {
-      console.log('Uninstalling ClaudeContext...')
+      console.log('Uninstalling MemCTX...')
       removeClaudeHooks()
       stopDaemon()
       console.log('Done. Data preserved at', CONFIG.dataDir)
@@ -185,7 +185,7 @@ async function run() {
       const db = getDB()
       const sessions = db.prepare('SELECT * FROM sessions WHERE summary_title IS NOT NULL ORDER BY started_at DESC').all() as any[]
 
-      const exportDir = path.join(process.cwd(), 'claudectx-export')
+      const exportDir = path.join(process.cwd(), 'memctx-export')
       fs.mkdirSync(exportDir, { recursive: true })
 
       for (const s of sessions) {
@@ -240,7 +240,7 @@ async function run() {
     case 'search': {
       const query = args.slice(1).join(' ')
       if (!query) {
-        console.error('Usage: claudectx search <query>')
+        console.error('Usage: memctx search <query>')
         process.exit(1)
       }
 
@@ -264,7 +264,7 @@ async function run() {
     }
 
     case 'config': {
-      console.log('\nClaudeContext Configuration:')
+      console.log('\nMemCTX Configuration:')
       console.log(`  Data dir:    ${CONFIG.dataDir}`)
       console.log(`  DB path:     ${CONFIG.dbPath}`)
       console.log(`  Port:        ${CONFIG.port}`)

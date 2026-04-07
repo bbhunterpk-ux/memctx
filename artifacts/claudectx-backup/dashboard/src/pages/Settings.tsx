@@ -42,9 +42,9 @@ export default function Settings() {
 
       setSettings({
         apiProvider: provider,
-        apiKey: currentSettings.apiKey || '',
+        apiKey: '', // Don't load masked API key
         baseURL: currentSettings.baseURL || 'http://localhost:20128/v1',
-        model: currentSettings.model || 'claude-opus-4-6',
+        model: currentSettings.model || 'AWS',
         disableSummaries: currentSettings.disableSummaries || false,
       })
     }
@@ -72,28 +72,41 @@ export default function Settings() {
 
     if (settings.apiProvider === 'local-9router') {
       finalBaseURL = 'http://localhost:20128/v1'
-      finalApiKey = 'sk_9router' // Default for local 9router
+      // Only update API key if user entered something, otherwise keep existing
+      if (!settings.apiKey || settings.apiKey.trim() === '') {
+        finalApiKey = 'sk_9router' // Default for local 9router
+      }
     } else if (settings.apiProvider === 'cloud-9router') {
       finalBaseURL = settings.baseURL
-      // Use provided API key
+      // Use provided API key (required for cloud)
     } else {
       // Direct Anthropic
       finalBaseURL = ''
     }
 
-    saveMutation.mutate({
-      apiKey: finalApiKey,
+    // Only include apiKey in update if user actually entered something
+    const updateData: any = {
       baseURL: finalBaseURL,
       model: settings.model,
       disableSummaries: settings.disableSummaries,
-    })
+    }
+
+    // Only update API key if user entered a value
+    if (settings.apiKey && settings.apiKey.trim() !== '') {
+      updateData.apiKey = finalApiKey
+    }
+
+    saveMutation.mutate(updateData)
   }
 
+  // For 9router: these are combo names, not model names
+  // For Direct API: these are actual Claude model names
   const models = [
-    { value: 'claude-opus-4-6', label: 'Claude Opus 4.6 (Most Capable)', description: 'Best for complex analysis' },
-    { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6 (Balanced)', description: 'Great balance of speed and quality' },
-    { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5 (Fast)', description: 'Fastest, good for simple tasks' },
-    { value: 'AWS', label: 'AWS (Default)', description: 'Uses Claude Code default model' },
+    { value: 'claude-opus-4-6', label: 'Claude Opus 4.6', description: 'Most capable - best for complex analysis' },
+    { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', description: 'Balanced - great speed and quality' },
+    { value: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', description: 'Fastest - good for simple tasks' },
+    { value: 'AWS', label: 'AWS', description: '9router combo or Claude Code default' },
+    { value: 'custom', label: 'Custom Combo/Model...', description: 'Enter your own combo name or model' },
   ]
 
   if (isLoading) {
@@ -105,21 +118,23 @@ export default function Settings() {
   }
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 800 }}>
+    <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <SettingsIcon size={24} color="var(--accent)" />
         <h1 style={{ fontSize: 24, fontWeight: 700 }}>Settings</h1>
       </div>
 
-      {/* API Provider Section */}
-      <div style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 10,
-        padding: 24,
-        marginBottom: 20,
-      }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>API Configuration</h2>
+      {/* Split Layout: API Config (Left) and Model/Combo (Right) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+
+        {/* LEFT: API Provider Section */}
+        <div style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 10,
+          padding: 24,
+        }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>API Configuration</h2>
 
         {/* Provider Type */}
         <div style={{ marginBottom: 20 }}>
@@ -261,23 +276,33 @@ export default function Settings() {
         )}
       </div>
 
-      {/* Model Selection */}
+      {/* RIGHT: Model/Combo Selection */}
       <div style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
         borderRadius: 10,
         padding: 24,
-        marginBottom: 20,
       }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Model Selection</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
+          {settings.apiProvider === 'direct' ? 'Model Selection' : 'Combo / Model Name'}
+        </h2>
 
         <div style={{ marginBottom: 20 }}>
           <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 8, color: 'var(--text)' }}>
-            Claude Model
+            {settings.apiProvider === 'direct' ? 'Claude Model' : 'Combo Name or Model'}
           </label>
           <select
-            value={settings.model}
-            onChange={(e) => setSettings({ ...settings, model: e.target.value })}
+            value={models.find(m => m.value === settings.model) ? settings.model : 'custom'}
+            onChange={(e) => {
+              if (e.target.value === 'custom') {
+                // Keep current value if it's already custom, otherwise clear
+                if (models.find(m => m.value === settings.model)) {
+                  setSettings({ ...settings, model: '' })
+                }
+              } else {
+                setSettings({ ...settings, model: e.target.value })
+              }
+            }}
             style={{
               width: '100%',
               padding: '10px 12px',
@@ -295,10 +320,54 @@ export default function Settings() {
               </option>
             ))}
           </select>
+
+          {/* Show text input for custom combo/model name */}
+          {!models.find(m => m.value === settings.model) && (
+            <input
+              type="text"
+              value={settings.model}
+              placeholder={settings.apiProvider === 'direct' ? 'Enter model name (e.g., claude-opus-4-6)' : 'Enter your combo name (e.g., my-fast-combo, production)'}
+              onChange={(e) => setSettings({ ...settings, model: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: 'var(--surface2)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                color: 'var(--text)',
+                fontSize: 13,
+                marginTop: 8,
+              }}
+            />
+          )}
+
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-            {models.find(m => m.value === settings.model)?.description}
+            {settings.apiProvider === 'direct'
+              ? models.find(m => m.value === settings.model)?.description || 'Direct Claude API model name'
+              : settings.apiProvider === 'local-9router'
+              ? '9router combo name (configured in your local 9router settings)'
+              : '9router combo name or model identifier'
+            }
           </div>
         </div>
+
+        {/* Info box for 9router combos */}
+        {settings.apiProvider !== 'direct' && (
+          <div style={{
+            background: 'var(--surface2)',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            padding: 12,
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            lineHeight: 1.6,
+            marginBottom: 20,
+          }}>
+            <strong style={{ color: 'var(--text)' }}>About 9router Combos:</strong> Combos are custom routing configurations
+            you create in 9router. Each combo can route to different models/providers with specific settings.
+            Common examples: "AWS", "production-combo", "fast-combo", etc.
+          </div>
+        )}
 
         {/* Disable Summaries Toggle */}
         <div style={{ marginBottom: 0 }}>
@@ -323,6 +392,10 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+    </div>
+
+    {/* Full Width: Info Box and Save Button */}
 
       {/* Info Box */}
       <div style={{

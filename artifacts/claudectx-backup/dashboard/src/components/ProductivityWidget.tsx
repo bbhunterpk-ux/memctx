@@ -10,7 +10,7 @@ export default function ProductivityWidget({ projectId }: Props) {
   const { data: sessions } = useQuery({
     queryKey: ['sessions', projectId],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8001/api/sessions?project_id=${projectId}&limit=100`)
+      const res = await fetch(`/api/sessions?project_id=${projectId}&limit=100`)
       if (!res.ok) throw new Error('Failed to fetch sessions')
       return res.json()
     },

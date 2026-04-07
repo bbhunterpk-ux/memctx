@@ -80,7 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Zap size={22} color="var(--accent)" />
-            <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>ClaudeContext</span>
+            <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>MemCTX</span>
           </div>
           <div style={{
             marginTop: 10,

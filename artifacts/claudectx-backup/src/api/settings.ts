@@ -5,7 +5,7 @@ import { homedir } from 'os'
 
 const router: Router = Router()
 
-const SETTINGS_FILE = path.join(homedir(), '.claudectx', 'settings.json')
+const SETTINGS_FILE = path.join(homedir(), '.memctx', 'settings.json')
 
 interface Settings {
   apiKey?: string

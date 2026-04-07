@@ -1,17 +1,17 @@
 {
-  "name": "claudectx",
+  "name": "memctx",
   "version": "1.0.0",
   "description": "Autonomous session memory for Claude Code - automatically captures, analyzes, and summarizes your development sessions",
-  "author": "ClaudeContext Contributors",
+  "author": "MemCTX Contributors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/claudectx.git"
+    "url": "https://github.com/yourusername/memctx.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/claudectx/issues"
+    "url": "https://github.com/yourusername/memctx/issues"
   },
-  "homepage": "https://github.com/yourusername/claudectx#readme",
+  "homepage": "https://github.com/yourusername/memctx#readme",
   "keywords": [
     "claude",
     "claude-code",
@@ -21,12 +21,13 @@
     "session-tracking",
     "anthropic",
     "development-tools",
-    "productivity"
+    "productivity",
+    "memctx"
   ],
   "type": "commonjs",
   "main": "dist/index.js",
   "bin": {
-    "claudectx": "./dist/bin/claudectx.js"
+    "memctx": "./dist/bin/claudectx.js"
   },
   "files": [
     "dist/",

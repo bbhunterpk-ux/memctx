@@ -1,6 +1,6 @@
 #!/bin/bash
-# ClaudeContext Kill Script
-# This script stops all ClaudeContext worker processes
+# MemCTX Kill Script
+# This script stops all MemCTX worker processes
 
 set -e
 
@@ -13,19 +13,19 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║                                                                  ║${NC}"
-echo -e "${BLUE}║              🛑 ClaudeContext - Stopping Service 🛑              ║${NC}"
+echo -e "${BLUE}║                  🛑 MemCTX - Stopping Service 🛑                 ║${NC}"
 echo -e "${BLUE}║                                                                  ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-PID_FILE="/tmp/claudectx.pid"
+PID_FILE="/tmp/memctx.pid"
 
-# Find all ClaudeContext processes
-echo -e "${BLUE}🔍 Searching for ClaudeContext processes...${NC}"
+# Find all MemCTX processes
+echo -e "${BLUE}🔍 Searching for MemCTX processes...${NC}"
 EXISTING_PIDS=$(ps aux | grep "node dist/src/index.js" | grep -v grep | awk '{print $2}')
 
 if [ -z "$EXISTING_PIDS" ]; then
-    echo -e "${YELLOW}⚠️  No ClaudeContext processes found${NC}"
+    echo -e "${YELLOW}⚠️  No MemCTX processes found${NC}"
     rm -f "$PID_FILE"
     exit 0
 fi
@@ -38,7 +38,7 @@ done
 echo ""
 
 # Kill all processes
-echo -e "${BLUE}🛑 Stopping all ClaudeContext processes...${NC}"
+echo -e "${BLUE}🛑 Stopping all MemCTX processes...${NC}"
 echo "$EXISTING_PIDS" | xargs kill 2>/dev/null || true
 sleep 1
 
@@ -59,7 +59,7 @@ if [ -z "$STILL_RUNNING" ]; then
     echo ""
     echo -e "${GREEN}╔══════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║                                                                  ║${NC}"
-    echo -e "${GREEN}║              ✅ ClaudeContext Stopped Successfully ✅              ║${NC}"
+    echo -e "${GREEN}║                  ✅ MemCTX Stopped Successfully ✅                ║${NC}"
     echo -e "${GREEN}║                                                                  ║${NC}"
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════════╝${NC}"
     echo ""

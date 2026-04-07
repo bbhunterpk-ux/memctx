@@ -1,6 +1,6 @@
 #!/bin/bash
-# ClaudeContext Startup Script
-# This script starts the ClaudeContext worker service
+# MemCTX Startup Script
+# This script starts the MemCTX worker service
 
 set -e
 
@@ -13,22 +13,22 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║                                                                  ║${NC}"
-echo -e "${BLUE}║              🧠 ClaudeContext - Starting Service 🧠              ║${NC}"
+echo -e "${BLUE}║                  🧠 MemCTX - Starting Service 🧠                 ║${NC}"
 echo -e "${BLUE}║                                                                  ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 # Configuration
 WORKER_DIR="/home/max/All_Projects_Files/April 2026 Projects/Claude-Context/artifacts/claudectx-backup"
-PORT="${CLAUDECTX_PORT:-9999}"
-LOG_FILE="/tmp/claudectx.log"
-PID_FILE="/tmp/claudectx.pid"
+PORT="${MEMCTX_PORT:-9999}"
+LOG_FILE="/tmp/memctx.log"
+PID_FILE="/tmp/memctx.pid"
 
-# Kill any existing ClaudeContext processes
+# Kill any existing MemCTX processes
 echo -e "${BLUE}🔍 Checking for existing processes...${NC}"
 EXISTING_PIDS=$(ps aux | grep "node dist/src/index.js" | grep -v grep | awk '{print $2}')
 if [ -n "$EXISTING_PIDS" ]; then
-    echo -e "${YELLOW}⚠️  Found existing ClaudeContext processes, killing them...${NC}"
+    echo -e "${YELLOW}⚠️  Found existing MemCTX processes, killing them...${NC}"
     echo "$EXISTING_PIDS" | xargs kill 2>/dev/null || true
     sleep 2
     echo -e "${GREEN}✅ Old processes killed${NC}"
@@ -56,8 +56,8 @@ fi
 # Check environment
 echo -e "${BLUE}📋 Configuration:${NC}"
 echo -e "   Port: ${GREEN}$PORT${NC}"
-echo -e "   Database: ${GREEN}~/.claudectx/db.sqlite${NC}"
-echo -e "   Hooks: ${GREEN}~/.claudectx/hooks/${NC}"
+echo -e "   Database: ${GREEN}~/.memctx/db.sqlite${NC}"
+echo -e "   Hooks: ${GREEN}~/.memctx/hooks/${NC}"
 
 if [ -n "$ANTHROPIC_API_KEY" ]; then
     echo -e "   API Key: ${GREEN}✓ Set${NC}"
@@ -68,7 +68,7 @@ fi
 echo ""
 
 # Start the worker
-echo -e "${BLUE}🚀 Starting ClaudeContext worker...${NC}"
+echo -e "${BLUE}🚀 Starting MemCTX worker...${NC}"
 cd "$WORKER_DIR"
 
 # Export 9router environment variables
@@ -92,7 +92,7 @@ if ps -p "$WORKER_PID" > /dev/null 2>&1; then
         echo ""
         echo -e "${GREEN}╔══════════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${GREEN}║                                                                  ║${NC}"
-        echo -e "${GREEN}║              ✅ ClaudeContext Started Successfully ✅              ║${NC}"
+        echo -e "${GREEN}║                  ✅ MemCTX Started Successfully ✅                ║${NC}"
         echo -e "${GREEN}║                                                                  ║${NC}"
         echo -e "${GREEN}╚══════════════════════════════════════════════════════════════════╝${NC}"
         echo ""

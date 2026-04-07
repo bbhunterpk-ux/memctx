@@ -4,7 +4,7 @@ import { CONFIG } from '../config'
 
 export const logsRouter: Router = Router()
 
-const LOG_FILE = '/tmp/claudectx.log'
+const LOG_FILE = '/tmp/memctx.log'
 
 // Get logs with optional filtering
 logsRouter.get('/', (req, res) => {

@@ -296,7 +296,7 @@ graph LR
 
 <div align="center">
 
-### [📚 Complete Documentation →](docs/README.md)
+### [📚 Complete Documentation →](./docs/README.md)
 
 </div>
 
@@ -305,21 +305,21 @@ graph LR
 <td width="50%">
 
 ### 📚 For Users
-- [📦 Installation Guide](docs/user/installation.md)
-- [⚙️ Configuration](docs/user/configuration.md)
-- [💻 CLI Reference](docs/user/cli-reference.md)
-- [🎨 Dashboard Guide](docs/user/dashboard.md)
-- [🔧 Troubleshooting](docs/user/troubleshooting.md)
+- [📦 Installation Guide](./docs/user/installation.md)
+- [⚙️ Configuration](./docs/user/configuration.md)
+- [💻 CLI Reference](./docs/user/cli-reference.md)
+- [🎨 Dashboard Guide](./docs/user/dashboard.md)
+- [🔧 Troubleshooting](./docs/user/troubleshooting.md)
 
 </td>
 <td width="50%">
 
 ### 🛠️ For Developers
-- [🏗️ Architecture](docs/developer/architecture.md)
-- [🔌 API Reference](docs/developer/api-reference.md)
-- [🤝 Contributing Guide](docs/developer/contributing.md)
-- [🔧 Development Setup](docs/developer/development.md)
-- [🔌 Plugin System](docs/developer/plugin-system.md)
+- [🏗️ Architecture](./docs/developer/architecture.md)
+- [🔌 API Reference](./docs/developer/api-reference.md)
+- [🤝 Contributing Guide](./docs/developer/contributing.md)
+- [🔧 Development Setup](./docs/developer/development.md)
+- [🔌 Plugin System](./docs/developer/plugin-system.md)
 
 </td>
 </tr>

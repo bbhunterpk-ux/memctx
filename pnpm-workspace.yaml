@@ -54,7 +54,7 @@ catalog:
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
   drizzle-orm: ^0.45.1
-  framer-motion: ^12.23.24
+  framer-motion: ^12.38.0
   lucide-react: ^1.7.0
   # Must be this exact version because expo requires it
   react: 19.1.0

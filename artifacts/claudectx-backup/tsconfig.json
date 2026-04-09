@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["ES2022"],
     "strict": false,
     "noImplicitAny": false,
@@ -14,7 +14,8 @@
     "rootDir": ".",
     "sourceMap": true,
     "declaration": true,
-    "types": ["node"]
+    "types": ["node"],
+    "ignoreDeprecations": "5.0"
   },
   "include": ["src/**/*", "bin/**/*", "installer/**/*"],
   "exclude": ["node_modules", "dist", "dashboard"]

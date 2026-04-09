@@ -82,7 +82,7 @@ router.post('/all', async (req: Request, res: Response) => {
  */
 router.post('/session/:sessionId', async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.params
+    const sessionId = req.params.sessionId as string
 
     const session = queries.getSession(sessionId)
     if (!session) {
@@ -136,8 +136,8 @@ router.post('/session/:sessionId', async (req: Request, res: Response) => {
  */
 router.post('/:projectId', async (req: Request, res: Response) => {
   try {
-    const { projectId } = req.params
-    const { force } = req.query // force=true to regenerate existing summaries
+    const projectId = req.params.projectId as string
+    const force = req.query.force as string | undefined // force=true to regenerate existing summaries
 
     logger.info('Resync', `Starting resync for project ${projectId}`, { force })
 
@@ -169,7 +169,7 @@ router.post('/:projectId', async (req: Request, res: Response) => {
       // Queue for summarization
       summarizationQueue.enqueue({
         sessionId: session.id,
-        transcriptPath: session.transcript_path,
+        transcriptPath: session.transcript_path as string,
         projectId: projectId,
         priority: 'low' // Use low priority for bulk resyncs
       })

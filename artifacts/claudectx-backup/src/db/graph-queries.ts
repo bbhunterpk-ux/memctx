@@ -55,28 +55,40 @@ export function insertGraphNodes(
   insertMany(nodes);
 }
 
+/**
+ * Generate content-hash edge ID for deduplication across sessions
+ */
+export function generateEdgeId(
+  projectId: string,
+  sourceId: string,
+  targetId: string,
+  relationship: string
+): string {
+  return `${projectId}|${sourceId}|${relationship}|${targetId}`;
+}
+
 export function insertGraphEdges(
   projectId: string,
-  edges: Array<Omit<GraphEdge, 'projectId' | 'createdAt'>>
+  edges: Array<Omit<GraphEdge, 'projectId' | 'createdAt' | 'id'>>
 ): void {
   const db = getDB();
   const now = Date.now();
+
+  // Use UNIQUE constraint conflict to increment weight on duplicate edges
   const stmt = db.prepare(`
     INSERT INTO graph_edges (id, projectId, sourceId, targetId, relationship, confidence, weight, metadata, createdAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      sourceId = excluded.sourceId,
-      targetId = excluded.targetId,
-      relationship = excluded.relationship,
+    ON CONFLICT(projectId, sourceId, targetId, relationship) DO UPDATE SET
       confidence = excluded.confidence,
-      weight = excluded.weight,
+      weight = weight + 1,
       metadata = excluded.metadata
   `);
 
   const insertMany = db.transaction((edges) => {
     for (const edge of edges) {
+      const edgeId = generateEdgeId(projectId, edge.sourceId, edge.targetId, edge.relationship);
       stmt.run(
-        edge.id,
+        edgeId,
         projectId,
         edge.sourceId,
         edge.targetId,

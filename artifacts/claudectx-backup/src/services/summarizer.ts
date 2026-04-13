@@ -9,6 +9,24 @@ import { logger } from './logger'
 import { metricsTracker } from './metrics'
 import { GraphExtractor } from './graph-extractor'
 import { insertGraphNodes, insertGraphEdges } from '../db/graph-queries'
+import { normalizeNodeId } from '../utils/node-id'
+
+interface GraphNode {
+  id: string
+  label: string
+  type: 'file' | 'function' | 'class' | 'concept' | 'problem' | 'decision'
+  confidence: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'
+  metadata?: Record<string, any>
+}
+
+interface GraphEdge {
+  sourceId: string
+  targetId: string
+  relationship: 'imports' | 'calls' | 'implements' | 'solves' | 'related_to'
+  confidence: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'
+  weight?: number
+  metadata?: Record<string, any>
+}
 
 interface SessionSummary {
   title: string
@@ -29,6 +47,10 @@ interface SessionSummary {
   patterns?: Array<{ type: string; title: string; description: string; example?: string }>
   tasks?: Array<{ title: string; description?: string; priority: string; status: string }>
   contacts?: Array<{ name: string; type: string; role?: string; context: string }>
+  graph?: {
+    nodes: GraphNode[]
+    edges: GraphEdge[]
+  }
 }
 
 function compactTranscriptSmart(turns: any[]): string {
@@ -106,13 +128,14 @@ export async function summarizeSession(
       model: CONFIG.summaryModel,
       max_tokens: CONFIG.summaryMaxTokens,
       stream: false,
-      system: `You are a memory extraction system. Analyze the session and extract:
+      system: `You are a unified memory and knowledge graph extraction system. Analyze the session and extract:
 1. Session summary (what was done, mood, complexity, blockers, resolutions, key insight)
 2. User preferences discovered (coding style, workflow, communication)
 3. Domain knowledge learned (technologies, patterns, gotchas)
 4. Problem-solving patterns used
 5. Pending tasks identified
 6. People/teams mentioned
+7. Knowledge graph (files, functions, classes, concepts, problems, decisions and their relationships)
 
 Always respond with ONLY valid JSON matching the exact schema provided. No preamble, no markdown, no explanation.`,
       messages: [{
@@ -141,7 +164,18 @@ Return this exact JSON schema:
   "knowledge": [{"category": "technology", "topic": "9router", "content": "Returns OpenAI format", "confidence": 0.8}],
   "patterns": [{"type": "debugging", "title": "Check logs first", "description": "Always check logs before diving into code"}],
   "tasks": [{"title": "Fix bug", "description": "Details", "priority": "high", "status": "pending"}],
-  "contacts": [{"name": "John", "type": "person", "role": "engineer", "context": "discussed API"}]
+  "contacts": [{"name": "John", "type": "person", "role": "engineer", "context": "discussed API"}],
+  "graph": {
+    "nodes": [
+      {"id": "file:src/index.ts", "label": "src/index.ts", "type": "file", "confidence": "EXTRACTED"},
+      {"id": "function:getUserById", "label": "getUserById", "type": "function", "confidence": "EXTRACTED"},
+      {"id": "concept:authentication", "label": "Authentication Flow", "type": "concept", "confidence": "INFERRED"}
+    ],
+    "edges": [
+      {"sourceId": "file:src/index.ts", "targetId": "function:getUserById", "relationship": "calls", "confidence": "EXTRACTED"},
+      {"sourceId": "function:getUserById", "targetId": "concept:authentication", "relationship": "implements", "confidence": "INFERRED"}
+    ]
+  }
 }
 
 Rules:
@@ -156,7 +190,18 @@ Rules:
 - blockers: things that prevented progress (empty array if none)
 - resolved: problems that were fixed (empty array if none)
 - key_insight: most valuable takeaway (empty string if none)
-- If nothing significant happened, use status "in_progress"`
+- If nothing significant happened, use status "in_progress"
+
+Graph extraction rules:
+- Node types: file, function, class, concept, problem, decision
+- Node IDs MUST follow format "type:identifier" (e.g., "file:src/auth.ts", "concept:jwt_tokens")
+- For files: use relative paths from project root, normalize (no ./ prefix)
+- For concepts/problems/decisions: use lowercase with underscores
+- For functions/classes: preserve original case
+- Relationship types: imports, calls, implements, solves, related_to
+- Confidence: EXTRACTED (explicitly mentioned), INFERRED (implied), AMBIGUOUS (unclear)
+- Only include nodes/edges that are actually relevant to the session
+- Empty graph object if no code structure was discussed`
       }]
     })
 
@@ -254,36 +299,48 @@ Rules:
       })
     }
 
-    // --- AUTO-EXTRACT KNOWLEDGE GRAPH ---
-    try {
-      logger.info('Summarizer', `Starting graph extraction for session ${sessionId}`)
-      const extractor = new GraphExtractor(CONFIG.apiKey, CONFIG.apiBaseUrl, CONFIG.summaryModel)
-      const graphResult = await extractor.extractFromTranscript(sessionId, compactTranscript)
-      
-      if (graphResult.nodes.length > 0) {
-        const nodesForDb = graphResult.nodes.map(node => ({
-          ...node,
-          metadata: node.metadata ? JSON.stringify(node.metadata) : null,
-        }))
-        insertGraphNodes(projectId, nodesForDb)
+    // --- UNIFIED GRAPH EXTRACTION (from same LLM response) ---
+    if (summary.graph && (summary.graph.nodes?.length > 0 || summary.graph.edges?.length > 0)) {
+      try {
+        logger.info('Summarizer', `Processing unified graph extraction for session ${sessionId}`)
+
+        // Normalize node IDs for consistent deduplication
+        const normalizedNodes = summary.graph.nodes.map(node => {
+          const normalizedId = normalizeNodeId(node.type, node.label)
+          return {
+            id: normalizedId,
+            label: node.label,
+            type: node.type,
+            confidence: node.confidence,
+            metadata: node.metadata ? JSON.stringify(node.metadata) : null
+          }
+        })
+
+        if (normalizedNodes.length > 0) {
+          insertGraphNodes(projectId, normalizedNodes)
+        }
+
+        // Edges use content-hash IDs (generated in insertGraphEdges)
+        if (summary.graph.edges.length > 0) {
+          const edgesForDb = summary.graph.edges.map(edge => ({
+            sourceId: edge.sourceId,
+            targetId: edge.targetId,
+            relationship: edge.relationship,
+            confidence: edge.confidence,
+            weight: edge.weight || 1.0,
+            metadata: edge.metadata ? JSON.stringify(edge.metadata) : null
+          }))
+          insertGraphEdges(projectId, edgesForDb)
+        }
+
+        logger.info('Summarizer', `Unified graph updated for session ${sessionId}`, {
+          nodesAdded: normalizedNodes.length,
+          edgesAdded: summary.graph.edges.length
+        })
+      } catch (graphErr) {
+        logger.error('Summarizer', `Unified graph processing failed for session ${sessionId}`, { error: graphErr })
+        // Don't fail the whole summarization just because graph failed
       }
-      
-      if (graphResult.edges.length > 0) {
-        const edgesForDb = graphResult.edges.map(edge => ({
-          ...edge,
-          weight: edge.weight || 1.0,
-          metadata: edge.metadata ? JSON.stringify(edge.metadata) : null,
-        }))
-        insertGraphEdges(projectId, edgesForDb)
-      }
-      
-      logger.info('Summarizer', `Graph updated for session ${sessionId}`, { 
-        nodesAdded: graphResult.nodes.length,
-        edgesAdded: graphResult.edges.length 
-      })
-    } catch (graphErr) {
-      logger.error('Summarizer', `Graph extraction failed for session ${sessionId}`, { error: graphErr })
-      // Don't fail the whole summarization just because graph failed
     }
 
     await updateClaudeMd(projectId, sessionId, summary)

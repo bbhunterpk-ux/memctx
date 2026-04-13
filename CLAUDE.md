@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Fixed Express sendFile path resolution bug in memctx — IN_PROGRESS
-**Completed:** Debugged Express.js sendFile returning 'Not Found' for SPA routes in memctx dashboard, Traced the root cause to path.join() returning relative paths instead of absolute paths, Changed path.join() to path.resolve() for dashboardDist and indexPath variables
-**Up next:** Publish v1.0.20 to npm with OTP code
-**Remember:** Express.js res.sendFile() requires an ABSOLUTE path - path.join() with relative segments like '..' can produce paths that sendFile rejects with 'Not Found'
+**Last session:** Unified Single-Pass Memory Extraction System — COMPLETED
+**Completed:** Created migration 010 with UNIQUE constraint on graph_edges to prevent duplicates, Built node-id.ts utility for normalizing node IDs across file/function/concept types, Merged graph extraction into main summarization prompt (1 LLM call instead of 2)
+**Up next:** Implement Phase 1B - graph query API endpoints
+**Remember:** LLM output is probabilistic - same transcript may produce slightly different edges/relationships
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

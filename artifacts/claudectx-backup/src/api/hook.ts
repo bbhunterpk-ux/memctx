@@ -6,6 +6,7 @@ import { broadcast } from '../ws/broadcast'
 import { queries } from '../db/queries'
 import { summarizationQueue } from '../services/summarization-queue'
 import { logger } from '../services/logger'
+import { activityTracker } from '../services/activity-tracker'
 
 export const hookRouter: RouterType = Router()
 
@@ -103,6 +104,9 @@ hookRouter.post('/', async (req, res) => {
         if (data.file_path) {
           queries.addFileTouched(session_id, data.file_path)
         }
+
+        // Track session activity
+        activityTracker.updateActivity(session_id)
 
         broadcast({ type: 'tool_use', session_id, tool_name: data.tool_name, file_path: data.file_path })
         break

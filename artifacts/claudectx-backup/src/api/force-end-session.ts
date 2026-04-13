@@ -24,24 +24,48 @@ forceEndSessionRouter.post('/:sessionId', async (req, res) => {
 
     console.log(`[ForceEndSession] Forcing session end: ${sessionId.slice(0, 8)}`)
 
+    // Find transcript path if not already set
+    let transcriptPath = session.transcript_path
+    if (!transcriptPath) {
+      // Try to find the transcript file in the Claude projects directory
+      const fs = require('fs')
+      const path = require('path')
+      const { homedir } = require('os')
+
+      // Get project from database to find the correct path
+      const project = queries.getProject(session.project_id)
+      if (project && project.root_path) {
+        // Convert root path to Claude projects directory format
+        const projectDirName = project.root_path.replace(/\//g, '-')
+        const claudeProjectsDir = path.join(homedir(), '.claude', 'projects', projectDirName)
+        const possiblePath = path.join(claudeProjectsDir, `${sessionId}.jsonl`)
+
+        if (fs.existsSync(possiblePath)) {
+          transcriptPath = possiblePath
+          console.log(`[ForceEndSession] Found transcript at: ${possiblePath}`)
+        }
+      }
+    }
+
     // Mark session as completed
     const now = Math.floor(Date.now() / 1000)
     queries.updateSession(sessionId, {
       ended_at: session.ended_at || session.last_activity || now,
-      status: 'completed'
+      status: 'completed',
+      transcript_path: transcriptPath || null
     })
 
     // Queue for AI summarization if we have a transcript
-    if (session.transcript_path) {
+    if (transcriptPath) {
       console.log(`[ForceEndSession] Queuing summarization for: ${sessionId.slice(0, 8)}`)
       summarizationQueue.enqueue({
         sessionId: session.id,
-        transcriptPath: session.transcript_path,
+        transcriptPath: transcriptPath,
         projectId: session.project_id,
         priority: 'high' // Use high priority for manual force end
       })
     } else {
-      console.log(`[ForceEndSession] No transcript path, skipping summarization`)
+      console.log(`[ForceEndSession] No transcript found, skipping summarization`)
     }
 
     // Broadcast session end event

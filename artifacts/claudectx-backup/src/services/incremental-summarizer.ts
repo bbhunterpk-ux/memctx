@@ -173,7 +173,7 @@ Return this exact JSON schema:
       }))
 
       if (normalizedNodes.length > 0) {
-        insertGraphNodes(projectId, normalizedNodes, sessionId)
+        insertGraphNodes(projectId, normalizedNodes)
         nodesAdded = normalizedNodes.length
       }
 
@@ -186,7 +186,7 @@ Return this exact JSON schema:
           weight: edge.weight || 1.0,
           metadata: edge.metadata ? JSON.stringify(edge.metadata) : null
         }))
-        insertGraphEdges(projectId, edgesForDb, sessionId)
+        insertGraphEdges(projectId, edgesForDb)
         edgesAdded = summary.graph.edges.length
       }
 

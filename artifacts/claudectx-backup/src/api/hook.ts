@@ -140,7 +140,7 @@ hookRouter.post('/', async (req, res) => {
           const session = queries.getSession(session_id)
           if (session) {
             const now = Math.floor(Date.now() / 1000)
-            const turnsSinceCheckpoint = session.turn_count - (session.last_checkpoint_turn || 0)
+            const turnsSinceCheckpoint = session.total_turns - (session.last_checkpoint_turn || 0)
             const timeSinceCheckpoint = now - (session.last_checkpoint_time || session.started_at)
 
             if (turnsSinceCheckpoint >= CONFIG.checkpointTurnThreshold ||
@@ -155,7 +155,7 @@ hookRouter.post('/', async (req, res) => {
                 sessionId: session_id,
                 projectId: project.id,
                 checkpointNumber: (session.checkpoint_count || 0) + 1,
-                turnRange: [session.last_checkpoint_turn || 0, session.turn_count]
+                turnRange: [session.last_checkpoint_turn || 0, session.total_turns]
               })
             }
           }

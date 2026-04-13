@@ -584,10 +584,10 @@ export const queries = {
 
   getIncompleteCheckpoints(turnThreshold: number) {
     return all(`
-      SELECT id as session_id, project_id, checkpoint_count, last_checkpoint_turn, turn_count
+      SELECT id as session_id, project_id, checkpoint_count, last_checkpoint_turn, total_turns
       FROM sessions
       WHERE status = 'active'
-        AND turn_count - last_checkpoint_turn >= ?
+        AND total_turns - last_checkpoint_turn >= ?
     `, turnThreshold)
   }
 }

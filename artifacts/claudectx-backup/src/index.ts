@@ -55,7 +55,7 @@ async function main() {
           sessionId: session.session_id,
           projectId: session.project_id,
           checkpointNumber: (session.checkpoint_count || 0) + 1,
-          turnRange: [session.last_checkpoint_turn || 0, session.turn_count]
+          turnRange: [session.last_checkpoint_turn || 0, session.total_turns]
         })
       }
     } else {

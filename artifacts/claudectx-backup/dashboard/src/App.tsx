@@ -10,6 +10,7 @@ import Memory from './pages/Memory'
 import MetricsDashboard from './pages/MetricsDashboard'
 import Logs from './pages/Logs'
 import Settings from './pages/Settings'
+import { GraphViewer } from './components/GraphViewer'
 import ToastContainer from './components/Toast'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import ProjectTabBar from './components/ProjectTabBar'
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="/" element={<Projects onOpenProject={(id, name) => addTab(id, name, 'project')} />} />
           <Route path="/project/:id" element={<ProjectDetail onOpenProject={(id, name) => addTab(id, name, 'project')} />} />
           <Route path="/project/:id/memory" element={<Memory />} />
+          <Route path="/project/:id/graph" element={<GraphViewer projectId={window.location.pathname.split('/')[2]} />} />
           <Route path="/session/:id" element={<SessionDetail onOpenSession={(id, name, projectId) => addTab(id, name, 'session', projectId)} />} />
           <Route path="/search" element={<Search />} />
           <Route path="/live" element={<Live />} />

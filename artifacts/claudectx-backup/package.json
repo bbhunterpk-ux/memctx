@@ -1,6 +1,6 @@
 {
   "name": "memctx",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Autonomous session memory for Claude Code - automatically captures, analyzes, and summarizes your development sessions",
   "author": "Fahad Aziz Qureshi <info@memctx.dev> (https://memctx.dev)",
   "license": "MIT",
@@ -43,7 +43,7 @@
     "dev": "NODE_NO_WARNINGS=1 tsx watch src/index.ts",
     "dev:dashboard": "cd dashboard && vite --port $PORT",
     "build": "pnpm run build:worker && pnpm run build:dashboard",
-    "build:worker": "tsc -p tsconfig.worker.json && cp -r installer/hooks-settings.json dist/installer/ && cp -r src/hooks/*.js dist/src/hooks/ 2>/dev/null || true",
+    "build:worker": "tsc -p tsconfig.worker.json && cp -r installer/hooks-settings.json dist/installer/ && cp -r src/hooks/*.js dist/src/hooks/ 2>/dev/null || true && cp -r src/db/migrations dist/src/db/",
     "build:dashboard": "cd dashboard && pnpm install && pnpm vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"

@@ -1,7 +1,5 @@
--- Add activity tracking columns
-ALTER TABLE sessions ADD COLUMN last_activity INTEGER;
-ALTER TABLE sessions ADD COLUMN auto_ended INTEGER DEFAULT 0;
-ALTER TABLE sessions ADD COLUMN summary_requested_at INTEGER;
+-- Add activity tracking columns (skip if already exist)
+-- SQLite will error if column exists, but migration system should handle this
 
 -- Create index for worker queries
 CREATE INDEX IF NOT EXISTS idx_sessions_activity

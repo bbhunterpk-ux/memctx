@@ -69,9 +69,13 @@ async function main() {
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))
-  app.get('/*', (req, res) => {
+
+  // Catch-all for SPA routing - serve index.html for non-API routes
+  app.use((req, res, next) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(dashboardDist, 'index.html'))
+    } else {
+      next()
     }
   })
 

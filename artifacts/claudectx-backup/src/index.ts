@@ -24,6 +24,7 @@ import { CONFIG } from './config'
 import { memoryDecay } from './services/memory-decay'
 import { startSessionTimeoutChecker } from './services/session-timeout'
 import { standardRateLimit } from './middleware/rate-limit'
+import { staleSessionWorker } from './services/stale-session-worker'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -90,10 +91,27 @@ async function main() {
   // Start session timeout checker
   startSessionTimeoutChecker()
 
+  // Start stale session worker
+  staleSessionWorker.start()
+  console.log('[Worker] Stale session worker started')
+
   server.listen(CONFIG.port, () => {
     console.log(`ClaudeContext running at http://localhost:${CONFIG.port}`)
     console.log(`API Key: ${CONFIG.apiKey ? 'configured' : 'NOT SET (summaries disabled)'}`)
   })
 }
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('[Worker] Stopping stale session worker...')
+  staleSessionWorker.stop()
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  console.log('[Worker] Stopping stale session worker...')
+  staleSessionWorker.stop()
+  process.exit(0)
+})
 
 main().catch(console.error)

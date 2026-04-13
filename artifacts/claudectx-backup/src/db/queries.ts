@@ -542,5 +542,52 @@ export const queries = {
       WHERE session_id = ?
       ORDER BY created_at ASC
     `, sessionId)
+  },
+
+  insertCheckpoint(checkpoint: {
+    id: string
+    session_id: string
+    project_id: string
+    checkpoint_number: number
+    turn_count: number
+    created_at: number
+    summary_title: string | null
+    summary_data: string | null
+    transcript_range: string | null
+  }) {
+    run(`
+      INSERT INTO session_checkpoints (
+        id, session_id, project_id, checkpoint_number, turn_count,
+        created_at, summary_title, summary_data, transcript_range
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, checkpoint.id, checkpoint.session_id, checkpoint.project_id,
+       checkpoint.checkpoint_number, checkpoint.turn_count, checkpoint.created_at,
+       checkpoint.summary_title, checkpoint.summary_data, checkpoint.transcript_range)
+  },
+
+  getSessionCheckpoints(sessionId: string) {
+    return all(`
+      SELECT * FROM session_checkpoints
+      WHERE session_id = ?
+      ORDER BY checkpoint_number ASC
+    `, sessionId)
+  },
+
+  getLatestCheckpoint(sessionId: string) {
+    return get(`
+      SELECT * FROM session_checkpoints
+      WHERE session_id = ?
+      ORDER BY checkpoint_number DESC
+      LIMIT 1
+    `, sessionId)
+  },
+
+  getIncompleteCheckpoints(turnThreshold: number) {
+    return all(`
+      SELECT id as session_id, project_id, checkpoint_count, last_checkpoint_turn, turn_count
+      FROM sessions
+      WHERE status = 'active'
+        AND turn_count - last_checkpoint_turn >= ?
+    `, turnThreshold)
   }
 }

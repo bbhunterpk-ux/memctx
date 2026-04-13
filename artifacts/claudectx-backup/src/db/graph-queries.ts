@@ -150,3 +150,50 @@ export function deleteGraphForProject(projectId: string): void {
 
   deleteTransaction();
 }
+
+/**
+ * Remap all edges pointing to oldNodeId to point to newNodeId instead
+ * Handles UNIQUE constraint conflicts by deleting duplicate edges before remapping
+ */
+export function remapNodeEdges(oldNodeId: string, newNodeId: string): void {
+  const db = getDB();
+
+  const remapTransaction = db.transaction(() => {
+    // First, delete any edges that would create duplicates after remapping
+    // (edges where both source and target would match an existing edge)
+    db.prepare(`
+      DELETE FROM graph_edges
+      WHERE id IN (
+        SELECT e1.id FROM graph_edges e1
+        INNER JOIN graph_edges e2
+        ON e1.projectId = e2.projectId
+        AND e1.relationship = e2.relationship
+        AND (
+          (e1.sourceId = ? AND e2.sourceId = ?) OR
+          (e1.targetId = ? AND e2.targetId = ?)
+        )
+        AND (
+          (e1.targetId = e2.targetId AND e1.sourceId = ?) OR
+          (e1.sourceId = e2.sourceId AND e1.targetId = ?)
+        )
+        WHERE e1.id != e2.id
+      )
+    `).run(oldNodeId, newNodeId, oldNodeId, newNodeId, oldNodeId, oldNodeId);
+
+    // Now remap edges where oldNodeId is the source
+    db.prepare('UPDATE graph_edges SET sourceId = ? WHERE sourceId = ?').run(newNodeId, oldNodeId);
+
+    // Remap edges where oldNodeId is the target
+    db.prepare('UPDATE graph_edges SET targetId = ? WHERE targetId = ?').run(newNodeId, oldNodeId);
+  });
+
+  remapTransaction();
+}
+
+/**
+ * Delete a graph node by ID
+ */
+export function deleteGraphNode(nodeId: string): void {
+  const db = getDB();
+  db.prepare('DELETE FROM graph_nodes WHERE id = ?').run(nodeId);
+}

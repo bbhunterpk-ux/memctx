@@ -10,6 +10,7 @@ import { metricsTracker } from './metrics'
 import { GraphExtractor } from './graph-extractor'
 import { insertGraphNodes, insertGraphEdges } from '../db/graph-queries'
 import { normalizeNodeId } from '../utils/node-id'
+import { consolidateGraphNodes } from './graph-consolidator'
 
 interface GraphNode {
   id: string
@@ -337,6 +338,10 @@ Graph extraction rules:
           nodesAdded: normalizedNodes.length,
           edgesAdded: summary.graph.edges.length
         })
+
+        // Consolidate similar nodes after extraction
+        await consolidateGraphNodes(projectId)
+
       } catch (graphErr) {
         logger.error('Summarizer', `Unified graph processing failed for session ${sessionId}`, { error: graphErr })
         // Don't fail the whole summarization just because graph failed

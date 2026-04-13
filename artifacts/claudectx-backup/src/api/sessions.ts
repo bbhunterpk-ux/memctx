@@ -154,10 +154,13 @@ sessionsRouter.post('/:id/sync', async (req, res) => {
       })
     }
 
-    if (!session.transcript_path) {
+    // Check if session has observations (fallback when transcript is missing)
+    const observations = queries.getSessionObservations(sessionId)
+
+    if (!session.transcript_path && observations.length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'No transcript available'
+        error: 'No transcript or observations available'
       })
     }
 
@@ -167,16 +170,18 @@ sessionsRouter.post('/:id/sync', async (req, res) => {
     })
 
     // Queue for summarization with high priority
+    // If no transcript_path, pass empty string - summarizer will use observations
     summarizationQueue.enqueue({
       sessionId: session.id,
-      transcriptPath: session.transcript_path,
+      transcriptPath: session.transcript_path || '',
       projectId: session.project_id,
       priority: 'high'
     })
 
     res.json({
       success: true,
-      message: 'Queued for summarization'
+      message: 'Queued for summarization',
+      using_observations: !session.transcript_path
     })
   } catch (error: any) {
     logger.error('Sessions', 'Sync failed', { error: error.message })

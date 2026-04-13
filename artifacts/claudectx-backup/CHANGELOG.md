@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1] - 2026-04-14
+
+### Fixed
+- Manual sync endpoint now works with sessions that have observations but no transcript file
+- Sync button in UI now enabled for all sessions (uses observations as fallback)
+- Sync button shows orange color for sessions without transcript to indicate observation-based summarization
+
 ## [1.2.0] - 2026-04-13
 
 ### Added

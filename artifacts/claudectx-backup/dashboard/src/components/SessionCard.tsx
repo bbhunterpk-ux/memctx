@@ -373,32 +373,33 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
             )}
             <button
               onClick={handleSyncSummary}
-              disabled={syncing || !session.transcript_path}
-              title={hasSummary ? 'Resync summary' : 'Sync summary'}
+              disabled={syncing}
+              title={hasSummary ? 'Resync summary' : (!session.transcript_path ? 'Sync from observations' : 'Sync summary')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
                 padding: '4px 8px',
-                background: syncing ? 'var(--surface)' : 'var(--blue)15',
-                color: syncing ? 'var(--text-muted)' : 'var(--blue)',
+                background: syncing ? 'var(--surface)' : (!hasSummary && !session.transcript_path ? 'var(--orange)15' : 'var(--blue)15'),
+                color: syncing ? 'var(--text-muted)' : (!hasSummary && !session.transcript_path ? 'var(--orange)' : 'var(--blue)'),
                 border: '1px solid',
-                borderColor: syncing ? 'var(--border)' : 'var(--blue)30',
+                borderColor: syncing ? 'var(--border)' : (!hasSummary && !session.transcript_path ? 'var(--orange)30' : 'var(--blue)30'),
                 borderRadius: 6,
                 fontSize: 11,
                 fontWeight: 600,
-                cursor: syncing || !session.transcript_path ? 'not-allowed' : 'pointer',
+                cursor: syncing ? 'not-allowed' : 'pointer',
                 transition: 'all 0.15s',
-                opacity: !session.transcript_path ? 0.5 : 1,
               }}
               onMouseEnter={e => {
-                if (!syncing && session.transcript_path) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)25'
+                if (!syncing) {
+                  const bgColor = !hasSummary && !session.transcript_path ? 'var(--orange)25' : 'var(--blue)25'
+                  ;(e.currentTarget as HTMLButtonElement).style.background = bgColor
                 }
               }}
               onMouseLeave={e => {
                 if (!syncing) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)15'
+                  const bgColor = !hasSummary && !session.transcript_path ? 'var(--orange)15' : 'var(--blue)15'
+                  ;(e.currentTarget as HTMLButtonElement).style.background = bgColor
                 }
               }}
             >

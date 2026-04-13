@@ -25,9 +25,14 @@ interface ExtractionResult {
 
 export class GraphExtractor {
   private client: Anthropic;
+  private model: string;
 
-  constructor(apiKey: string) {
-    this.client = new Anthropic({ apiKey });
+  constructor(apiKey: string, baseURL?: string, model?: string) {
+    this.client = new Anthropic({
+      apiKey,
+      baseURL: baseURL || undefined
+    });
+    this.model = model || 'claude-sonnet-4-6';
   }
 
   async extractFromTranscript(
@@ -66,18 +71,29 @@ Transcript:
 ${transcript}`;
 
     const response = await this.client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: this.model,
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const content = response.content[0];
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response type');
+    // Handle both Anthropic format (content array) and OpenAI format (choices array)
+    let raw = ''
+    if (response.content && response.content[0]) {
+      // Anthropic format
+      const content = response.content[0];
+      if (content.type !== 'text') {
+        throw new Error('Unexpected response type');
+      }
+      raw = content.text;
+    } else if ((response as any).choices && (response as any).choices[0]) {
+      // OpenAI format (from 9router)
+      raw = (response as any).choices[0].message.content || '';
+    } else {
+      throw new Error(`Invalid API response: ${JSON.stringify(response)}`);
     }
 
     // Extract JSON from response
-    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in response');
     }

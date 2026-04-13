@@ -88,8 +88,8 @@ router.post('/:projectId/extract/:sessionId', async (req, res) => {
       return '';
     }).filter(Boolean).join('\n');
 
-    // Extract graph
-    const extractor = new GraphExtractor(CONFIG.apiKey);
+    // Extract graph - pass baseURL and model like summarizer does
+    const extractor = new GraphExtractor(CONFIG.apiKey, CONFIG.apiBaseUrl, CONFIG.summaryModel);
     const result = await extractor.extractFromTranscript(session.id, transcript);
 
     // Save to database - convert metadata to JSON strings

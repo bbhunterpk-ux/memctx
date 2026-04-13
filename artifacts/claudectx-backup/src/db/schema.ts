@@ -34,8 +34,14 @@ CREATE TABLE IF NOT EXISTS sessions (
   total_tool_calls INTEGER DEFAULT 0,
   files_touched   TEXT,
   tools_used      TEXT,
-  estimated_tokens INTEGER DEFAULT 0
+  estimated_tokens INTEGER DEFAULT 0,
+  last_activity       INTEGER,
+  auto_ended          INTEGER DEFAULT 0,
+  summary_requested_at INTEGER
 );
+
+CREATE INDEX IF NOT EXISTS idx_sessions_activity
+ON sessions(status, last_activity);
 
 CREATE TABLE IF NOT EXISTS observations (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,

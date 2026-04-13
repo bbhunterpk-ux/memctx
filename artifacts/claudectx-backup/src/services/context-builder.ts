@@ -59,6 +59,40 @@ export async function buildContextMarkdown(cwd: string, n: number = 3): Promise<
       lines.push(`  Key Insight: ${s.summary_key_insight}`)
     }
 
+    if (s.next_session_starting_point) {
+      lines.push(`  START HERE: ${s.next_session_starting_point}`)
+    }
+
+    if (s.unresolved_tech_debt) {
+      try {
+        const debt = JSON.parse(s.unresolved_tech_debt) as string[]
+        if (debt.length > 0) {
+          lines.push(`  Tech Debt: ${debt.join(', ')}`)
+        }
+      } catch {}
+    }
+
+    if (s.open_rabbit_holes) {
+      try {
+        const holes = JSON.parse(s.open_rabbit_holes) as string[]
+        if (holes.length > 0) {
+          lines.push(`  Rabbit Holes: ${holes.join(', ')}`)
+        }
+      } catch {}
+    }
+
+    if (s.testing_coverage_gap) {
+      lines.push(`  Testing Gap: ${s.testing_coverage_gap}`)
+    }
+
+    if (s.architectural_drift) {
+      lines.push(`  Arch Drift: ${s.architectural_drift}`)
+    }
+
+    if (s.collaboration_style) {
+      lines.push(`  Style: ${s.collaboration_style}`)
+    }
+
     if (s.summary_blockers) {
       try {
         const blockers = JSON.parse(s.summary_blockers) as string[]

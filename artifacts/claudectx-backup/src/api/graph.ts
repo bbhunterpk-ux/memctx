@@ -8,6 +8,8 @@ import {
   deleteGraphForProject,
 } from '../db/graph-queries';
 import { getDB } from '../db/client';
+import { CONFIG } from '../config';
+import { readTranscript } from '../services/transcript-reader';
 
 const router: Router = Router();
 
@@ -27,9 +29,9 @@ router.get('/:projectId', (req, res) => {
 router.post('/:projectId/extract/:sessionId', async (req, res) => {
   try {
     const { projectId, sessionId } = req.params;
-    const apiKey = process.env.ANTHROPIC_API_KEY;
 
-    if (!apiKey) {
+    // Use CONFIG.apiKey like summarizer does
+    if (!CONFIG.apiKey) {
       return res.status(500).json({
         success: false,
         error: 'ANTHROPIC_API_KEY not configured',
@@ -38,9 +40,18 @@ router.post('/:projectId/extract/:sessionId', async (req, res) => {
 
     // Get session transcript
     const db = getDB();
-    const session = db
-      .prepare('SELECT * FROM sessions WHERE id = ? AND project_id = ?')
-      .get(sessionId, projectId) as any;
+
+    // Handle "latest" sessionId
+    let session: any;
+    if (sessionId === 'latest') {
+      session = db
+        .prepare('SELECT * FROM sessions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1')
+        .get(projectId);
+    } else {
+      session = db
+        .prepare('SELECT * FROM sessions WHERE id = ? AND project_id = ?')
+        .get(sessionId, projectId);
+    }
 
     if (!session) {
       return res.status(404).json({
@@ -49,23 +60,37 @@ router.post('/:projectId/extract/:sessionId', async (req, res) => {
       });
     }
 
-    // Read transcript from file
-    const fs = require('fs');
-    let transcript = '';
-    if (session.transcript_path && fs.existsSync(session.transcript_path)) {
-      transcript = fs.readFileSync(session.transcript_path, 'utf-8');
-    }
-
-    if (!transcript) {
+    // Read transcript using the same method as summarizer
+    if (!session.transcript_path) {
       return res.status(400).json({
         success: false,
         error: 'Session has no transcript',
       });
     }
 
+    const turns = await readTranscript(session.transcript_path);
+    if (turns.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Session transcript is empty',
+      });
+    }
+
+    // Compact transcript like summarizer does
+    const transcript = turns.map(turn => {
+      if (turn.role === 'user') {
+        return `USER: ${(turn.content || '').slice(0, 500)}`;
+      } else if (turn.role === 'assistant') {
+        return `CLAUDE: ${(turn.content || '').slice(0, 800)}`;
+      } else if (turn.type === 'tool_use') {
+        return `TOOL(${turn.name}): ${JSON.stringify(turn.input || {}).slice(0, 200)}`;
+      }
+      return '';
+    }).filter(Boolean).join('\n');
+
     // Extract graph
-    const extractor = new GraphExtractor(apiKey);
-    const result = await extractor.extractFromTranscript(sessionId, transcript);
+    const extractor = new GraphExtractor(CONFIG.apiKey);
+    const result = await extractor.extractFromTranscript(session.id, transcript);
 
     // Save to database - convert metadata to JSON strings
     if (result.nodes.length > 0) {

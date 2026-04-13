@@ -12,7 +12,7 @@ import ShareLinkButton from '../components/ShareLinkButton'
 import TagInput from '../components/TagInput'
 import NotesModal from '../components/NotesModal'
 import { GraphViewer } from '../components/GraphViewer'
-import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText } from 'lucide-react'
+import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText, ArrowRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
@@ -112,7 +112,7 @@ export default function SessionDetail({ onOpenSession }: Props) {
   const { id } = useParams<{ id: string }>()
   const [syncing, setSyncing] = useState(false)
   const [notesModalOpen, setNotesModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'overview' | 'timeline'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'graph'>('overview')
 
   const { data: session, isLoading, refetch } = useQuery({
     queryKey: ['session', id],
@@ -304,6 +304,26 @@ export default function SessionDetail({ onOpenSession }: Props) {
                 onUpdate={refetch}
               />
             </div>
+
+            {session.next_session_starting_point && (
+              <div style={{
+                padding: '12px 14px',
+                background: 'var(--green)15',
+                border: '1px solid var(--green)30',
+                borderRadius: 8,
+                fontSize: 15,
+                color: 'var(--text)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8,
+                marginBottom: 16
+              }}>
+                <ArrowRight size={16} style={{ color: 'var(--green)', flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <strong style={{ color: 'var(--green)' }}>Next Session Start:</strong> {session.next_session_starting_point}
+                </div>
+              </div>
+            )}
 
             {session.summary_key_insight && (
               <div style={{
@@ -551,6 +571,63 @@ export default function SessionDetail({ onOpenSession }: Props) {
               </div>
             )}
 
+            {(session.aha_moments_count > 0 || session.flow_state_duration_mins > 0 || session.cognitive_load_estimate > 0) && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12
+              }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+                  Session Telemetry
+                </div>
+                
+                {session.aha_moments_count > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Aha! Moments</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--yellow)' }}>{session.aha_moments_count}</span>
+                  </div>
+                )}
+                {session.flow_state_duration_mins > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Flow State</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--blue)' }}>{session.flow_state_duration_mins}m</span>
+                  </div>
+                )}
+                {session.preferred_verbosity > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>AI Verbosity</span>
+                    <div style={{ width: 60, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(100, session.preferred_verbosity)}%`, height: '100%', background: 'var(--blue)' }} />
+                    </div>
+                  </div>
+                )}
+                {session.cognitive_load_estimate > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Cognitive Load</span>
+                    <div style={{ width: 60, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(100, session.cognitive_load_estimate)}%`, height: '100%', background: session.cognitive_load_estimate > 75 ? 'var(--red)' : session.cognitive_load_estimate > 50 ? 'var(--yellow)' : 'var(--green)' }} />
+                    </div>
+                  </div>
+                )}
+                {session.divergence_score > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Divergence</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--red)' }}>{session.divergence_score}/100</span>
+                  </div>
+                )}
+                {session.collaboration_style && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Style</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', textTransform: 'capitalize' }}>{session.collaboration_style}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Resolved Card */}
             {(() => {
               const resolved = session.summary_resolved ? JSON.parse(session.summary_resolved) : []
@@ -694,6 +771,11 @@ export default function SessionDetail({ onOpenSession }: Props) {
             summary_next_steps={session.summary_next_steps}
             summary_gotchas={session.summary_gotchas}
             summary_tech_notes={session.summary_tech_notes}
+            open_rabbit_holes={session.open_rabbit_holes ? JSON.parse(session.open_rabbit_holes) : undefined}
+            environmental_dependencies={session.environmental_dependencies ? JSON.parse(session.environmental_dependencies) : undefined}
+            unresolved_tech_debt={session.unresolved_tech_debt ? JSON.parse(session.unresolved_tech_debt) : undefined}
+            testing_coverage_gap={session.testing_coverage_gap}
+            architectural_drift={session.architectural_drift}
           />
         </div>
       )}

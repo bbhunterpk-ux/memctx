@@ -109,7 +109,7 @@ interface Props {
 
 export default function SessionDetail({ onOpenSession }: Props) {
   const { id } = useParams<{ id: string }>()
-  const [resyncing, setResyncing] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [notesModalOpen, setNotesModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline'>('overview')
 
@@ -157,20 +157,34 @@ export default function SessionDetail({ onOpenSession }: Props) {
     }
   }, [id, refetch])
 
-  const handleResync = async () => {
+  // Track activity when viewing session detail
+  useEffect(() => {
+    if (id) {
+      api.updateSessionActivity(id).catch(err => {
+        console.error('Failed to update activity:', err)
+      })
+    }
+  }, [id])
+
+  const handleSyncSummary = async () => {
     if (!id) return
-    setResyncing(true)
-    const toastId = toast.loading('Queueing session for resync...')
+    const hasSummary = !!session?.summary_title
+    setSyncing(true)
+    const toastId = toast.loading(hasSummary ? 'Resyncing summary...' : 'Syncing summary...')
     try {
-      await api.resyncSession(id)
+      if (hasSummary) {
+        await api.resyncSession(id)
+      } else {
+        await api.syncSession(id)
+      }
       toast.dismiss(toastId)
-      toast.success('Session queued for resync. Summary will be regenerated.')
+      toast.success('Session queued for summarization')
       setTimeout(() => refetch(), 2000)
     } catch (error) {
       toast.dismiss(toastId)
-      toast.error('Resync failed: ' + error)
+      toast.error('Failed to sync: ' + error)
     } finally {
-      setResyncing(false)
+      setSyncing(false)
     }
   }
 
@@ -616,35 +630,36 @@ export default function SessionDetail({ onOpenSession }: Props) {
           )}
           {session.status !== 'active' && session.transcript_path && (
             <button
-              onClick={handleResync}
-              disabled={resyncing}
+              onClick={handleSyncSummary}
+              disabled={syncing}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
                 padding: '8px 14px',
-                background: resyncing ? 'var(--surface)' : 'var(--surface2)',
-                color: resyncing ? 'var(--text-muted)' : 'var(--text)',
-                border: '1px solid var(--border)',
+                background: syncing ? 'var(--surface)' : 'var(--blue)15',
+                color: syncing ? 'var(--text-muted)' : 'var(--blue)',
+                border: '1px solid',
+                borderColor: syncing ? 'var(--border)' : 'var(--blue)30',
                 borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 600,
-                cursor: resyncing ? 'not-allowed' : 'pointer',
+                cursor: syncing ? 'not-allowed' : 'pointer',
                 transition: 'all 0.15s',
               }}
               onMouseEnter={e => {
-                if (!resyncing) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)'
+                if (!syncing) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)25'
                 }
               }}
               onMouseLeave={e => {
-                if (!resyncing) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface2)'
+                if (!syncing) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)15'
                 }
               }}
             >
-              <RefreshCw size={16} style={{ animation: resyncing ? 'spin 1s linear infinite' : 'none' }} />
-              {resyncing ? 'Resyncing...' : 'Resync Summary'}
+              <RefreshCw size={14} />
+              {syncing ? 'Processing...' : (hasSummary ? 'Resync Summary' : 'Sync Summary')}
             </button>
           )}
         </div>

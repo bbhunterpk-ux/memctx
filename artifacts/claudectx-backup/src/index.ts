@@ -84,7 +84,11 @@ async function main() {
         if (err) {
           console.error('Error serving index.html:', err)
           console.error('Attempted path:', indexPath)
-          res.status(500).send('Failed to load application')
+          console.error('Request path:', req.path)
+          // Don't send error if headers already sent
+          if (!res.headersSent) {
+            res.status(500).send('Failed to load application')
+          }
         }
       })
     } else {

@@ -82,7 +82,10 @@ export const queries = {
       'summary_files_changed', 'summary_next_steps', 'summary_gotchas',
       'summary_tech_notes', 'summary_mood', 'summary_resolved',
       'summary_key_insight', 'duration_seconds', 'transcript_path',
-      'embedding_summary', 'tools_used', 'estimated_tokens'
+      'embedding_summary', 'tools_used', 'estimated_tokens',
+      'checkpoint_count', 'last_checkpoint_turn', 'last_checkpoint_time',
+      'metric_momentum', 'metric_frustration', 'metric_productivity',
+      'learning_progression', 'emotional_context', 'code_quality_notes'
     ]
 
     const validKeys = keys.filter(k => allowedColumns.includes(k))

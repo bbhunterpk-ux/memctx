@@ -235,6 +235,79 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
               </div>
             )}
 
+            {(session.metric_momentum !== undefined || session.metric_frustration !== undefined) && (
+              <div style={{
+                display: 'flex',
+                gap: 8,
+                marginBottom: 8,
+                fontSize: 10,
+                flexWrap: 'wrap'
+              }}>
+                {session.metric_momentum != null && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: session.metric_momentum > 70 ? 'var(--green)20' : 'var(--blue)15',
+                    color: session.metric_momentum > 70 ? 'var(--green)' : 'var(--blue)',
+                    border: '1px solid',
+                    borderColor: session.metric_momentum > 70 ? 'var(--green)30' : 'var(--blue)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    ⚡ Momentum: {session.metric_momentum}
+                  </span>
+                )}
+                {session.metric_frustration != null && session.metric_frustration > 0 && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: session.metric_frustration > 50 ? 'var(--red)20' : 'var(--orange)15',
+                    color: session.metric_frustration > 50 ? 'var(--red)' : 'var(--orange)',
+                    border: '1px solid',
+                    borderColor: session.metric_frustration > 50 ? 'var(--red)30' : 'var(--orange)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    🔴 Frustration: {session.metric_frustration}
+                  </span>
+                )}
+                {session.metric_productivity != null && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'var(--accent)20',
+                    color: 'var(--accent)',
+                    border: '1px solid var(--accent)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    🎯 Productivity: {session.metric_productivity}
+                  </span>
+                )}
+                {session.emotional_context && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'var(--surface)',
+                    color: 'var(--text-muted)',
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }} title={session.emotional_context}>
+                    💬 {session.emotional_context}
+                  </span>
+                )}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Clock size={11} />

@@ -10,6 +10,14 @@ import { consolidateGraphNodes } from './graph-consolidator'
 interface SessionSummary {
   title: string
   status: 'completed' | 'in_progress' | 'blocked'
+  metrics?: {
+    momentum: number
+    frustration: number
+    productivity: number
+  }
+  learning_progression?: string
+  emotional_context?: string
+  code_quality_notes?: string
   what_we_did: string[]
   decisions_made: string[]
   files_changed: string[]
@@ -113,6 +121,14 @@ Return this exact JSON schema:
 {
   "title": "5-8 word title describing the main work done",
   "status": "completed OR in_progress OR blocked",
+  "metrics": {
+    "momentum": 85,
+    "frustration": 20,
+    "productivity": 90
+  },
+  "learning_progression": "What the user learned during the session",
+  "emotional_context": "The user's overall emotional state (e.g., focused, frustrated, exploring)",
+  "code_quality_notes": "Observations about code structure, technical debt, or patterns",
   "what_we_did": ["specific thing 1", "specific thing 2"],
   "decisions_made": ["architectural or technical decision made"],
   "files_changed": ["relative/path/to/file.ts"],
@@ -196,7 +212,13 @@ Return this exact JSON schema:
     queries.updateSession(sessionId, {
       last_checkpoint_turn: turnRange[1],
       last_checkpoint_time: Math.floor(Date.now() / 1000),
-      checkpoint_count: checkpointNumber
+      checkpoint_count: checkpointNumber,
+      metric_momentum: summary.metrics?.momentum ?? null,
+      metric_frustration: summary.metrics?.frustration ?? null,
+      metric_productivity: summary.metrics?.productivity ?? null,
+      learning_progression: summary.learning_progression ?? null,
+      emotional_context: summary.emotional_context ?? null,
+      code_quality_notes: summary.code_quality_notes ?? null
     })
 
     broadcast({

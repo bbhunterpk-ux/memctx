@@ -32,6 +32,14 @@ interface GraphEdge {
 interface SessionSummary {
   title: string
   status: 'completed' | 'in_progress' | 'blocked'
+  metrics?: {
+    momentum: number
+    frustration: number
+    productivity: number
+  }
+  learning_progression?: string
+  emotional_context?: string
+  code_quality_notes?: string
   what_we_did: string[]
   decisions_made: string[]
   files_changed: string[]
@@ -172,11 +180,12 @@ export async function summarizeSession(
 2. User preferences discovered (coding style, workflow, communication)
 3. Domain knowledge learned (technologies, patterns, gotchas)
 4. Problem-solving patterns used
-5. Pending tasks identified
-6. People/teams mentioned
-7. Knowledge graph (files, functions, classes, concepts, problems, decisions and their relationships)
+  5. Pending tasks identified
+  6. People/teams mentioned
+  7. Knowledge graph (files, functions, classes, concepts, problems, decisions and their relationships)
+  8. Rich memory metrics (momentum, frustration, productivity, learning progression, emotional context, code quality notes)
 
-Always respond with ONLY valid JSON matching the exact schema provided. No preamble, no markdown, no explanation.`,
+  Always respond with ONLY valid JSON matching the exact schema provided. No preamble, no markdown, no explanation.`,
       messages: [{
         role: 'user',
         content: `Summarize this Claude Code coding session transcript. Return ONLY JSON.
@@ -188,6 +197,14 @@ Return this exact JSON schema:
 {
   "title": "5-8 word title describing the main work done",
   "status": "completed OR in_progress OR blocked",
+  "metrics": {
+    "momentum": 85,
+    "frustration": 20,
+    "productivity": 90
+  },
+  "learning_progression": "What the user learned during the session",
+  "emotional_context": "The user's overall emotional state (e.g., focused, frustrated, exploring)",
+  "code_quality_notes": "Observations about code structure, technical debt, or patterns",
   "what_we_did": ["specific thing 1", "specific thing 2", "specific thing 3"],
   "decisions_made": ["architectural or technical decision made"],
   "files_changed": ["relative/path/to/file.ts"],
@@ -228,10 +245,14 @@ Rules:
 - complexity: technical difficulty level
 - blockers: things that prevented progress (empty array if none)
 - resolved: problems that were fixed (empty array if none)
-- key_insight: most valuable takeaway (empty string if none)
-- If nothing significant happened, use status "in_progress"
-
-Graph extraction rules:
+  - key_insight: most valuable takeaway (empty string if none)
+  - metrics.momentum: 0-100 score, high means fast progress and flow
+  - metrics.frustration: 0-100 score, high means frequent errors or blockers
+  - metrics.productivity: 0-100 score, high means lots of valuable output
+  - learning_progression: What new concepts or context were gained
+  - emotional_context: User's emotional state implicitly or explicitly expressed
+  - code_quality_notes: Impressions on design, abstractions, or debt accumulated
+  - If nothing significant happened, use status "in_progress"Graph extraction rules:
 - Node types: file, function, class, concept, problem, decision
 - Node IDs MUST follow format "type:identifier" (e.g., "file:src/auth.ts", "concept:jwt_tokens")
 - For files: use relative paths from project root, normalize (no ./ prefix)
@@ -268,25 +289,29 @@ Graph extraction rules:
       ? session.ended_at - session.started_at
       : null
 
-    queries.updateSession(sessionId, {
-      summary_title: summary.title,
-      summary_status: 'completed', // Always mark summary as completed after successful AI processing
-      summary_what_we_did: JSON.stringify(summary.what_we_did),
-      summary_decisions: JSON.stringify(summary.decisions_made),
-      summary_files_changed: JSON.stringify(summary.files_changed),
-      summary_next_steps: JSON.stringify(summary.next_steps),
-      summary_gotchas: JSON.stringify(summary.gotchas),
-      summary_tech_notes: JSON.stringify(summary.tech_stack_notes),
-      summary_mood: summary.mood || null,
-      summary_complexity: summary.complexity || null,
-      summary_blockers: summary.blockers ? JSON.stringify(summary.blockers) : null,
-      summary_resolved: summary.resolved ? JSON.stringify(summary.resolved) : null,
-      summary_key_insight: summary.key_insight || null,
-      duration_seconds: durationSeconds,
-      status: 'completed'
-    })
-
-    // Store extracted memory
+      queries.updateSession(sessionId, {
+        summary_title: summary.title,
+        summary_status: 'completed', // Always mark summary as completed after successful AI processing
+        summary_what_we_did: JSON.stringify(summary.what_we_did),
+        summary_decisions: JSON.stringify(summary.decisions_made),
+        summary_files_changed: JSON.stringify(summary.files_changed),
+        summary_next_steps: JSON.stringify(summary.next_steps),
+        summary_gotchas: JSON.stringify(summary.gotchas),
+        summary_tech_notes: JSON.stringify(summary.tech_stack_notes),
+        summary_mood: summary.mood || null,
+        summary_complexity: summary.complexity || null,
+        summary_blockers: summary.blockers ? JSON.stringify(summary.blockers) : null,
+        summary_resolved: summary.resolved ? JSON.stringify(summary.resolved) : null,
+        summary_key_insight: summary.key_insight || null,
+        metric_momentum: summary.metrics?.momentum ?? 50,
+        metric_frustration: summary.metrics?.frustration ?? 0,
+        metric_productivity: summary.metrics?.productivity ?? 50,
+        learning_progression: summary.learning_progression || null,
+        emotional_context: summary.emotional_context || null,
+        code_quality_notes: summary.code_quality_notes || null,
+        duration_seconds: durationSeconds,
+        status: 'completed'
+      })    // Store extracted memory
     if (summary.preferences) {
       for (const pref of summary.preferences) {
         queries.setPreference(pref.category, pref.key, pref.value, pref.confidence, sessionId, projectId)

@@ -18,6 +18,7 @@ import { forceEndSessionRouter } from './api/force-end-session'
 import { logsRouter } from './api/logs'
 import { tagsRouter } from './api/tags'
 import { settingsRouter } from './api/settings'
+import graphRouter from './api/graph'
 import { startWatcher } from './services/watcher'
 import { broadcast, initWS } from './ws/broadcast'
 import { CONFIG } from './config'
@@ -67,6 +68,7 @@ async function main() {
   app.use('/api/logs', logsRouter)
   app.use('/api/tags', tagsRouter)
   app.use('/api/settings', settingsRouter)
+  app.use('/api/graph', graphRouter)
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))

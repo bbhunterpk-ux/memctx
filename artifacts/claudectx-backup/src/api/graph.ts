@@ -41,12 +41,12 @@ router.post('/:projectId/extract/:sessionId', async (req, res) => {
     // Get session transcript
     const db = getDB();
 
-    // Handle "latest" sessionId
+    // Handle "latest" sessionId - find latest completed session with transcript
     let session: any;
     if (sessionId === 'latest') {
       session = db
-        .prepare('SELECT * FROM sessions WHERE project_id = ? ORDER BY started_at DESC LIMIT 1')
-        .get(projectId);
+        .prepare('SELECT * FROM sessions WHERE project_id = ? AND status = ? AND transcript_path IS NOT NULL ORDER BY started_at DESC LIMIT 1')
+        .get(projectId, 'completed');
     } else {
       session = db
         .prepare('SELECT * FROM sessions WHERE id = ? AND project_id = ?')

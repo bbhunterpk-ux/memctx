@@ -148,7 +148,7 @@ async function run() {
     case 'restart': {
       stopDaemon()
       await new Promise(r => setTimeout(r, 1000))
-      const workerPath = path.join(__dirname, '..', 'dist', 'src', 'index.js')
+      const workerPath = path.join(__dirname, '..', 'src', 'index.js')
       startDaemon(workerPath)
       break
     }

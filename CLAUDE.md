@@ -2,9 +2,8 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Debugged force-end transcript discovery bug — IN_PROGRESS
-**Completed:** Restarted memctx service on port 9999, Tested force-end-session API endpoint multiple times, Manually set transcript_path in database to verify summarization works
-**Up next:** Publish v1.0.13 with npm publish --otp command
-**Remember:** Force-end's transcript path lookup fails silently - no 'Found transcript' or 'Transcript not found' logs appear
+**Last session:** Fixed memctx daemon crash and published v1.0.18 — COMPLETED
+**Completed:** Fixed daemon restart crash caused by incorrect worker path resolution, Changed path from __dirname/../dist/src/index.js to __dirname/../src/index.js, Published memctx v1.0.18 to npm with the daemon fix
+**Remember:** npm can cache old builds during publish - clean rebuild required before version bump
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

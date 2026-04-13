@@ -31,6 +31,11 @@ export function insertGraphNodes(
   const stmt = db.prepare(`
     INSERT INTO graph_nodes (id, projectId, label, type, confidence, metadata, createdAt)
     VALUES (?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      label = excluded.label,
+      type = excluded.type,
+      confidence = excluded.confidence,
+      metadata = excluded.metadata
   `);
 
   const insertMany = db.transaction((nodes) => {
@@ -59,6 +64,13 @@ export function insertGraphEdges(
   const stmt = db.prepare(`
     INSERT INTO graph_edges (id, projectId, sourceId, targetId, relationship, confidence, weight, metadata, createdAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      sourceId = excluded.sourceId,
+      targetId = excluded.targetId,
+      relationship = excluded.relationship,
+      confidence = excluded.confidence,
+      weight = excluded.weight,
+      metadata = excluded.metadata
   `);
 
   const insertMany = db.transaction((edges) => {

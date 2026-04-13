@@ -7,6 +7,8 @@ import { broadcast } from '../ws/broadcast'
 import { fuzzyTaskMatcher } from './fuzzy-task-matcher'
 import { logger } from './logger'
 import { metricsTracker } from './metrics'
+import { GraphExtractor } from './graph-extractor'
+import { insertGraphNodes, insertGraphEdges } from '../db/graph-queries'
 
 interface SessionSummary {
   title: string
@@ -250,6 +252,38 @@ Rules:
         content: item,
         metadata: '{}'
       })
+    }
+
+    // --- AUTO-EXTRACT KNOWLEDGE GRAPH ---
+    try {
+      logger.info('Summarizer', `Starting graph extraction for session ${sessionId}`)
+      const extractor = new GraphExtractor(CONFIG.apiKey, CONFIG.apiBaseUrl, CONFIG.summaryModel)
+      const graphResult = await extractor.extractFromTranscript(sessionId, compactTranscript)
+      
+      if (graphResult.nodes.length > 0) {
+        const nodesForDb = graphResult.nodes.map(node => ({
+          ...node,
+          metadata: node.metadata ? JSON.stringify(node.metadata) : null,
+        }))
+        insertGraphNodes(projectId, nodesForDb)
+      }
+      
+      if (graphResult.edges.length > 0) {
+        const edgesForDb = graphResult.edges.map(edge => ({
+          ...edge,
+          weight: edge.weight || 1.0,
+          metadata: edge.metadata ? JSON.stringify(edge.metadata) : null,
+        }))
+        insertGraphEdges(projectId, edgesForDb)
+      }
+      
+      logger.info('Summarizer', `Graph updated for session ${sessionId}`, { 
+        nodesAdded: graphResult.nodes.length,
+        edgesAdded: graphResult.edges.length 
+      })
+    } catch (graphErr) {
+      logger.error('Summarizer', `Graph extraction failed for session ${sessionId}`, { error: graphErr })
+      // Don't fail the whole summarization just because graph failed
     }
 
     await updateClaudeMd(projectId, sessionId, summary)

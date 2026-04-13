@@ -18,6 +18,18 @@ interface SessionSummary {
   learning_progression?: string
   emotional_context?: string
   code_quality_notes?: string
+  next_session_starting_point?: string
+  open_rabbit_holes?: string[]
+  environmental_dependencies?: string[]
+  unresolved_tech_debt?: string[]
+  testing_coverage_gap?: string
+  architectural_drift?: string
+  preferred_verbosity?: number
+  collaboration_style?: string
+  cognitive_load_estimate?: number
+  aha_moments_count?: number
+  flow_state_duration_mins?: number
+  divergence_score?: number
   what_we_did: string[]
   decisions_made: string[]
   files_changed: string[]
@@ -126,10 +138,22 @@ Return this exact JSON schema:
     "frustration": 20,
     "productivity": 90
   },
-  "learning_progression": "What the user learned during the session",
-  "emotional_context": "The user's overall emotional state (e.g., focused, frustrated, exploring)",
-  "code_quality_notes": "Observations about code structure, technical debt, or patterns",
-  "what_we_did": ["specific thing 1", "specific thing 2"],
+    "learning_progression": "What the user learned during the session",
+    "emotional_context": "The user's overall emotional state (e.g., focused, frustrated, exploring)",
+    "code_quality_notes": "Observations about code structure, technical debt, or patterns",
+    "next_session_starting_point": "Exact file, command, or thought to pick up on next session",
+    "open_rabbit_holes": ["unresolved tangent 1"],
+    "environmental_dependencies": ["required running process 1"],
+    "unresolved_tech_debt": ["hacky code added 1"],
+    "testing_coverage_gap": "Description of untested logic",
+    "architectural_drift": "Description of anti-patterns introduced",
+    "preferred_verbosity": 50,
+    "collaboration_style": "Pair Programmer, Rubber Duck, Direct Implementer",
+    "cognitive_load_estimate": 50,
+    "aha_moments_count": 0,
+    "flow_state_duration_mins": 0,
+    "divergence_score": 0,
+    "what_we_did": ["specific thing 1", "specific thing 2"],
   "decisions_made": ["architectural or technical decision made"],
   "files_changed": ["relative/path/to/file.ts"],
   "next_steps": ["concrete next thing to do"],
@@ -216,12 +240,24 @@ Return this exact JSON schema:
       metric_momentum: summary.metrics?.momentum ?? null,
       metric_frustration: summary.metrics?.frustration ?? null,
       metric_productivity: summary.metrics?.productivity ?? null,
-      learning_progression: summary.learning_progression ?? null,
-      emotional_context: summary.emotional_context ?? null,
-      code_quality_notes: summary.code_quality_notes ?? null
-    })
+          learning_progression: summary.learning_progression ?? null,
+          emotional_context: summary.emotional_context ?? null,
+          code_quality_notes: summary.code_quality_notes ?? null,
+          next_session_starting_point: summary.next_session_starting_point || null,
+          open_rabbit_holes: summary.open_rabbit_holes ? JSON.stringify(summary.open_rabbit_holes) : null,
+          environmental_dependencies: summary.environmental_dependencies ? JSON.stringify(summary.environmental_dependencies) : null,
+          unresolved_tech_debt: summary.unresolved_tech_debt ? JSON.stringify(summary.unresolved_tech_debt) : null,
+          testing_coverage_gap: summary.testing_coverage_gap || null,
+          architectural_drift: summary.architectural_drift || null,
+          preferred_verbosity: summary.preferred_verbosity ?? 50,
+          collaboration_style: summary.collaboration_style || null,
+          cognitive_load_estimate: summary.cognitive_load_estimate ?? 50,
+          aha_moments_count: summary.aha_moments_count ?? 0,
+          flow_state_duration_mins: summary.flow_state_duration_mins ?? 0,
+          divergence_score: summary.divergence_score ?? 0
+        })
 
-    broadcast({
+        broadcast({
       type: 'checkpoint_complete',
       session_id: sessionId,
       checkpoint_number: checkpointNumber,

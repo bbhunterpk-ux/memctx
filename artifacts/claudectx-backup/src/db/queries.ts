@@ -85,7 +85,11 @@ export const queries = {
       'embedding_summary', 'tools_used', 'estimated_tokens',
       'checkpoint_count', 'last_checkpoint_turn', 'last_checkpoint_time',
       'metric_momentum', 'metric_frustration', 'metric_productivity',
-      'learning_progression', 'emotional_context', 'code_quality_notes'
+      'learning_progression', 'emotional_context', 'code_quality_notes',
+      'next_session_starting_point', 'open_rabbit_holes', 'environmental_dependencies',
+      'unresolved_tech_debt', 'testing_coverage_gap', 'architectural_drift',
+      'preferred_verbosity', 'collaboration_style', 'cognitive_load_estimate',
+      'aha_moments_count', 'flow_state_duration_mins', 'divergence_score'
     ]
 
     const validKeys = keys.filter(k => allowedColumns.includes(k))

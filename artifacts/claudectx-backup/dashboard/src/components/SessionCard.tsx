@@ -235,7 +235,7 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
               </div>
             )}
 
-            {(session.metric_momentum !== undefined || session.metric_frustration !== undefined) && (
+            {(session.metric_momentum !== undefined || session.metric_frustration !== undefined || session.next_session_starting_point || session.aha_moments_count) && (
               <div style={{
                 display: 'flex',
                 gap: 8,
@@ -243,6 +243,48 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
                 fontSize: 10,
                 flexWrap: 'wrap'
               }}>
+                {session.next_session_starting_point && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'var(--yellow)20',
+                    color: 'var(--yellow)',
+                    border: '1px solid var(--yellow)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    ⏭️ Start: {session.next_session_starting_point}
+                  </span>
+                )}
+                {session.aha_moments_count > 0 && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'var(--accent)20',
+                    color: 'var(--accent)',
+                    border: '1px solid var(--accent)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    💡 Aha! x{session.aha_moments_count}
+                  </span>
+                )}
+                {session.unresolved_tech_debt && session.unresolved_tech_debt !== 'null' && (
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'var(--orange)20',
+                    color: 'var(--orange)',
+                    border: '1px solid var(--orange)30',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3
+                  }}>
+                    🚧 Tech Debt
+                  </span>
+                )}
                 {session.metric_momentum != null && (
                   <span style={{
                     padding: '2px 6px',

@@ -2,8 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Fixed memctx daemon crash and published v1.0.18 — COMPLETED
-**Completed:** Fixed daemon restart crash caused by incorrect worker path resolution, Changed path from __dirname/../dist/src/index.js to __dirname/../src/index.js, Published memctx v1.0.18 to npm with the daemon fix
-**Remember:** npm can cache old builds during publish - clean rebuild required before version bump
+**Last session:** Fixed Express sendFile path resolution bug in memctx — IN_PROGRESS
+**Completed:** Debugged Express.js sendFile returning 'Not Found' for SPA routes in memctx dashboard, Traced the root cause to path.join() returning relative paths instead of absolute paths, Changed path.join() to path.resolve() for dashboardDist and indexPath variables
+**Up next:** Publish v1.0.20 to npm with OTP code
+**Remember:** Express.js res.sendFile() requires an ABSOLUTE path - path.join() with relative segments like '..' can produce paths that sendFile rejects with 'Not Found'
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

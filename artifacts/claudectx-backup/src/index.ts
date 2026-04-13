@@ -70,13 +70,21 @@ async function main() {
   app.use('/api/settings', settingsRouter)
   app.use('/api/graph', graphRouter)
 
-  const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
+  const dashboardDist = path.resolve(__dirname, '..', '..', 'dashboard', 'dist')
+  const indexPath = path.resolve(dashboardDist, 'index.html')
+
   app.use(express.static(dashboardDist))
 
   // Catch-all for SPA routing - serve index.html for non-API routes
   app.use((req, res, next) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(dashboardDist, 'index.html'))
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error('Error serving index.html:', err)
+          console.error('Attempted path:', indexPath)
+          res.status(500).send('Failed to load application')
+        }
+      })
     } else {
       next()
     }

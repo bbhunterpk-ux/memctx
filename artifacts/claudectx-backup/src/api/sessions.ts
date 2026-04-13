@@ -1,5 +1,8 @@
 import { Router } from 'express'
 import { queries } from '../db/queries'
+import { activityTracker } from '../services/activity-tracker'
+import { summarizationQueue } from '../services/summarization-queue'
+import { logger } from '../services/logger'
 
 export const sessionsRouter: import("express").Router = Router()
 
@@ -135,6 +138,67 @@ sessionsRouter.post('/:id/archive', (req, res) => {
   } catch (err) {
     console.error('[API] Error updating archive status:', err)
     res.status(500).json({ error: String(err) })
+  }
+})
+
+// POST /api/sessions/:id/sync
+sessionsRouter.post('/:id/sync', async (req, res) => {
+  try {
+    const sessionId = req.params.id as string
+    const session = queries.getSession(sessionId)
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: 'Session not found'
+      })
+    }
+
+    if (!session.transcript_path) {
+      return res.status(400).json({
+        success: false,
+        error: 'No transcript available'
+      })
+    }
+
+    // Update summary_requested_at
+    queries.updateSession(session.id, {
+      summary_requested_at: Math.floor(Date.now() / 1000)
+    })
+
+    // Queue for summarization with high priority
+    summarizationQueue.enqueue({
+      sessionId: session.id,
+      transcriptPath: session.transcript_path,
+      projectId: session.project_id,
+      priority: 'high'
+    })
+
+    res.json({
+      success: true,
+      message: 'Queued for summarization'
+    })
+  } catch (error: any) {
+    logger.error('Sessions', 'Sync failed', { error: error.message })
+    res.status(500).json({
+      success: false,
+      error: error.message
+    })
+  }
+})
+
+// POST /api/sessions/:id/activity
+sessionsRouter.post('/:id/activity', async (req, res) => {
+  try {
+    const sessionId = req.params.id as string
+    activityTracker.updateActivity(sessionId)
+    res.json({ success: true })
+  } catch (error: any) {
+    logger.error('Sessions', 'Activity update failed', { error: error.message })
+    res.status(500).json({
+      success: false,
+      error: error.message
+    })
   }
 })
 

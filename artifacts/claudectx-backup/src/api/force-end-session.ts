@@ -36,13 +36,16 @@ forceEndSessionRouter.post('/:sessionId', async (req, res) => {
       const project = queries.getProject(session.project_id)
       if (project && project.root_path) {
         // Convert root path to Claude projects directory format
-        const projectDirName = project.root_path.replace(/\//g, '-')
+        // Replace / with - and spaces with -
+        const projectDirName = project.root_path.replace(/\//g, '-').replace(/ /g, '-')
         const claudeProjectsDir = path.join(homedir(), '.claude', 'projects', projectDirName)
         const possiblePath = path.join(claudeProjectsDir, `${sessionId}.jsonl`)
 
         if (fs.existsSync(possiblePath)) {
           transcriptPath = possiblePath
           console.log(`[ForceEndSession] Found transcript at: ${possiblePath}`)
+        } else {
+          console.log(`[ForceEndSession] Transcript not found at: ${possiblePath}`)
         }
       }
     }

@@ -1,6 +1,6 @@
 Run these commands:                                                                                                                                                
                                                                                                                                                                      
-  npm uninstall -g memctx && npm install -g memctx@1.0.8 && memctx restart                                                                                           
+  npm uninstall -g memctx && npm install -g memctx@1.0.10 && memctx restart                                                                                           
                                                                                                                                                                      
   This will:                                                                                                                                                         
   1. Uninstall the old version                                                                                                                                       

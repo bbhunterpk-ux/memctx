@@ -76,7 +76,13 @@ export const queries = {
       'summary_next', 'summary_remember', 'summary_blockers',
       'summary_productivity', 'summary_complexity', 'total_turns',
       'total_tool_calls', 'files_touched', 'is_bookmarked', 'is_archived', 'notes',
-      'last_activity', 'auto_ended', 'summary_requested_at'
+      'last_activity', 'auto_ended', 'summary_requested_at',
+      // New summary fields
+      'summary_status', 'summary_what_we_did', 'summary_decisions',
+      'summary_files_changed', 'summary_next_steps', 'summary_gotchas',
+      'summary_tech_notes', 'summary_mood', 'summary_resolved',
+      'summary_key_insight', 'duration_seconds', 'transcript_path',
+      'embedding_summary', 'tools_used', 'estimated_tokens'
     ]
 
     const validKeys = keys.filter(k => allowedColumns.includes(k))

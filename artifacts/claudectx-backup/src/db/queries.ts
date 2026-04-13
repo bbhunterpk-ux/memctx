@@ -75,7 +75,8 @@ export const queries = {
       'status', 'ended_at', 'summary_title', 'summary_completed',
       'summary_next', 'summary_remember', 'summary_blockers',
       'summary_productivity', 'summary_complexity', 'total_turns',
-      'total_tool_calls', 'files_touched', 'is_bookmarked', 'is_archived', 'notes'
+      'total_tool_calls', 'files_touched', 'is_bookmarked', 'is_archived', 'notes',
+      'last_activity', 'auto_ended', 'summary_requested_at'
     ]
 
     const validKeys = keys.filter(k => allowedColumns.includes(k))
@@ -493,5 +494,22 @@ export const queries = {
 
   updateSessionNotes(sessionId: string, notes: string) {
     run('UPDATE sessions SET notes = ? WHERE id = ?', notes, sessionId)
+  },
+
+  getStaleSessions(staleThreshold: number) {
+    return all(`
+      SELECT * FROM sessions
+      WHERE (status = 'active' OR status IS NULL)
+      AND last_activity < ?
+      AND transcript_path IS NOT NULL
+    `, staleThreshold)
+  },
+
+  updateSessionActivity(sessionId: string, timestamp: number) {
+    run(`
+      UPDATE sessions
+      SET last_activity = ?
+      WHERE id = ?
+    `, timestamp, sessionId)
   }
 }

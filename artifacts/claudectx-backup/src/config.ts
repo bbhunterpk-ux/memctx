@@ -34,4 +34,10 @@ export const CONFIG = {
   summaryModel: userSettings.model || process.env.ANTHROPIC_DEFAULT_HAIKU_MODEL || 'AWS',
   summaryMaxTokens: 2500,
   disableSummaries: userSettings.disableSummaries || process.env.MEMCTX_DISABLE_SUMMARIES === '1',
+
+  // Incremental checkpointing
+  enableIncrementalCheckpoints: process.env.ENABLE_INCREMENTAL === 'true',
+  checkpointTurnThreshold: parseInt(process.env.CHECKPOINT_TURNS || '10'),
+  checkpointTimeThreshold: parseInt(process.env.CHECKPOINT_TIME || '300'),
+  checkpointIncludeGraph: process.env.CHECKPOINT_GRAPH !== 'false',
 }

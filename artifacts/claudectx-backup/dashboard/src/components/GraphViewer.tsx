@@ -29,31 +29,64 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({ nodes: 0, edges: 0 });
+  const [graphData, setGraphData] = useState<{ nodes: GraphNode[]; edges: GraphEdge[] } | null>(null);
 
+  // Fetch graph data
   useEffect(() => {
-    loadGraph();
+    async function fetchGraph() {
+      try {
+        console.log('[GraphViewer] Fetching graph data for project:', projectId);
+        const response = await fetch(`/api/graph/${projectId}`);
+        console.log('[GraphViewer] API response status:', response.status);
+        const result = await response.json();
+        console.log('[GraphViewer] API result:', result);
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to load graph');
+        }
+
+        const { nodes, edges } = result.data;
+        console.log('[GraphViewer] Graph data fetched:', { nodes: nodes.length, edges: edges.length });
+        setStats({ nodes: nodes.length, edges: edges.length });
+        setGraphData({ nodes, edges });
+        setLoading(false);
+      } catch (err) {
+        console.error('[GraphViewer] Error fetching graph:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
+        setLoading(false);
+      }
+    }
+    fetchGraph();
   }, [projectId]);
 
-  async function loadGraph() {
+  // Render graph when data is ready and container is rendered
+  useEffect(() => {
+    if (!graphData) {
+      console.log('[GraphViewer] Waiting for data');
+      return;
+    }
+
+    if (loading) {
+      console.log('[GraphViewer] Still in loading state');
+      return;
+    }
+
+    if (!containerRef.current) {
+      console.log('[GraphViewer] Container not ready yet after loading is false');
+      return;
+    }
+
+    console.log('[GraphViewer] Container and data ready, rendering graph');
+    renderGraph(graphData.nodes, graphData.edges);
+  }, [graphData, loading]);
+
+  function renderGraph(nodes: GraphNode[], edges: GraphEdge[]) {
     try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`/api/graph/${projectId}`);
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to load graph');
-      }
-
-      const { nodes, edges } = result.data;
-      setStats({ nodes: nodes.length, edges: edges.length });
-
-      // If no container yet, just set loading to false and return
       if (!containerRef.current) {
-        setLoading(false);
+        console.log('[GraphViewer] No container in renderGraph');
         return;
       }
+      console.log('[GraphViewer] Starting graph render');
 
       // Color mapping by node type
       const typeColors: Record<string, string> = {
@@ -101,7 +134,9 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
         },
         edges: {
           smooth: {
+            enabled: true,
             type: 'continuous',
+            roundness: 0.5,
           },
         },
         physics: {
@@ -121,11 +156,13 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
       };
 
       // Create network
+      console.log('[GraphViewer] Creating vis-network with nodes:', visNodes.length, 'edges:', visEdges.length);
       networkRef.current = new Network(
         containerRef.current,
         { nodes: visNodes, edges: visEdges },
         options
       );
+      console.log('[GraphViewer] Network created successfully');
 
       // Add click handler
       networkRef.current.on('click', (params) => {
@@ -136,11 +173,28 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
         }
       });
 
+      console.log('[GraphViewer] Graph rendering complete');
       setLoading(false);
     } catch (err) {
-      console.error('Error loading graph:', err);
+      console.error('[GraphViewer] Error rendering graph:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setLoading(false);
+    }
+  }
+
+  async function loadGraph() {
+    // Refetch graph data
+    try {
+      console.log('[GraphViewer] Reloading graph data');
+      const response = await fetch(`/api/graph/${projectId}`);
+      const result = await response.json();
+      if (result.success) {
+        const { nodes, edges } = result.data;
+        setStats({ nodes: nodes.length, edges: edges.length });
+        setGraphData({ nodes, edges });
+      }
+    } catch (err) {
+      console.error('[GraphViewer] Error reloading graph:', err);
     }
   }
 
@@ -213,7 +267,9 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
           </button>
         </div>
       </div>
-      <div ref={containerRef} className="flex-1 bg-gray-900" />
+      <div className="flex-1 relative min-h-0 bg-gray-900">
+        <div ref={containerRef} className="absolute inset-0" />
+      </div>
       <div className="p-4 border-t border-gray-700 text-xs text-gray-400">
         <div className="flex gap-4">
           <span className="flex items-center gap-2">

@@ -53,7 +53,7 @@ catalog:
   '@vitejs/plugin-react': ^4.3.4
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
-  drizzle-orm: ^0.45.1
+  drizzle-orm: ^0.45.2
   framer-motion: ^12.23.24
   lucide-react: ^1.7.0
   # Must be this exact version because expo requires it
@@ -63,7 +63,7 @@ catalog:
   tailwind-merge: ^3.3.1
   tailwindcss: ^4.1.14
   tsx: ^4.21.0
-  vite: ^6.0.7
+  vite: ^6.4.2
   zod: ^3.25.76
 
 autoInstallPeers: false

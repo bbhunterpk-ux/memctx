@@ -38,6 +38,8 @@ export const api = {
   consolidateMemory: (projectId: string) => apiFetch(`/api/consolidate/${projectId}`, { method: 'POST' }),
   resyncProject: (projectId: string, force?: boolean) => apiFetch(`/api/resync/${projectId}${force ? '?force=true' : ''}`, { method: 'POST' }),
   resyncSession: (sessionId: string) => apiFetch(`/api/resync/session/${sessionId}`, { method: 'POST' }),
+  syncSession: (sessionId: string) => apiFetch(`/api/sessions/${sessionId}/sync`, { method: 'POST' }),
+  updateSessionActivity: (sessionId: string) => apiFetch(`/api/sessions/${sessionId}/activity`, { method: 'POST' }),
   resyncAll: (force?: boolean) => apiFetch(`/api/resync/all${force ? '?force=true' : ''}`, { method: 'POST' }),
   forceEndSession: (sessionId: string) => apiFetch(`/api/force-end-session/${sessionId}`, { method: 'POST' }),
   deleteSession: (sessionId: string) => apiFetch(`/api/sessions/${sessionId}`, { method: 'DELETE' }),

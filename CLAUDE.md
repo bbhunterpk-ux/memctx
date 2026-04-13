@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Published memctx v1.0.6 with auto-summarization — COMPLETED
-**Completed:** Completed all 10 implementation tasks for stale session auto-summarization, Fixed dashboard build by updating vite config target to esnext, Bumped version to 1.0.6 and published to npm
-**Up next:** Uninstall and reinstall memctx globally to get v1.0.6
-**Remember:** User data in ~/.memctx/db.sqlite persists across npm installs - migrations run automatically
+**Last session:** Fixed logger file writing for dashboard logs — COMPLETED
+**Completed:** Published memctx v1.0.6 to npm with auto-summarization features, Discovered logs API reading from /tmp/memctx.log but logger only writing to console, Updated logger.ts to write to both console and /tmp/memctx.log file
+**Up next:** User needs to run: npm uninstall -g memctx && npm install -g memctx@1.0.7
+**Remember:** Logger was only writing to console, not to file - dashboard logs page was empty
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

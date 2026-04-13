@@ -69,7 +69,7 @@ async function main() {
 
   const dashboardDist = path.join(__dirname, '..', '..', 'dashboard', 'dist')
   app.use(express.static(dashboardDist))
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(dashboardDist, 'index.html'))
     }

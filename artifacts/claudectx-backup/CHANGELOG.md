@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.2] - 2026-04-14
+
+### Fixed
+- Health endpoint now reads version dynamically from package.json instead of hardcoded "1.0.0"
+
 ## [1.2.1] - 2026-04-14
 
 ### Fixed

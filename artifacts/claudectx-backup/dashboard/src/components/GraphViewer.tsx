@@ -49,7 +49,11 @@ export function GraphViewer({ projectId }: GraphViewerProps) {
       const { nodes, edges } = result.data;
       setStats({ nodes: nodes.length, edges: edges.length });
 
-      if (!containerRef.current) return;
+      // If no container yet, just set loading to false and return
+      if (!containerRef.current) {
+        setLoading(false);
+        return;
+      }
 
       // Color mapping by node type
       const typeColors: Record<string, string> = {

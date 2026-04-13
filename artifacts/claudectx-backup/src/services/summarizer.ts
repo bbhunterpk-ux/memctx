@@ -100,6 +100,29 @@ function getClient(): Anthropic {
   })
 }
 
+/**
+ * Build a synthetic transcript from observations when the real transcript is missing
+ */
+function buildTranscriptFromObservations(observations: any[]): string {
+  const lines: string[] = []
+
+  for (const obs of observations) {
+    if (obs.event_type === 'user_message') {
+      lines.push(`USER: ${obs.content}`)
+    } else if (obs.event_type === 'assistant_message') {
+      lines.push(`CLAUDE: ${obs.content}`)
+    } else if (obs.event_type === 'tool_call') {
+      const toolName = obs.tool_name || 'unknown'
+      const filePath = obs.file_path ? ` file: ${obs.file_path}` : ''
+      lines.push(`TOOL(${toolName}):${filePath}`)
+    } else if (obs.event_type === 'decision') {
+      lines.push(`DECISION: ${obs.content}`)
+    }
+  }
+
+  return lines.join('\n')
+}
+
 export async function summarizeSession(
   sessionId: string,
   transcriptPath: string,
@@ -113,10 +136,25 @@ export async function summarizeSession(
   try {
     const startTime = Date.now()
     const turns = await readTranscript(transcriptPath)
-    if (turns.length === 0) return
 
-    // Smart transcript compaction
-    const compactTranscript = compactTranscriptSmart(turns)
+    let compactTranscript: string
+
+    if (turns.length === 0) {
+      // Transcript missing or empty - try to reconstruct from observations
+      logger.warn('Summarizer', `Transcript empty for session ${sessionId}, attempting observation fallback`)
+      const observations = queries.getSessionObservations(sessionId)
+
+      if (observations.length === 0) {
+        logger.warn('Summarizer', `No observations found for session ${sessionId}, cannot summarize`)
+        return
+      }
+
+      compactTranscript = buildTranscriptFromObservations(observations)
+      logger.info('Summarizer', `Using ${observations.length} observations as fallback transcript for session ${sessionId}`)
+    } else {
+      // Smart transcript compaction
+      compactTranscript = compactTranscriptSmart(turns)
+    }
 
     const client = getClient()
 

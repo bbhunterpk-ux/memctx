@@ -507,7 +507,6 @@ export const queries = {
       SELECT * FROM sessions
       WHERE (status = 'active' OR status IS NULL)
       AND last_activity < ?
-      AND transcript_path IS NOT NULL
     `, staleThreshold)
   },
 
@@ -517,5 +516,31 @@ export const queries = {
       SET last_activity = ?
       WHERE id = ?
     `, timestamp, sessionId)
+  },
+
+  getUnsummarizedSessions(projectId?: string) {
+    if (projectId) {
+      return all(`
+        SELECT * FROM sessions
+        WHERE status = 'completed'
+        AND summary_title IS NULL
+        AND transcript_path IS NOT NULL
+        AND project_id = ?
+      `, projectId)
+    }
+    return all(`
+      SELECT * FROM sessions
+      WHERE status = 'completed'
+      AND summary_title IS NULL
+      AND transcript_path IS NOT NULL
+    `)
+  },
+
+  getSessionObservations(sessionId: string) {
+    return all(`
+      SELECT * FROM observations
+      WHERE session_id = ?
+      ORDER BY created_at ASC
+    `, sessionId)
   }
 }

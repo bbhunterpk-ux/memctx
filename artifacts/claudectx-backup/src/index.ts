@@ -27,6 +27,8 @@ import { startSessionTimeoutChecker } from './services/session-timeout'
 import { standardRateLimit } from './middleware/rate-limit'
 import { staleSessionWorker } from './services/stale-session-worker'
 import { logger } from './services/logger'
+import { queries } from './db/queries'
+import { summarizationQueue } from './services/summarization-queue'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -109,6 +111,29 @@ async function main() {
   // Start stale session worker
   staleSessionWorker.start()
   logger.info('Worker', 'Stale session worker started')
+
+  // Startup recovery: queue unsummarized sessions
+  try {
+    logger.info('Startup', 'Running recovery scan for unsummarized sessions')
+    const unsummarized = queries.getUnsummarizedSessions()
+
+    if (unsummarized.length > 0) {
+      logger.info('Startup', `Found ${unsummarized.length} unsummarized sessions, queuing for summarization`)
+
+      for (const session of unsummarized) {
+        summarizationQueue.enqueue({
+          sessionId: session.id,
+          transcriptPath: session.transcript_path,
+          projectId: session.project_id,
+          priority: 'low'
+        })
+      }
+    } else {
+      logger.info('Startup', 'No unsummarized sessions found')
+    }
+  } catch (err) {
+    logger.error('Startup', 'Recovery scan failed', { error: err })
+  }
 
   server.listen(CONFIG.port, () => {
     logger.info('Server', `ClaudeContext running at http://localhost:${CONFIG.port}`)

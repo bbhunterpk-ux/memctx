@@ -102,14 +102,14 @@ async function main() {
   // Catch-all for SPA routing - serve index.html for non-API routes
   app.use((req, res, next) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(indexPath, (err) => {
+      res.sendFile(indexPath, { dotfiles: 'allow' }, (err) => {
         if (err) {
           console.error('Error serving index.html:', err)
           console.error('Attempted path:', indexPath)
           console.error('Request path:', req.path)
           // Don't send error if headers already sent
           if (!res.headersSent) {
-            res.status(500).send('Failed to load application')
+            res.status(500).json({ error: String(err), message: err.message, stack: err.stack, path: indexPath })
           }
         }
       })

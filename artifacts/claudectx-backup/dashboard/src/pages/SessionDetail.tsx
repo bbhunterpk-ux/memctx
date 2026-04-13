@@ -11,6 +11,7 @@ import PDFDownloadButton from '../components/PDFDownloadButton'
 import ShareLinkButton from '../components/ShareLinkButton'
 import TagInput from '../components/TagInput'
 import NotesModal from '../components/NotesModal'
+import { GraphViewer } from '../components/GraphViewer'
 import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
@@ -260,6 +261,23 @@ export default function SessionDetail({ onOpenSession }: Props) {
             }}
           >
             Timeline ({session.observations?.length || 0} events)
+          </button>
+          <button
+            onClick={() => setActiveTab('graph')}
+            style={{
+              padding: '10px 16px',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'graph' ? '2px solid var(--accent)' : '2px solid transparent',
+              color: activeTab === 'graph' ? 'var(--accent)' : 'var(--text-muted)',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              marginBottom: -1
+            }}
+          >
+            Knowledge Graph
           </button>
         </div>
 
@@ -701,6 +719,13 @@ export default function SessionDetail({ onOpenSession }: Props) {
       {activeTab === 'timeline' && session.observations && session.observations.length > 0 && (
         <div>
           <ObservationList observations={session.observations} />
+        </div>
+      )}
+
+      {/* Graph Tab */}
+      {activeTab === 'graph' && (
+        <div style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+          <GraphViewer projectId={session.project_id} />
         </div>
       )}
 

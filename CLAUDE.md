@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Session Management Bug Analysis and Design — IN_PROGRESS
-**Completed:** Explored Claude-Context codebase structure to understand session management, Analyzed SessionCard.tsx Force End button visibility logic, Reviewed force-end-session.ts and summarization-queue.ts for auto-summarization flow
-**Up next:** Clarify exact conditions when Force End should remain visible after overnight sessions
-**Remember:** Force End button visibility depends on both session.status and summary_status fields
+**Last session:** Published memctx v1.0.6 with auto-summarization — COMPLETED
+**Completed:** Completed all 10 implementation tasks for stale session auto-summarization, Fixed dashboard build by updating vite config target to esnext, Bumped version to 1.0.6 and published to npm
+**Up next:** Uninstall and reinstall memctx globally to get v1.0.6
+**Remember:** User data in ~/.memctx/db.sqlite persists across npm installs - migrations run automatically
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

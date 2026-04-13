@@ -7,6 +7,8 @@ import { queries } from '../db/queries'
 import { summarizationQueue } from '../services/summarization-queue'
 import { logger } from '../services/logger'
 import { activityTracker } from '../services/activity-tracker'
+import { incrementalCheckpointQueue } from '../services/incremental-checkpoint-queue'
+import { CONFIG } from '../config'
 
 export const hookRouter: RouterType = Router()
 
@@ -132,6 +134,32 @@ hookRouter.post('/', async (req, res) => {
           last_activity: Math.floor(Date.now() / 1000)
         })
         console.log('[Hook] Updated last_activity for session:', session_id.slice(0, 8))
+
+        // Check if checkpoint needed (only if feature enabled)
+        if (CONFIG.enableIncrementalCheckpoints) {
+          const session = queries.getSession(session_id)
+          if (session) {
+            const now = Math.floor(Date.now() / 1000)
+            const turnsSinceCheckpoint = session.turn_count - (session.last_checkpoint_turn || 0)
+            const timeSinceCheckpoint = now - (session.last_checkpoint_time || session.started_at)
+
+            if (turnsSinceCheckpoint >= CONFIG.checkpointTurnThreshold ||
+                timeSinceCheckpoint >= CONFIG.checkpointTimeThreshold) {
+
+              logger.info('Hook', `Checkpoint threshold met for session ${session_id}`, {
+                turns: turnsSinceCheckpoint,
+                time: timeSinceCheckpoint
+              })
+
+              incrementalCheckpointQueue.enqueue({
+                sessionId: session_id,
+                projectId: project.id,
+                checkpointNumber: (session.checkpoint_count || 0) + 1,
+                turnRange: [session.last_checkpoint_turn || 0, session.turn_count]
+              })
+            }
+          }
+        }
 
         broadcast({ type: 'user_prompt', session_id, preview: data.prompt_preview })
         break

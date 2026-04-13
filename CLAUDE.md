@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Implement Graph Node Consolidation System — IN_PROGRESS
-**Completed:** Created graph-consolidator.ts service with Levenshtein similarity matching, Added migration 011 for graph_nodes.merged_into column, Integrated consolidation into summarizer workflow after graph extraction
-**Up next:** Verify consolidation completes successfully with test-consolidation-fixed session
-**Remember:** remapNodeEdges creates duplicate edges that violate UNIQUE(source_id, target_id, relationship) constraint
+**Last session:** MemCTX v1.1.0 Deployment and Phase 1 Verification — COMPLETED
+**Completed:** Published memctx v1.1.0 to npm with Phase 1 features, Verified unified extraction reduces LLM calls by 50%, Confirmed graph consolidation with Levenshtein matching works
+**Up next:** Monitor production usage for Phase 1 performance metrics
+**Remember:** npm publish requires --otp flag with actual OTP code, not just the flag
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

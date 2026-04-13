@@ -45,7 +45,7 @@ router.post('/:projectId/extract/:sessionId', async (req, res) => {
     let session: any;
     if (sessionId === 'latest') {
       session = db
-        .prepare('SELECT * FROM sessions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1')
+        .prepare('SELECT * FROM sessions WHERE project_id = ? ORDER BY started_at DESC LIMIT 1')
         .get(projectId);
     } else {
       session = db

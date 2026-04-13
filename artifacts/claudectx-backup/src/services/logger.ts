@@ -3,6 +3,20 @@
  * Provides consistent log formatting with levels and context
  */
 
+import fs from 'fs'
+import path from 'path'
+
+const LOG_FILE = '/tmp/memctx.log'
+
+// Ensure log file exists
+try {
+  if (!fs.existsSync(LOG_FILE)) {
+    fs.writeFileSync(LOG_FILE, '')
+  }
+} catch (err) {
+  console.error('Failed to create log file:', err)
+}
+
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -23,8 +37,17 @@ export class Logger {
     const timestamp = new Date().toISOString()
     const levelName = LogLevel[level]
     const metaStr = meta ? ` ${JSON.stringify(meta)}` : ''
+    const logLine = `[${timestamp}] [${levelName}] [${component}] ${message}${metaStr}`
 
-    console.log(`[${timestamp}] [${levelName}] [${component}] ${message}${metaStr}`)
+    // Write to console
+    console.log(logLine)
+
+    // Write to file
+    try {
+      fs.appendFileSync(LOG_FILE, logLine + '\n')
+    } catch (err) {
+      console.error('Failed to write to log file:', err)
+    }
   }
 
   debug(component: string, message: string, meta?: any): void {

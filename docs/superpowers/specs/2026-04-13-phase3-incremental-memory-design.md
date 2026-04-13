@@ -866,3 +866,686 @@ interface ContextDepth {
 - Call stack depth indicator
 - Pattern usage badges
 
+
+### Enhanced UI Components
+
+#### 1. Session Timeline View (New Component)
+
+**Location:** `dashboard/src/components/SessionTimeline.tsx`
+
+**Features:**
+- Horizontal timeline showing checkpoints as milestones
+- Color-coded segments by mood/momentum
+- Hover to see checkpoint summary
+- Click to expand full checkpoint details
+- Visual indicators for breakthroughs, blockers, decisions
+
+**Data Source:** `session_checkpoints` table + `sessions` table
+
+#### 2. Memory Heatmap (New Component)
+
+**Location:** `dashboard/src/components/MemoryHeatmap.tsx`
+
+**Features:**
+- Calendar-style heatmap showing session activity
+- Color intensity = productivity/focus score
+- Hover shows daily summary
+- Click to filter sessions by date
+- Weekly/monthly aggregation views
+
+**Data Source:** Aggregated from `sessions` table
+
+#### 3. Knowledge Graph Explorer (Enhanced)
+
+**Location:** `dashboard/src/components/GraphExplorer.tsx`
+
+**New Features:**
+- Real-time node addition animation (on checkpoint_complete)
+- Node size = importance/connection count
+- Node color = type (file=blue, concept=green, problem=red)
+- Edge thickness = relationship strength
+- Filter by confidence level (EXTRACTED/INFERRED/AMBIGUOUS)
+- Search nodes by label
+- Expand/collapse node clusters
+
+**Data Source:** `graph_nodes` + `graph_edges` tables
+
+#### 4. Focus Score Dashboard (New Component)
+
+**Location:** `dashboard/src/components/FocusScoreDashboard.tsx`
+
+**Features:**
+- Gauge showing current session focus score (0-100)
+- Trend line over time
+- Context switch counter
+- Deep work period tracker
+- Distraction alerts
+
+**Data Source:** Calculated from checkpoint data
+
+#### 5. Learning Progress Tracker (New Component)
+
+**Location:** `dashboard/src/components/LearningTracker.tsx`
+
+**Features:**
+- Concept mastery graph (concepts × confidence)
+- Confusion point tracker (resolved vs unresolved)
+- Aha moment timeline
+- Question frequency analysis
+- Recommended learning resources
+
+**Data Source:** `knowledge` table + checkpoint learning data
+
+#### 6. Tech Debt Monitor (New Component)
+
+**Location:** `dashboard/src/components/TechDebtMonitor.tsx`
+
+**Features:**
+- Debt added vs resolved chart
+- Debt by category (TODO, hack, workaround)
+- Aging debt alerts (> 7 days old)
+- Debt resolution suggestions
+- Link to files with debt
+
+**Data Source:** Extracted from checkpoint code quality signals
+
+#### 7. Emotional Journey View (New Component)
+
+**Location:** `dashboard/src/components/EmotionalJourney.tsx`
+
+**Features:**
+- Line graph showing frustration/confidence over time
+- Energy level indicator
+- Breakthrough moment markers
+- Blocker impact visualization
+- Break suggestions when frustration high
+
+**Data Source:** Checkpoint emotional context data
+
+#### 8. Productivity Analytics (New Component)
+
+**Location:** `dashboard/src/components/ProductivityAnalytics.tsx`
+
+**Features:**
+- Lines changed per hour
+- Files touched heatmap
+- Commit velocity graph
+- Tool efficiency matrix
+- Time-to-first-commit tracker
+- Productivity score (0-100)
+
+**Data Source:** Checkpoint productivity metrics
+
+
+### Updated LLM Extraction Schema
+
+To support rich memory features, extend the existing `SessionSummary` interface:
+
+```typescript
+interface SessionSummary {
+  // ... existing fields (title, status, what_we_did, etc.) ...
+  
+  // NEW: Session momentum
+  momentum?: {
+    velocity: 'fast' | 'steady' | 'slow' | 'blocked'
+    focus_score: number  // 0-1
+    context_switches: number
+    deep_work_periods: Array<{start: number, end: number, topic: string}>
+  }
+  
+  // NEW: Code quality signals
+  code_quality?: {
+    refactoring_count: number
+    test_coverage_mentions: string[]
+    bug_fixes: Array<{file: string, description: string}>
+    tech_debt_added: string[]
+    tech_debt_resolved: string[]
+  }
+  
+  // NEW: Learning curve
+  learning?: {
+    new_concepts_learned: Array<{concept: string, confidence: number}>
+    questions_asked: string[]
+    confusion_points: Array<{topic: string, resolved: boolean}>
+    aha_moments: string[]
+  }
+  
+  // NEW: Collaboration signals
+  collaboration?: {
+    pair_programming: boolean
+    code_review_feedback: string[]
+    external_references: Array<{type: string, url: string}>
+    team_mentions: Array<{person: string, context: string}>
+  }
+  
+  // NEW: Emotional context
+  emotional?: {
+    frustration_level: number  // 0-1
+    confidence_level: number  // 0-1
+    energy_level: 'high' | 'medium' | 'low'
+    breakthrough_moments: Array<{timestamp: number, description: string}>
+    blockers_emotional_impact: Array<{blocker: string, impact: string}>
+  }
+  
+  // NEW: Productivity metrics
+  productivity?: {
+    lines_changed: number
+    files_touched: number
+    commits_made: number
+    time_to_first_commit: number
+    avg_time_between_commits: number
+    tool_efficiency: {[tool: string]: {count: number, success_rate: number}}
+  }
+  
+  // NEW: Context depth
+  context_depth?: {
+    max_call_stack_depth: number
+    abstraction_layers: string[]
+    cross_cutting_concerns: string[]
+    architectural_patterns: string[]
+  }
+}
+```
+
+**LLM Prompt Update:**
+
+Add to system prompt in `summarizer.ts` and `incremental-summarizer.ts`:
+
+```
+Extract rich memory features:
+
+MOMENTUM:
+- velocity: fast (rapid progress), steady (consistent), slow (careful), blocked (stuck)
+- focus_score: 0-1 (1=single topic, 0=scattered across many)
+- context_switches: count of topic/file changes
+- deep_work_periods: uninterrupted work on single topic
+
+CODE QUALITY:
+- refactoring_count: number of refactors performed
+- test_coverage_mentions: tests written/discussed
+- bug_fixes: bugs fixed with file and description
+- tech_debt_added: TODOs, hacks, workarounds added
+- tech_debt_resolved: debt paid down
+
+LEARNING:
+- new_concepts_learned: concepts with confidence (0-1)
+- questions_asked: user questions to Claude
+- confusion_points: topics causing friction (resolved true/false)
+- aha_moments: breakthroughs/insights
+
+COLLABORATION:
+- pair_programming: detected from conversation style
+- code_review_feedback: review comments discussed
+- external_references: docs/stackoverflow/github links
+- team_mentions: people mentioned with context
+
+EMOTIONAL:
+- frustration_level: 0-1 (0=calm, 1=very frustrated)
+- confidence_level: 0-1 (0=uncertain, 1=confident)
+- energy_level: high/medium/low
+- breakthrough_moments: timestamp + description
+- blockers_emotional_impact: blocker + impact level
+
+PRODUCTIVITY:
+- lines_changed: approximate from edits
+- files_touched: count of files modified
+- commits_made: git commits during session
+- time_to_first_commit: seconds from start
+- avg_time_between_commits: average interval
+- tool_efficiency: per-tool usage + success rate
+
+CONTEXT DEPTH:
+- max_call_stack_depth: deepest nesting level discussed
+- abstraction_layers: UI/API/Service/DB layers touched
+- cross_cutting_concerns: auth/logging/errors discussed
+- architectural_patterns: MVC/Repository/Factory/etc used
+```
+
+
+### API Endpoints for Rich Memory
+
+**Location:** `src/api/memory.ts` (extend existing endpoints)
+
+#### GET /api/memory/momentum/:sessionId
+
+Returns session momentum data for timeline visualization.
+
+```typescript
+{
+  "session_id": "abc123",
+  "checkpoints": [
+    {
+      "checkpoint_number": 1,
+      "velocity": "fast",
+      "focus_score": 0.85,
+      "context_switches": 2,
+      "deep_work_periods": [
+        {"start": 1681234567, "end": 1681235567, "topic": "authentication"}
+      ]
+    }
+  ]
+}
+```
+
+#### GET /api/memory/learning/:projectId
+
+Returns learning progress across all sessions in a project.
+
+```typescript
+{
+  "project_id": "proj123",
+  "concepts": [
+    {"concept": "React hooks", "confidence": 0.9, "first_seen": 1681234567, "last_seen": 1681334567}
+  ],
+  "confusion_points": [
+    {"topic": "TypeScript generics", "resolved": true, "session_id": "abc123"}
+  ],
+  "aha_moments": [
+    {"description": "Understood closure scope", "timestamp": 1681234567, "session_id": "abc123"}
+  ]
+}
+```
+
+#### GET /api/memory/tech-debt/:projectId
+
+Returns tech debt tracking data.
+
+```typescript
+{
+  "project_id": "proj123",
+  "debt_added": [
+    {"item": "TODO: refactor auth", "session_id": "abc123", "age_days": 3}
+  ],
+  "debt_resolved": [
+    {"item": "Fixed N+1 query", "session_id": "def456", "resolved_at": 1681234567}
+  ],
+  "debt_score": 42  // 0-100, lower is better
+}
+```
+
+#### GET /api/memory/productivity/:sessionId
+
+Returns productivity metrics for a session.
+
+```typescript
+{
+  "session_id": "abc123",
+  "lines_changed": 342,
+  "files_touched": 8,
+  "commits_made": 3,
+  "time_to_first_commit": 420,
+  "avg_time_between_commits": 600,
+  "tool_efficiency": {
+    "Edit": {"count": 15, "success_rate": 0.93},
+    "Read": {"count": 42, "success_rate": 1.0}
+  },
+  "productivity_score": 78
+}
+```
+
+#### GET /api/memory/emotional/:sessionId
+
+Returns emotional journey data.
+
+```typescript
+{
+  "session_id": "abc123",
+  "timeline": [
+    {"checkpoint": 1, "frustration": 0.2, "confidence": 0.8, "energy": "high"},
+    {"checkpoint": 2, "frustration": 0.6, "confidence": 0.5, "energy": "medium"}
+  ],
+  "breakthrough_moments": [
+    {"timestamp": 1681234567, "description": "Figured out async/await pattern"}
+  ],
+  "blockers": [
+    {"blocker": "CORS errors", "impact": "high"}
+  ]
+}
+```
+
+#### GET /api/memory/heatmap/:projectId
+
+Returns activity heatmap data for calendar view.
+
+```typescript
+{
+  "project_id": "proj123",
+  "dates": {
+    "2026-04-01": {"sessions": 2, "productivity_score": 65, "focus_score": 0.7},
+    "2026-04-02": {"sessions": 1, "productivity_score": 82, "focus_score": 0.9}
+  }
+}
+```
+
+
+## Testing Strategy
+
+### Unit Tests
+
+**Location:** `src/services/__tests__/incremental-summarizer.test.ts`
+
+Test cases:
+- Checkpoint creation with valid turn range
+- Partial transcript building from observations
+- Graph extraction and normalization
+- Error handling on LLM API failure
+- Retry logic with exponential backoff
+
+**Location:** `src/services/__tests__/incremental-checkpoint-queue.test.ts`
+
+Test cases:
+- Queue enqueue/dequeue operations
+- Concurrency limiting (max 1 concurrent)
+- Priority ordering (end-of-session > checkpoint)
+- Job retry on failure
+
+### Integration Tests
+
+**Location:** `src/__tests__/integration/incremental-checkpoints.test.ts`
+
+Test scenarios:
+1. **Happy path:** 30-turn session creates 3 checkpoints + final summary
+2. **Time-based trigger:** Idle session triggers checkpoint after 5 minutes
+3. **Hybrid trigger:** Whichever comes first (turns or time)
+4. **Checkpoint failure recovery:** Failed checkpoint retries successfully
+5. **Session end before checkpoint:** No checkpoints created, final summary runs
+6. **Real-time UI updates:** WebSocket broadcasts checkpoint_complete events
+
+### End-to-End Tests
+
+**Location:** `e2e/incremental-memory.spec.ts`
+
+Test flows:
+1. Start session → send 10 prompts → verify checkpoint created → check UI update
+2. Start session → wait 5 minutes → verify time-based checkpoint
+3. Crash worker mid-checkpoint → restart → verify recovery scan
+4. View session timeline → verify checkpoints displayed correctly
+5. View knowledge graph → verify real-time node additions
+
+### Performance Tests
+
+**Metrics to track:**
+- Checkpoint processing time (target: < 5 seconds)
+- Queue throughput (checkpoints/minute)
+- Database write latency
+- WebSocket broadcast latency
+- UI render time for graph updates
+
+**Load testing:**
+- 10 concurrent sessions with checkpoints
+- 100 checkpoints queued simultaneously
+- Large transcript (200+ turns) checkpoint processing
+
+
+## Implementation Phases
+
+### Phase 3A: Core Incremental Engine (Week 1)
+
+**Goal:** Basic checkpoint system working end-to-end
+
+**Tasks:**
+1. Database migration (012_incremental_checkpoints.sql)
+2. Add checkpoint tracking columns to sessions table
+3. Implement incremental-checkpoint-queue.ts
+4. Implement incremental-summarizer.ts (basic version)
+5. Update hook.ts with trigger logic
+6. Add queries for checkpoint CRUD operations
+7. Unit tests for core components
+
+**Success Criteria:**
+- Checkpoint created after 10 turns
+- Checkpoint stored in database
+- Graph nodes/edges inserted correctly
+- No regression in end-of-session summarization
+
+### Phase 3B: Rich Memory Features (Week 2)
+
+**Goal:** Extract and store enhanced memory dimensions
+
+**Tasks:**
+1. Extend SessionSummary interface with new fields
+2. Update LLM prompt to extract rich features
+3. Add database columns for new memory types
+4. Implement API endpoints for rich memory
+5. Unit tests for new extraction logic
+
+**Success Criteria:**
+- Momentum, learning, emotional data extracted
+- Code quality and productivity metrics calculated
+- API endpoints return correct data
+- No significant increase in LLM processing time
+
+### Phase 3C: Real-time UI Updates (Week 3)
+
+**Goal:** Live dashboard updates as checkpoints complete
+
+**Tasks:**
+1. Implement WebSocket broadcast for checkpoint_complete
+2. Update frontend to listen for checkpoint events
+3. Build SessionTimeline component
+4. Build MemoryHeatmap component
+5. Enhance GraphExplorer with real-time updates
+6. Add notification system for checkpoints
+
+**Success Criteria:**
+- Graph updates in real-time (no page refresh)
+- Timeline shows checkpoints as they complete
+- Notifications appear on checkpoint completion
+- No UI performance degradation
+
+### Phase 3D: Advanced UI Components (Week 4)
+
+**Goal:** Rich visualization of memory features
+
+**Tasks:**
+1. Build FocusScoreDashboard component
+2. Build LearningTracker component
+3. Build TechDebtMonitor component
+4. Build EmotionalJourney component
+5. Build ProductivityAnalytics component
+6. Integrate all components into project detail page
+
+**Success Criteria:**
+- All 8 new UI components functional
+- Data flows correctly from API to UI
+- Responsive design on mobile/tablet
+- Accessible (WCAG 2.1 AA)
+
+### Phase 3E: Polish & Optimization (Week 5)
+
+**Goal:** Production-ready with cost optimizations
+
+**Tasks:**
+1. Implement adaptive thresholds (10→15→20 turns)
+2. Add configuration toggles (graph extraction, turn threshold)
+3. Optimize LLM prompts for token efficiency
+4. Add recovery scan on startup
+5. Performance testing and optimization
+6. Documentation and user guide
+
+**Success Criteria:**
+- API costs < 2x Phase 1 baseline
+- Checkpoint processing < 5 seconds
+- Zero data loss on crashes
+- Feature flag system working
+- Comprehensive documentation
+
+
+## Success Metrics
+
+### Technical Metrics
+
+1. **Reliability**
+   - Checkpoint success rate: > 99%
+   - Recovery success rate: 100% (no data loss)
+   - Uptime: > 99.9%
+
+2. **Performance**
+   - Checkpoint processing time: < 5 seconds (p95)
+   - Queue latency: < 1 second
+   - UI update latency: < 500ms
+   - Database write latency: < 100ms
+
+3. **Cost Efficiency**
+   - API cost increase: < 2.5x vs Phase 1
+   - Token usage per checkpoint: < 10k tokens
+   - Storage growth: < 10MB per 100 sessions
+
+### User Experience Metrics
+
+1. **Engagement**
+   - Dashboard views per session: +50% vs Phase 1
+   - Time spent on memory views: +100%
+   - Feature adoption rate: > 60% within 30 days
+
+2. **Satisfaction**
+   - User feedback score: > 4.5/5
+   - Feature request rate: < 10% (indicates completeness)
+   - Bug report rate: < 5 per 1000 sessions
+
+3. **Utility**
+   - Memory recall accuracy: > 90% (user survey)
+   - Context recovery time: < 2 minutes (vs 10+ minutes manual)
+   - Session resumption success: > 95%
+
+## Risks & Mitigations
+
+### Risk 1: High API Costs
+
+**Impact:** High  
+**Probability:** Medium
+
+**Mitigation:**
+- Implement adaptive thresholds (increase after first checkpoint)
+- Add cost monitoring dashboard
+- Allow users to disable graph extraction in checkpoints
+- Provide cost estimates in UI before enabling feature
+
+### Risk 2: LLM Extraction Quality Degradation
+
+**Impact:** High  
+**Probability:** Low
+
+**Mitigation:**
+- A/B test prompts before deployment
+- Monitor extraction accuracy metrics
+- Implement fallback to simpler extraction on failure
+- Allow manual correction of extracted data
+
+### Risk 3: Database Growth
+
+**Impact:** Medium  
+**Probability:** Medium
+
+**Mitigation:**
+- Implement checkpoint pruning (keep last 10 per session)
+- Compress old checkpoint data
+- Add database size monitoring
+- Provide cleanup tools for old sessions
+
+### Risk 4: UI Performance with Large Graphs
+
+**Impact:** Medium  
+**Probability:** Medium
+
+**Mitigation:**
+- Implement graph virtualization (render visible nodes only)
+- Add pagination for large node lists
+- Lazy load checkpoint details
+- Optimize WebSocket message size
+
+### Risk 5: Race Conditions in Concurrent Checkpoints
+
+**Impact:** High  
+**Probability:** Low
+
+**Mitigation:**
+- Queue serialization (concurrency: 1)
+- Database UNIQUE constraints prevent duplicates
+- Idempotent checkpoint operations
+- Comprehensive integration tests
+
+
+## Future Enhancements (Post-Phase 3)
+
+### 1. Predictive Checkpointing
+
+Use ML to predict optimal checkpoint timing based on:
+- Session complexity patterns
+- User working style
+- Topic change detection
+- Natural break points in conversation
+
+### 2. Differential Checkpoints
+
+Instead of full summaries, store only deltas:
+- Reduces storage by ~70%
+- Faster processing
+- Requires reconstruction logic for queries
+
+### 3. Multi-Session Context Linking
+
+Link related sessions across time:
+- "Continued from session X"
+- "Related to sessions Y, Z"
+- Cross-session graph merging
+- Project-level memory consolidation
+
+### 4. Collaborative Memory
+
+Share memory across team members:
+- Team knowledge graph
+- Shared learning curves
+- Collective tech debt tracking
+- Team productivity analytics
+
+### 5. Memory Export/Import
+
+Export memory to portable formats:
+- JSON export for backup
+- Markdown reports for documentation
+- CSV for analytics tools
+- Import from other tools (Linear, Jira, etc.)
+
+### 6. AI-Powered Insights
+
+Proactive suggestions based on memory:
+- "You struggled with X last time, here's a tip"
+- "This pattern worked well in session Y"
+- "Tech debt in file Z is aging, consider addressing"
+- "Your focus score is low, take a break?"
+
+### 7. Voice Annotations
+
+Add voice notes to checkpoints:
+- Quick verbal summaries
+- Context that's hard to type
+- Emotional tone capture
+- Transcription + sentiment analysis
+
+## Conclusion
+
+Phase 3 transforms MemCTX from a passive end-of-session recorder to an active real-time memory engine. By processing memory incrementally and extracting rich contextual features, we provide:
+
+1. **Better crash resilience** - Memory saved every 10 turns/5 minutes
+2. **Real-time feedback** - Users see memory forming as they work
+3. **Richer insights** - 7 new memory dimensions beyond basic summaries
+4. **Enhanced UI** - 8 new visualization components
+5. **Better context** - AI can reference recent checkpoints during long sessions
+
+**Trade-offs:**
+- 2.1x higher API costs (mitigated with adaptive thresholds)
+- More complex state management
+- Increased database storage
+
+**Next Steps:**
+1. Review and approve this design specification
+2. Create detailed implementation plan (writing-plans skill)
+3. Begin Phase 3A implementation (core incremental engine)
+
+---
+
+**Document Status:** Ready for Review  
+**Estimated Implementation Time:** 5 weeks  
+**Estimated API Cost Impact:** 2.1x (optimizable to 1.5x)
+

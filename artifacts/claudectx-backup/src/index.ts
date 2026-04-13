@@ -29,6 +29,7 @@ import { staleSessionWorker } from './services/stale-session-worker'
 import { logger } from './services/logger'
 import { queries } from './db/queries'
 import { summarizationQueue } from './services/summarization-queue'
+import { incrementalCheckpointQueue } from './services/incremental-checkpoint-queue'
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
@@ -40,6 +41,27 @@ process.on('unhandledRejection', (err) => {
 
 async function main() {
   initDB()
+
+  // Recovery scan for incomplete checkpoints
+  if (CONFIG.enableIncrementalCheckpoints) {
+    logger.info('Startup', 'Running recovery scan for incomplete checkpoints')
+    const incomplete = queries.getIncompleteCheckpoints(CONFIG.checkpointTurnThreshold)
+
+    if (incomplete.length > 0) {
+      logger.info('Startup', `Found ${incomplete.length} sessions needing checkpoints, queuing`)
+
+      for (const session of incomplete) {
+        incrementalCheckpointQueue.enqueue({
+          sessionId: session.session_id,
+          projectId: session.project_id,
+          checkpointNumber: (session.checkpoint_count || 0) + 1,
+          turnRange: [session.last_checkpoint_turn || 0, session.turn_count]
+        })
+      }
+    } else {
+      logger.info('Startup', 'No incomplete checkpoints found')
+    }
+  }
 
   const app = express()
   app.use(express.json({ limit: '10mb' }))

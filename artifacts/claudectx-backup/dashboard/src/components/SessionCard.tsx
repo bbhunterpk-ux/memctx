@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, format } from 'date-fns'
-import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2, Star, Archive, ArchiveRestore } from 'lucide-react'
+import { Clock, FileText, Wrench, Lightbulb, AlertCircle, Smile, Frown, Meh, Zap, CheckCircle, Trash2, Star, Archive, ArchiveRestore, RefreshCw } from 'lucide-react'
 import StatusBadge from './StatusBadge'
 import ConfirmDialog from './ConfirmDialog'
 import Checkbox from './Checkbox'
@@ -37,6 +37,7 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
   const [deleting, setDeleting] = useState(false)
   const [bookmarking, setBookmarking] = useState(false)
   const [archiving, setArchiving] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showForceEndDialog, setShowForceEndDialog] = useState(false)
   const startDate = new Date(session.started_at * 1000)
@@ -54,8 +55,10 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
   const complexityColor = session.summary_complexity ? complexityColors[session.summary_complexity] : 'var(--text-muted)'
 
   const isActive = session.status === 'active' ||
-                   (!session.status && !session.ended_at) ||
+                   !session.status ||
                    (session.summary_status && session.summary_status.toLowerCase() === 'in_progress')
+
+  const hasSummary = !!session.summary_title
 
   const handleToggleBookmark = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -118,6 +121,30 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
       toast.error('Failed to update archive status: ' + error)
     } finally {
       setArchiving(false)
+    }
+  }
+
+  const handleSyncSummary = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setSyncing(true)
+    const toastId = toast.loading(hasSummary ? 'Resyncing summary...' : 'Syncing summary...')
+    try {
+      if (hasSummary) {
+        await api.resyncSession(session.id)
+      } else {
+        await api.syncSession(session.id)
+      }
+      toast.dismiss(toastId)
+      toast.success('Session queued for summarization')
+      if (onSessionUpdated) {
+        setTimeout(() => onSessionUpdated(), 2000)
+      }
+    } catch (error) {
+      toast.dismiss(toastId)
+      toast.error('Failed to sync: ' + error)
+    } finally {
+      setSyncing(false)
     }
   }
 
@@ -344,6 +371,40 @@ export default function SessionCard({ session, onSessionUpdated, selectionMode, 
                 {ending ? 'Ending...' : 'Force End'}
               </button>
             )}
+            <button
+              onClick={handleSyncSummary}
+              disabled={syncing || !session.transcript_path}
+              title={hasSummary ? 'Resync summary' : 'Sync summary'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '4px 8px',
+                background: syncing ? 'var(--surface)' : 'var(--blue)15',
+                color: syncing ? 'var(--text-muted)' : 'var(--blue)',
+                border: '1px solid',
+                borderColor: syncing ? 'var(--border)' : 'var(--blue)30',
+                borderRadius: 6,
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: syncing || !session.transcript_path ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+                opacity: !session.transcript_path ? 0.5 : 1,
+              }}
+              onMouseEnter={e => {
+                if (!syncing && session.transcript_path) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)25'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!syncing) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--blue)15'
+                }
+              }}
+            >
+              <RefreshCw size={12} />
+              {syncing ? 'Syncing...' : (hasSummary ? 'Resync' : 'Sync')}
+            </button>
             <button
               onClick={handleDelete}
               disabled={deleting}

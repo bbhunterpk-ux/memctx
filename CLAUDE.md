@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Debugging force-end session transcript path issue — BLOCKED
-**Completed:** Published memctx v1.3.6 with force-end fix to npm, Verified service running with new version, Triggered force-end for stuck session 5ca08af4
-**Up next:** Add more verbose logging to trace project lookup and path construction in force-end-session.js
-**Remember:** Console.log statements in deployed code may not appear in logs if execution path doesn't reach them
+**Last session:** Fixed Session Summary Not Starting Issue — COMPLETED
+**Completed:** Diagnosed transcript path mismatch in force-end-session.ts, Fixed path normalization to replace all non-alphanumeric chars with dashes, Published memctx v1.3.7 and deployed globally
+**Up next:** Monitor active sessions to ensure summarization works automatically
+**Remember:** Claude Code replaces ALL non-alphanumeric characters with dashes in project paths, not just slashes and spaces
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

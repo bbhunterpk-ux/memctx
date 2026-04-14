@@ -40,6 +40,7 @@ packages:
   - lib/*
   - lib/integrations/*
   - scripts
+  - MemCTX_Frontend
 
 catalog:
   '@replit/vite-plugin-cartographer': ^0.5.1

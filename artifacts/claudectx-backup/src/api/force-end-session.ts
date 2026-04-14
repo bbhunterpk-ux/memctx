@@ -16,9 +16,14 @@ forceEndSessionRouter.post('/:sessionId', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' })
     }
 
-    // Allow force end if session is active OR if summary is still in progress
+    // Allow force end if:
+    // 1. Session is active, OR
+    // 2. Session is completed but has no summary (summary_title is null), OR
+    // 3. Summary is still in progress
+    const hasSummary = session.summary_title !== null
     const summaryInProgress = session.summary_status && session.summary_status.toLowerCase() === 'in_progress'
-    if (session.status === 'completed' && !summaryInProgress) {
+
+    if (session.status === 'completed' && hasSummary && !summaryInProgress) {
       return res.status(400).json({ error: 'Session already completed with summary' })
     }
 

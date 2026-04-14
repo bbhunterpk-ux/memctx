@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import { FolderOpen, Search, Radio, Activity, Zap, Brain, BarChart3, FileText, Settings, Menu, X } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
+import Logo from './Logo'
 import { useState } from 'react'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -79,7 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Zap size={22} color="var(--accent)" />
+            <Logo size={22} />
             <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>MemCTX</span>
           </div>
           <div style={{

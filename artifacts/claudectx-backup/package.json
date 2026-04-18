@@ -1,6 +1,6 @@
 {
   "name": "memctx",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Autonomous session memory for Claude Code - automatically captures, analyzes, and summarizes your development sessions",
   "author": "Fahad Aziz Qureshi <info@memctx.dev> (https://memctx.dev)",
   "license": "MIT",

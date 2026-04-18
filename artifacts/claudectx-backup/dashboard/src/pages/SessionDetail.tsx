@@ -542,6 +542,62 @@ export default function SessionDetail({ onOpenSession }: Props) {
                 )
               })()}
             </div>
+
+            {/* Learning, Emotional, Code Quality Notes */}
+            {(session.learning_progression || session.emotional_context || session.code_quality_notes) && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(1, 1fr)',
+                gap: 12,
+                marginTop: 12
+              }}>
+                {session.learning_progression && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--blue)', fontWeight: 600 }}>
+                      <Brain size={16} />
+                      Learning Progression
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.learning_progression}</div>
+                  </div>
+                )}
+                {session.emotional_context && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--orange)', fontWeight: 600 }}>
+                      <MessageSquare size={16} />
+                      Emotional Context
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.emotional_context}</div>
+                  </div>
+                )}
+                {session.code_quality_notes && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--green)', fontWeight: 600 }}>
+                      <Terminal size={16} />
+                      Code Quality Notes
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.code_quality_notes}</div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right Side - 30% Stats Cards */}
@@ -717,62 +773,6 @@ export default function SessionDetail({ onOpenSession }: Props) {
             </div>
           )
         })()}
-
-        {/* Learning, Emotional, Code Quality Notes */}
-        {(session.learning_progression || session.emotional_context || session.code_quality_notes) && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: 16,
-            marginTop: 16
-          }}>
-            {session.learning_progression && (
-              <div style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '12px 14px',
-                fontSize: 14
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--blue)', fontWeight: 600 }}>
-                  <Brain size={16} />
-                  Learning Progression
-                </div>
-                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.learning_progression}</div>
-              </div>
-            )}
-            {session.emotional_context && (
-              <div style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '12px 14px',
-                fontSize: 14
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--orange)', fontWeight: 600 }}>
-                  <MessageSquare size={16} />
-                  Emotional Context
-                </div>
-                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.emotional_context}</div>
-              </div>
-            )}
-            {session.code_quality_notes && (
-              <div style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '12px 14px',
-                fontSize: 14
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--green)', fontWeight: 600 }}>
-                  <Terminal size={16} />
-                  Code Quality Notes
-                </div>
-                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.code_quality_notes}</div>
-              </div>
-            )}
-          </div>
-        )}
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 20 }}>
           <button

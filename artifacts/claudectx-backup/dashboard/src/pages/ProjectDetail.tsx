@@ -443,9 +443,23 @@ ${Array.isArray(session.summary_gotchas) ? session.summary_gotchas.map((item: st
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 12, marginBottom: 16 }}>
-          <FolderOpen size={12} />
-          {project.root_path}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, color: 'var(--text-muted)', fontSize: 12, marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <FolderOpen size={12} />
+            {project.root_path}
+          </div>
+          {project.created_at && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ opacity: 0.7 }}>Created:</span>
+              <span>{typeof project.created_at === 'number' ? new Date(project.created_at * 1000).toLocaleDateString() : new Date(project.created_at).toLocaleDateString()}</span>
+            </div>
+          )}
+          {project.updated_at && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ opacity: 0.7 }}>Updated:</span>
+              <span>{typeof project.updated_at === 'number' ? new Date(project.updated_at * 1000).toLocaleDateString() : new Date(project.updated_at).toLocaleDateString()}</span>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>

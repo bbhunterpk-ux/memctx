@@ -308,11 +308,38 @@ export default function SessionDetail({ onOpenSession }: Props) {
             <div style={{ marginBottom: 16 }}>
               <TagInput
                 sessionId={session.id}
-                projectId={session.project_id}
-                sessionTags={session.tags || []}
-                onUpdate={refetch}
+                initialTags={session.tags}
+                onTagsChange={refetch}
               />
             </div>
+
+            {/* Transcript Access */}
+            {session.transcript_path && (
+              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 13 }}>
+                <FileText size={14} /> 
+                <span>Transcript: </span>
+                <span style={{ fontFamily: 'monospace', color: 'var(--text)', background: 'var(--surface2)', padding: '2px 6px', borderRadius: 4 }}>
+                  {session.transcript_path}
+                </span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(session.transcript_path);
+                    toast.success('Transcript path copied!');
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--blue)',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    marginLeft: 4,
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Copy Path
+                </button>
+              </div>
+            )}
 
             {session.next_session_starting_point && (
               <div style={{
@@ -923,6 +950,85 @@ export default function SessionDetail({ onOpenSession }: Props) {
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Total Cost</span>
                       <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>
                         ${session.total_cost_usd.toFixed(4)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Checkpoint Stats */}
+            {(session.checkpoint_count > 0 || session.last_checkpoint_time) && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+                marginTop: 12
+              }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>
+                  Checkpoints
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {session.checkpoint_count > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Count</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {session.checkpoint_count}
+                      </span>
+                    </div>
+                  )}
+
+                  {session.last_checkpoint_turn > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Last Turn</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        #{session.last_checkpoint_turn}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {session.last_checkpoint_time && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Last Saved</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {new Date(session.last_checkpoint_time * 1000).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Session Timing */}
+            {(session.last_activity || session.summary_requested_at) && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+                marginTop: 12
+              }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>
+                  Timing
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {session.last_activity && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Last Activity</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {new Date(session.last_activity * 1000).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {session.summary_requested_at && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Summary Requested</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {new Date(session.summary_requested_at * 1000).toLocaleTimeString()}
                       </span>
                     </div>
                   )}

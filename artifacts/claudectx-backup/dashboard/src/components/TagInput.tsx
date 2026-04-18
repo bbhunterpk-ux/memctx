@@ -12,10 +12,12 @@ interface Tag {
 }
 
 interface Props {
-  sessionId: string
-  projectId: string
-  sessionTags: Tag[]
+  sessionId?: string
+  projectId?: string
+  sessionTags?: Tag[]
   onUpdate?: () => void
+  selectedTags?: Tag[]
+  onChange?: (tags: Tag[]) => void
 }
 
 const TAG_COLORS = [
@@ -29,13 +31,15 @@ const TAG_COLORS = [
   '#8b5cf6', // violet
 ]
 
-export default function TagInput({ sessionId, projectId, sessionTags, onUpdate }: Props) {
+export default function TagInput({ sessionId = '', projectId = '', sessionTags = [], onUpdate, selectedTags, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [selectedColor, setSelectedColor] = useState(TAG_COLORS[0])
   const inputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
+
+  const currentTags = selectedTags || sessionTags
 
   const { data: allTags = [] } = useQuery({
     queryKey: ['tags', projectId],
@@ -44,39 +48,68 @@ export default function TagInput({ sessionId, projectId, sessionTags, onUpdate }
   })
 
   const addTagMutation = useMutation({
-    mutationFn: ({ tagId }: { tagId: number }) => api.addSessionTag(sessionId, tagId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
-      if (onUpdate) onUpdate()
-      setSearchTerm('')
+    mutationFn: async ({ tagId }: { tagId: number }) => {
+      if (onChange && selectedTags) {
+        const tag = allTags.find((t: any) => t.id === tagId)
+        if (tag) onChange([...selectedTags, tag])
+        return null
+      }
+      return api.addSessionTag(sessionId, tagId)
     },
-    onError: (error) => toast.error('Failed to add tag: ' + error),
+    onSuccess: () => {
+      if (!onChange) {
+        queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
+        queryClient.invalidateQueries({ queryKey: ['sessions', projectId] })
+        onUpdate?.()
+      }
+    },
   })
 
   const removeTagMutation = useMutation({
-    mutationFn: ({ tagId }: { tagId: number }) => api.removeSessionTag(sessionId, tagId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
-      if (onUpdate) onUpdate()
+    mutationFn: async ({ tagId }: { tagId: number }) => {
+      if (onChange && selectedTags) {
+        onChange(selectedTags.filter(t => t.id !== tagId))
+        return null
+      }
+      return api.removeSessionTag(sessionId, tagId)
     },
-    onError: (error) => toast.error('Failed to remove tag: ' + error),
+    onSuccess: () => {
+      if (!onChange) {
+        queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
+        queryClient.invalidateQueries({ queryKey: ['sessions', projectId] })
+        onUpdate?.()
+      }
+    },
   })
 
   const createTagMutation = useMutation({
-    mutationFn: ({ name, color }: { name: string; color?: string }) =>
-      api.createTag(projectId, name, color),
-    onSuccess: (newTag) => {
+    mutationFn: async ({ name, color }: { name: string, color?: string }) => {
+      if (onChange && selectedTags) {
+        const mockTag = { id: Date.now(), name, color, project_id: projectId } // Or mock real API call to create without attaching
+        // Since Bulk Tag Modal creates them across many, it might be tricky. Let's just create it on the project and add it.
+        const tag = await api.createTag(projectId, name, color)
+        onChange([...selectedTags, tag])
+        return tag
+      }
+      const tag = await api.createTag(projectId, name, color)
+      await api.addSessionTag(sessionId, tag.id)
+      return tag
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags', projectId] })
-      addTagMutation.mutate({ tagId: newTag.id })
+      if (!onChange) {
+        queryClient.invalidateQueries({ queryKey: ['session', sessionId] })
+        queryClient.invalidateQueries({ queryKey: ['sessions', projectId] })
+        onUpdate?.()
+      }
       setSearchTerm('')
       setShowColorPicker(false)
     },
-    onError: (error) => toast.error('Failed to create tag: ' + error),
   })
 
-  const filteredTags = allTags.filter((tag: Tag) =>
+  const filteredTags = allTags.filter((tag: any) => 
     tag.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !sessionTags.some(st => st.id === tag.id)
+    !currentTags.some(st => st.id === tag.id)
   )
 
   const handleCreateTag = () => {
@@ -84,7 +117,7 @@ export default function TagInput({ sessionId, projectId, sessionTags, onUpdate }
     createTagMutation.mutate({ name: searchTerm.trim(), color: selectedColor })
   }
 
-  const exactMatch = allTags.find((tag: Tag) =>
+  const exactMatch = allTags.find((tag: any) =>
     tag.name.toLowerCase() === searchTerm.toLowerCase()
   )
 
@@ -97,7 +130,7 @@ export default function TagInput({ sessionId, projectId, sessionTags, onUpdate }
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-        {sessionTags.map(tag => (
+        {currentTags.map(tag => (
           <div
             key={tag.id}
             style={{

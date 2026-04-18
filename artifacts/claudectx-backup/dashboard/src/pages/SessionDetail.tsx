@@ -308,8 +308,9 @@ export default function SessionDetail({ onOpenSession }: Props) {
             <div style={{ marginBottom: 16 }}>
               <TagInput
                 sessionId={session.id}
-                initialTags={session.tags}
-                onTagsChange={refetch}
+                projectId={session.project_id}
+                sessionTags={session.tags || []}
+                onUpdate={refetch}
               />
             </div>
 

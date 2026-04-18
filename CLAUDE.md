@@ -2,9 +2,9 @@
 
 <!-- CLAUDECTX:START -->
 ## Recent session history (auto-updated by ClaudeContext)
-**Last session:** Debug Token Usage Tracking Issue — IN_PROGRESS
-**Completed:** Verified database schema has token_usage table with correct columns, Confirmed insertTokenUsage and updateSessionTokens functions exist and are called, Discovered token_usage records exist but all values are 0
-**Up next:** Reinstall v1.4.8 globally and restart daemon
-**Remember:** Token tracking only happens if BOTH input_tokens > 0 AND output_tokens > 0
+**Last session:** Database Schema UI Coverage Analysis — COMPLETED
+**Completed:** Analyzed database schema to identify all stored fields, Audited ProjectDetail and SessionDetail UI components, Compared API queries against UI display logic
+**Up next:** Add token usage display to ProjectDetail component
+**Remember:** Token usage data exists in DB but completely hidden from users
 _Updated automatically. View full history at http://localhost:9999_
 <!-- CLAUDECTX:END -->

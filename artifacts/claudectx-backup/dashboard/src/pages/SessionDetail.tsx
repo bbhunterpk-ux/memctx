@@ -12,7 +12,7 @@ import ShareLinkButton from '../components/ShareLinkButton'
 import TagInput from '../components/TagInput'
 import NotesModal from '../components/NotesModal'
 import { GraphViewer } from '../components/GraphViewer'
-import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Zap, AlertCircle, CheckCircle, RefreshCw, FileText, ArrowRight, Terminal, FileEdit, MessageSquare, Brain, Wrench } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from '../components/Toast'
 
@@ -197,9 +197,17 @@ export default function SessionDetail({ onOpenSession }: Props) {
     return <div style={{ padding: 32, color: 'var(--red)', fontSize: 13 }}>Session not found</div>
   }
 
-  const duration = session.ended_at
-    ? formatDistanceStrict(new Date(session.ended_at * 1000), new Date(session.started_at * 1000))
-    : null
+  const duration = session.duration_seconds 
+    ? `${Math.floor(session.duration_seconds / 60)}m ${session.duration_seconds % 60}s`
+    : session.ended_at
+      ? formatDistanceStrict(new Date(session.ended_at * 1000), new Date(session.started_at * 1000))
+      : null
+
+  const autoEndedBadge = session.auto_ended ? (
+    <span style={{ fontSize: 11, padding: '2px 6px', background: 'var(--orange)15', color: 'var(--orange)', borderRadius: 4, marginLeft: 8 }}>
+      Auto-Ended
+    </span>
+  ) : null
 
   const hasSummary = !!session.summary_title
 
@@ -293,6 +301,7 @@ export default function SessionDetail({ onOpenSession }: Props) {
               {duration && <span>Duration: {duration}</span>}
               {session.total_turns > 0 && <span>{session.total_turns} turns</span>}
               {session.total_tool_calls > 0 && <span>{session.total_tool_calls} tool calls</span>}
+              {session.estimated_tokens > 0 && <span>~{session.estimated_tokens.toLocaleString()} tokens</span>}
             </div>
 
             {/* Tags */}
@@ -571,7 +580,7 @@ export default function SessionDetail({ onOpenSession }: Props) {
               </div>
             )}
 
-            {(session.aha_moments_count > 0 || session.flow_state_duration_mins > 0 || session.cognitive_load_estimate > 0) && (
+            {(session.aha_moments_count > 0 || session.flow_state_duration_mins > 0 || session.cognitive_load_estimate > 0 || session.metric_momentum != null || session.metric_frustration != null || session.metric_productivity != null) && (
               <div style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--border)',
@@ -585,6 +594,30 @@ export default function SessionDetail({ onOpenSession }: Props) {
                   Session Telemetry
                 </div>
                 
+                {session.metric_momentum != null && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Momentum</span>
+                    <div style={{ width: 60, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(100, session.metric_momentum)}%`, height: '100%', background: session.metric_momentum > 70 ? 'var(--green)' : 'var(--blue)' }} />
+                    </div>
+                  </div>
+                )}
+                {session.metric_productivity != null && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Productivity</span>
+                    <div style={{ width: 60, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(100, session.metric_productivity)}%`, height: '100%', background: session.metric_productivity > 70 ? 'var(--green)' : 'var(--blue)' }} />
+                    </div>
+                  </div>
+                )}
+                {session.metric_frustration != null && session.metric_frustration > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Frustration</span>
+                    <div style={{ width: 60, height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(100, session.metric_frustration)}%`, height: '100%', background: session.metric_frustration > 50 ? 'var(--red)' : 'var(--orange)' }} />
+                    </div>
+                  </div>
+                )}
                 {session.aha_moments_count > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Aha! Moments</span>
@@ -684,6 +717,62 @@ export default function SessionDetail({ onOpenSession }: Props) {
             </div>
           )
         })()}
+
+        {/* Learning, Emotional, Code Quality Notes */}
+        {(session.learning_progression || session.emotional_context || session.code_quality_notes) && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: 16,
+            marginTop: 16
+          }}>
+            {session.learning_progression && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '12px 14px',
+                fontSize: 14
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--blue)', fontWeight: 600 }}>
+                  <Brain size={16} />
+                  Learning Progression
+                </div>
+                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.learning_progression}</div>
+              </div>
+            )}
+            {session.emotional_context && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '12px 14px',
+                fontSize: 14
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--orange)', fontWeight: 600 }}>
+                  <MessageSquare size={16} />
+                  Emotional Context
+                </div>
+                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.emotional_context}</div>
+              </div>
+            )}
+            {session.code_quality_notes && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '12px 14px',
+                fontSize: 14
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--green)', fontWeight: 600 }}>
+                  <Terminal size={16} />
+                  Code Quality Notes
+                </div>
+                <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.code_quality_notes}</div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 20 }}>
           <button

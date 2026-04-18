@@ -7,6 +7,7 @@ interface Observation {
   tool_name?: string
   file_path?: string
   content?: string
+  metadata?: string
   created_at: number
 }
 
@@ -99,6 +100,32 @@ export default function ObservationList({ observations }: { observations: Observ
               {obs.file_path && (
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
                   {obs.file_path}
+                </div>
+              )}
+              {obs.metadata && (
+                <div style={{
+                  marginTop: 6,
+                  padding: '8px 10px',
+                  background: 'var(--surface2)',
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  color: 'var(--text-muted)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  maxHeight: '150px',
+                  overflowY: 'auto'
+                }}>
+                  {(() => {
+                    try {
+                      // Format JSON if it is JSON
+                      const parsed = JSON.parse(obs.metadata)
+                      return JSON.stringify(parsed, null, 2)
+                    } catch (e) {
+                      return obs.metadata
+                    }
+                  })()}
                 </div>
               )}
             </div>

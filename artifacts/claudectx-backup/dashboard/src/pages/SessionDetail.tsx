@@ -598,6 +598,125 @@ export default function SessionDetail({ onOpenSession }: Props) {
                 )}
               </div>
             )}
+
+            {/* Missing Summary Fields */}
+            {(session.testing_coverage_gap || session.architectural_drift || session.open_rabbit_holes || session.environmental_dependencies || session.unresolved_tech_debt) && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(1, 1fr)',
+                gap: 12,
+                marginTop: 12
+              }}>
+                {session.testing_coverage_gap && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--orange)', fontWeight: 600 }}>
+                      <AlertCircle size={16} />
+                      Testing Coverage Gap
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.testing_coverage_gap}</div>
+                  </div>
+                )}
+                {session.architectural_drift && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--red)', fontWeight: 600 }}>
+                      <AlertCircle size={16} />
+                      Architectural Drift
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{session.architectural_drift}</div>
+                  </div>
+                )}
+                {session.unresolved_tech_debt && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--yellow)', fontWeight: 600 }}>
+                      <AlertCircle size={16} />
+                      Unresolved Tech Debt
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      {(() => {
+                        const debt = typeof session.unresolved_tech_debt === 'string' 
+                          ? (session.unresolved_tech_debt.startsWith('[') ? JSON.parse(session.unresolved_tech_debt) : [session.unresolved_tech_debt])
+                          : session.unresolved_tech_debt;
+                        return Array.isArray(debt) ? (
+                          <ul style={{ margin: 0, paddingLeft: 20 }}>
+                            {debt.map((item: string, i: number) => <li key={i} style={{ marginBottom: 4 }}>{item}</li>)}
+                          </ul>
+                        ) : String(session.unresolved_tech_debt);
+                      })()}
+                    </div>
+                  </div>
+                )}
+                {session.open_rabbit_holes && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--blue)', fontWeight: 600 }}>
+                      <Zap size={16} />
+                      Open Rabbit Holes
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      {(() => {
+                        const holes = typeof session.open_rabbit_holes === 'string' 
+                          ? (session.open_rabbit_holes.startsWith('[') ? JSON.parse(session.open_rabbit_holes) : [session.open_rabbit_holes])
+                          : session.open_rabbit_holes;
+                        return Array.isArray(holes) ? (
+                          <ul style={{ margin: 0, paddingLeft: 20 }}>
+                            {holes.map((item: string, i: number) => <li key={i} style={{ marginBottom: 4 }}>{item}</li>)}
+                          </ul>
+                        ) : String(session.open_rabbit_holes);
+                      })()}
+                    </div>
+                  </div>
+                )}
+                {session.environmental_dependencies && (
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    fontSize: 14
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: 'var(--green)', fontWeight: 600 }}>
+                      <Terminal size={16} />
+                      Environmental Dependencies
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                      {(() => {
+                        const deps = typeof session.environmental_dependencies === 'string' 
+                          ? (session.environmental_dependencies.startsWith('[') ? JSON.parse(session.environmental_dependencies) : [session.environmental_dependencies])
+                          : session.environmental_dependencies;
+                        return Array.isArray(deps) ? (
+                          <ul style={{ margin: 0, paddingLeft: 20 }}>
+                            {deps.map((item: string, i: number) => <li key={i} style={{ marginBottom: 4 }}>{item}</li>)}
+                          </ul>
+                        ) : String(session.environmental_dependencies);
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right Side - 30% Stats Cards */}
@@ -719,7 +838,12 @@ export default function SessionDetail({ onOpenSession }: Props) {
 
             {/* Resolved Card */}
             {(() => {
-              const resolved = session.summary_resolved ? JSON.parse(session.summary_resolved) : []
+              const resolved = session.summary_resolved
+                ? (Array.isArray(session.summary_resolved)
+                    ? session.summary_resolved
+                    : JSON.parse(session.summary_resolved))
+                : []
+
               if (resolved.length === 0) return null
 
               return (
@@ -745,6 +869,66 @@ export default function SessionDetail({ onOpenSession }: Props) {
                 </div>
               )
             })()}
+
+            {/* Token Usage Stats */}
+            {(session.total_input_tokens > 0 || session.total_output_tokens > 0 || session.total_cost_usd > 0) && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '14px 16px',
+              }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 12 }}>
+                  Token Usage & Cost
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {session.total_input_tokens > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Input</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {session.total_input_tokens.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {session.total_output_tokens > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Output</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        {session.total_output_tokens.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {(session.total_cache_creation_tokens > 0 || session.total_cache_read_tokens > 0) && (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Cache Created</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--blue)' }}>
+                          {session.total_cache_creation_tokens.toLocaleString()}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Cache Read</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--green)' }}>
+                          {session.total_cache_read_tokens.toLocaleString()}
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {session.total_cost_usd > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Total Cost</span>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>
+                        ${session.total_cost_usd.toFixed(4)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

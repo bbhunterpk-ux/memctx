@@ -132,6 +132,88 @@ export default function ObservationList({ observations }: { observations: Observ
           </div>
         )
       })}
+
+      {sortedObservations.map((obs, i) => (
+        <div key={obs.id} style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              background: 'var(--surface2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              zIndex: 1,
+            }}>
+              <Terminal size={16} color="var(--text-muted)" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                overflow: 'hidden',
+                marginTop: 6
+              }}>
+                <div style={{ padding: '16px' }}>
+                  <div style={{
+                    margin: 0,
+                    color: 'var(--text)',
+                    fontSize: 14,
+                    lineHeight: 1.5,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word'
+                  }}>{obs.content}</div>
+                </div>
+                
+                {/* Token & Metadata Summary */}
+                {(() => {
+                  if (!obs.metadata) return null;
+                  let meta: any = {};
+                  try {
+                    meta = typeof obs.metadata === 'string' ? JSON.parse(obs.metadata) : obs.metadata;
+                  } catch (e) {
+                    return null;
+                  }
+
+                  if (Object.keys(meta).length === 0) return null;
+
+                  return (
+                    <div style={{
+                      padding: '10px 16px',
+                      borderTop: '1px solid var(--border)',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      fontSize: 12,
+                      color: 'var(--text-muted)',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '12px',
+                    }}>
+                      {meta.input_tokens > 0 && (
+                        <span><span style={{opacity: 0.7}}>In:</span> <strong>{meta.input_tokens.toLocaleString()}</strong></span>
+                      )}
+                      {meta.output_tokens > 0 && (
+                        <span><span style={{opacity: 0.7}}>Out:</span> <strong>{meta.output_tokens.toLocaleString()}</strong></span>
+                      )}
+                      {meta.cache_creation_tokens > 0 && (
+                        <span style={{color: 'var(--blue)'}}><span style={{opacity: 0.7}}>Cache In:</span> <strong>{meta.cache_creation_tokens.toLocaleString()}</strong></span>
+                      )}
+                      {meta.cache_read_tokens > 0 && (
+                        <span style={{color: 'var(--green)'}}><span style={{opacity: 0.7}}>Cache Out:</span> <strong>{meta.cache_read_tokens.toLocaleString()}</strong></span>
+                      )}
+                      {meta.cost_usd > 0 && (
+                        <span style={{color: 'var(--accent)'}}><strong>${meta.cost_usd.toFixed(4)}</strong></span>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

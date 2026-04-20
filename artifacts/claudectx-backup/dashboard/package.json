@@ -33,7 +33,7 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^4.3.4",
     "tailwindcss": "catalog:",
-    "typescript": "~6.0.2",
+    "typescript": "~6.0.3",
     "vite": "catalog:"
   }
 }

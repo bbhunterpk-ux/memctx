@@ -20,7 +20,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-is": "^19.2.5",
-    "react-router-dom": "^7.14.0",
+    "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",
     "uuid": "^13.0.0",
     "vis-data": "^8.0.3",

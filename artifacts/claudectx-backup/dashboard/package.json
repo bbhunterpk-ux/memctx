@@ -22,7 +22,7 @@
     "react-is": "^19.2.5",
     "react-router-dom": "^7.14.0",
     "recharts": "^3.8.1",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "vis-data": "^8.0.3",
     "vis-network": "^10.0.2",
     "vis-util": "^6.0.0"

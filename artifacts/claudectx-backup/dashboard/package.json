@@ -19,7 +19,7 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-is": "^19.2.5",
+    "react-is": "^19.2.6",
     "react-router-dom": "^7.14.0",
     "recharts": "^3.8.1",
     "uuid": "^13.0.0",

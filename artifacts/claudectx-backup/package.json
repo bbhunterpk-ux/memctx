@@ -55,7 +55,7 @@
     "chokidar": "^5.0.0",
     "express": "^5.2.1",
     "p-queue": "^9.1.2",
-    "ws": "^8.17.0"
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

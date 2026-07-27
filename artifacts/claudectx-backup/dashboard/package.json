@@ -21,7 +21,7 @@
     "react-dom": "catalog:",
     "react-is": "^19.2.5",
     "react-router-dom": "^7.14.0",
-    "recharts": "^3.8.1",
+    "recharts": "^3.10.1",
     "uuid": "^13.0.0",
     "vis-data": "^8.0.3",
     "vis-network": "^10.0.2",

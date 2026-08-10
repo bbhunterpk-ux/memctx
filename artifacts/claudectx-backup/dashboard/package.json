@@ -25,7 +25,7 @@
     "uuid": "^13.0.0",
     "vis-data": "^8.0.3",
     "vis-network": "^10.0.2",
-    "vis-util": "^6.0.0"
+    "vis-util": "^6.0.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
